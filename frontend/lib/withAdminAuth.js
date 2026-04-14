@@ -24,7 +24,7 @@ async function verifyAdminToken(token, domain) {
   if (decoded.role !== 'admin')
     throw Object.assign(new Error('Admin access required'), { reason: 'unauthorized' });
 
-  const [[tenant]] = await db.execute(
+  const [[tenant]] = await db.query(
     'SELECT id, name, domain, logo_url, theme_color, whatsapp_number, is_active FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1',
     [domain]
   );
@@ -37,7 +37,7 @@ async function verifyAdminToken(token, domain) {
       { reason: 'unauthorized', securityEvent: true }
     );
 
-  const [[dbUser]] = await db.execute(
+  const [[dbUser]] = await db.query(
     'SELECT id, name, email, role, is_active, token_version FROM users WHERE id = ? AND tenant_id = ? AND is_active = 1 LIMIT 1',
     [decoded.userId, tenant.id]
   );

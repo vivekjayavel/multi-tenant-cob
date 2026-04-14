@@ -71,10 +71,10 @@ export async function getServerSideProps({ req, params, res }) {
   const db     = require('../../../backend/config/db');
   const tenant = await getTenantFromRequest(req);
   if (!tenant) return { notFound: true };
-  const [[productRow]] = await db.execute('SELECT id, is_active FROM products WHERE tenant_id = ? AND slug = ? LIMIT 1', [tenant.id, params.slug]);
+  const [[productRow]] = await db.query('SELECT id, is_active FROM products WHERE tenant_id = ? AND slug = ? LIMIT 1', [tenant.id, params.slug]);
   if (!productRow) return { notFound: true };
   if (!productRow.is_active) { res.statusCode = 410; return { props: { tenant, product: null, deleted: true } }; }
-  const [[product]] = await db.execute('SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1', [tenant.id, params.slug]);
+  const [[product]] = await db.query('SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1', [tenant.id, params.slug]);
   if (!product) return { notFound: true };
   return { props: { tenant, product: JSON.parse(JSON.stringify({ ...product, available_qty: Math.max(0, product.stock_qty - product.reserved_qty) })) } };
 }

@@ -1,5 +1,7 @@
 // All requires are LAZY (inside functions) to prevent db.js from
 // loading at import time during Next.js build phase.
+// Uses db.query() instead of db.execute() to avoid MySQL 8 prepared
+// statement issues ("Incorrect arguments to mysqld_stmt_execute").
 
 async function getTenantFromRequest(req) {
   const db = require('../../backend/config/db');
@@ -10,12 +12,13 @@ async function getTenantFromRequest(req) {
   const cached   = tenantCache.get(cacheKey);
   if (cached) return cached;
 
-  const [[tenant]] = await db.execute(
+  const [rows] = await db.query(
     'SELECT id, name, domain, logo_url, theme_color, whatsapp_number FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1',
     [domain]
   );
+  const tenant = rows[0] || null;
   if (tenant) tenantCache.set(cacheKey, tenant);
-  return tenant || null;
+  return tenant;
 }
 
 async function getProductsForPage(tenantId, category = null) {
@@ -26,14 +29,14 @@ async function getProductsForPage(tenantId, category = null) {
   const cached   = productCache.get(cacheKey);
   if (cached) return cached;
 
-  const [products] = await db.execute(
-    `SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty
-     FROM products
-     WHERE tenant_id = ? AND is_active = 1
-     ${category ? 'AND category = ?' : ''}
-     ORDER BY created_at DESC`,
-    category ? [tenantId, category] : [tenantId]
-  );
+  const params = category ? [tenantId, category] : [tenantId];
+  const sql = `SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty
+               FROM products
+               WHERE tenant_id = ? AND is_active = 1
+               ${category ? 'AND category = ?' : ''}
+               ORDER BY created_at DESC`;
+
+  const [products] = await db.query(sql, params);
   const enriched   = products.map(p => ({ ...p, available_qty: Math.max(0, p.stock_qty - p.reserved_qty) }));
   const serialized = JSON.parse(JSON.stringify(enriched));
   productCache.set(cacheKey, serialized);
@@ -48,7 +51,7 @@ async function getFeaturedProducts(tenantId, limit = 8) {
   const cached   = productCache.get(cacheKey);
   if (cached) return cached;
 
-  const [products] = await db.execute(
+  const [products] = await db.query(
     'SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty FROM products WHERE tenant_id = ? AND is_active = 1 ORDER BY created_at DESC LIMIT ?',
     [tenantId, limit]
   );
