@@ -10,7 +10,7 @@ import api from '../lib/api';
 
 export default function CheckoutPage({ tenant }) {
   const router           = useRouter();
-  const { items, total, dispatch } = useCart();
+  const { items, total, dispatch, hydrated } = useCart();
   const [step,    setStep]    = useState(1);
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState(null);
@@ -52,6 +52,9 @@ export default function CheckoutPage({ tenant }) {
     } catch (err) { setError(err?.response?.data?.message || 'Payment initialisation failed.'); setLoading(false); }
   };
 
+  // Only show empty cart screen after client hydration
+  // Before hydration, render nothing to avoid SSR/CSR mismatch
+  if (!hydrated) return null;
   if (items.length === 0 && step !== 3) return (
     <Layout tenant={tenant}>
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 pt-20">

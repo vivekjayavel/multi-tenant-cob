@@ -1,4 +1,5 @@
-import { createContext, useContext, useReducer, useEffect } from 'react';
+import { createContext, useContext, useReducer, useEffect, useState } from 'react';
+
 const CartContext = createContext(null);
 
 function cartReducer(state, action) {
@@ -17,12 +18,33 @@ function cartReducer(state, action) {
 }
 
 export function CartProvider({ children }) {
-  const [state, dispatch] = useReducer(cartReducer, { items: [] });
-  useEffect(() => { try { const saved = localStorage.getItem('cart'); if (saved) dispatch({ type: 'HYDRATE', items: JSON.parse(saved) }); } catch {} }, []);
-  useEffect(() => { localStorage.setItem('cart', JSON.stringify(state.items)); }, [state.items]);
+  const [state,    dispatch] = useReducer(cartReducer, { items: [] });
+  const [hydrated, setHydrated] = useState(false);
+
+  // Load from localStorage only after mount (client-side only)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('cart');
+      if (saved) dispatch({ type: 'HYDRATE', items: JSON.parse(saved) });
+    } catch {}
+    setHydrated(true); // signal that client-side cart is ready
+  }, []);
+
+  // Persist to localStorage whenever cart changes (after first hydration)
+  useEffect(() => {
+    if (hydrated) {
+      localStorage.setItem('cart', JSON.stringify(state.items));
+    }
+  }, [state.items, hydrated]);
+
   const total     = state.items.reduce((s, i) => s + i.price * i.quantity, 0);
   const itemCount = state.items.reduce((s, i) => s + i.quantity, 0);
-  return <CartContext.Provider value={{ ...state, total, itemCount, dispatch }}>{children}</CartContext.Provider>;
+
+  return (
+    <CartContext.Provider value={{ ...state, total, itemCount, hydrated, dispatch }}>
+      {children}
+    </CartContext.Provider>
+  );
 }
 
 export function useCart() {

@@ -7,8 +7,10 @@ const { noindexSeo }           = require('../lib/seo');
 const { getTenantFromRequest } = require('../lib/prefetch');
 
 export default function CartPage({ tenant }) {
-  const { items, total, dispatch } = useCart();
+  const { items, total, dispatch, hydrated } = useCart();
   const seo = noindexSeo(tenant, 'Cart');
+  // Wait for client-side cart to load before rendering
+  if (!hydrated) return null;
   return (
     <>
       <MetaTags seo={seo} tenant={tenant} />

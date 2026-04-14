@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 
 export default function CartDrawer({ open, onClose }) {
-  const { items, total, dispatch } = useCart();
+  const { items, total, dispatch, hydrated } = useCart();
   return (
     <AnimatePresence>
       {open && (
