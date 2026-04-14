@@ -30,6 +30,19 @@ const nextConfig = {
   },
 
   async headers() {
+    const isDev = process.env.NODE_ENV !== 'production';
+
+    // In development, Next.js needs 'unsafe-eval' for hot module replacement
+    // In production, we keep it strict
+    const scriptSrc = isDev
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com"
+      : "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com";
+
+    // In development, allow webpack HMR websocket connections
+    const connectSrc = isDev
+      ? "connect-src 'self' https://api.razorpay.com ws://localhost:* http://localhost:*"
+      : "connect-src 'self' https://api.razorpay.com";
+
     return [
       {
         source: '/(.*)',
@@ -41,11 +54,11 @@ const nextConfig = {
             key:   'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com",
+              scriptSrc,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https:",
-              "connect-src 'self' https://api.razorpay.com",
+              connectSrc,
               "frame-src https://api.razorpay.com",
             ].join('; '),
           },
