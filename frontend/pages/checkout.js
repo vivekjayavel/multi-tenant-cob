@@ -22,7 +22,7 @@ export default function CheckoutPage({ tenant }) {
   const handlePlaceOrder = async (e) => {
     e.preventDefault(); setError(null); setLoading(true);
     try {
-      const address = `${form.name}, ${form.phone}\n${form.address}, ${form.city} - ${form.pincode}`;
+      const address = [form.name + ', ' + form.phone, form.address + ', ' + form.city + ' - ' + form.pincode].join('\n');
       const { data } = await api.post('/orders', { items: items.map(i => ({ product_id: i.id, quantity: i.quantity })), delivery_address: address, notes: form.notes || undefined });
       setOrderId(data.orderId); setStep(2);
     } catch (err) { setError(err?.response?.data?.message || 'Could not place order. Please try again.'); }
@@ -153,11 +153,12 @@ export default function CheckoutPage({ tenant }) {
   );
 }
 
-function Field({ label, ...props }) {
+function Field({ label, id, ...props }) {
+  const fieldId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
   return (
     <div>
-      <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">{label}</label>
-      <input className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 transition-all placeholder-gray-300" {...props} />
+      <label htmlFor={fieldId} className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">{label}</label>
+      <input id={fieldId} name={fieldId} className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 transition-all placeholder-gray-300" {...props} />
     </div>
   );
 }

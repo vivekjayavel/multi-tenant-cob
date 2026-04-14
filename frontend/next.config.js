@@ -40,8 +40,8 @@ const nextConfig = {
 
     // In development, allow webpack HMR websocket connections
     const connectSrc = isDev
-      ? "connect-src 'self' https://api.razorpay.com ws://localhost:* http://localhost:*"
-      : "connect-src 'self' https://api.razorpay.com";
+      ? "connect-src 'self' https://api.razorpay.com ws://localhost:* http://localhost:* https://fonts.googleapis.com https://fonts.gstatic.com"
+      : "connect-src 'self' https://api.razorpay.com https://fonts.googleapis.com";
 
     return [
       {
