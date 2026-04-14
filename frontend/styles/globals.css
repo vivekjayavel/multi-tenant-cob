@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Default CSS variable values — overridden by _app.js inline style per tenant */
 :root {
   --tenant-primary:      #D97706;
   --tenant-primary-dark: #B45309;

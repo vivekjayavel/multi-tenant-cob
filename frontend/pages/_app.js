@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { TenantContext } from '../context/TenantContext';
 import { CartProvider } from '../context/CartContext';
 import '../styles/globals.css';
@@ -6,32 +5,31 @@ import '../styles/globals.css';
 export default function App({ Component, pageProps }) {
   const { tenant } = pageProps;
 
-  // Set CSS variables for tenant theming
-  // This runs both on server (via inline style) and client (via useEffect)
+  // Set CSS variables as inline style on a wrapper div.
+  // This is the correct SSR-safe approach — no useEffect, no <style> tags,
+  // no hydration mismatch. React handles inline styles identically on
+  // server and client.
   const primaryColor     = tenant?.theme_color || '#D97706';
   const primaryDarkColor = _darken(primaryColor, 15);
 
-  useEffect(() => {
-    const root = document.documentElement;
-    root.style.setProperty('--tenant-primary',      primaryColor);
-    root.style.setProperty('--tenant-primary-dark', primaryDarkColor);
-  }, [primaryColor, primaryDarkColor]);
+  const cssVars = {
+    '--tenant-primary':      primaryColor,
+    '--tenant-primary-dark': primaryDarkColor,
+    minHeight:               '100vh',
+    display:                 'flex',
+    flexDirection:           'column',
+  };
 
   return (
-    <>
-      {/* Set CSS vars server-side to prevent flash / hydration mismatch */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        :root {
-          --tenant-primary: ${primaryColor};
-          --tenant-primary-dark: ${primaryDarkColor};
-        }
-      ` }} />
-      <TenantContext.Provider value={tenant || {}}>
-        <CartProvider>
+    <TenantContext.Provider value={tenant || {}}>
+      <CartProvider>
+        {/* CSS variables set as inline style — works on both server and client
+            without any hydration mismatch */}
+        <div style={cssVars}>
           <Component {...pageProps} />
-        </CartProvider>
-      </TenantContext.Provider>
-    </>
+        </div>
+      </CartProvider>
+    </TenantContext.Provider>
   );
 }
 
