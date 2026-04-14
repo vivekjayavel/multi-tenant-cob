@@ -1,0 +1,2 @@
+-- Indexes are included in schema.sql
+-- This file is a placeholder for migration tracking

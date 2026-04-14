@@ -1,0 +1,2 @@
+-- reserved_qty is included in schema.sql initial create
+-- ALTER TABLE products ADD COLUMN reserved_qty INT UNSIGNED NOT NULL DEFAULT 0 AFTER stock_qty;

@@ -1,0 +1,2 @@
+-- token_version is included in schema.sql initial create
+-- ALTER TABLE users ADD COLUMN token_version INT UNSIGNED NOT NULL DEFAULT 0 AFTER role;

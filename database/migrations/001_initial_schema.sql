@@ -1,0 +1,2 @@
+-- Run database/schema.sql for initial setup
+-- This file is a placeholder for migration tracking

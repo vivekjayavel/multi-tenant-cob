@@ -6,7 +6,8 @@ node_modules/
 out/
 logs/*.log
 backups/
-*.sql
+# Exclude sql dumps but keep schema/migration files
+*.dump.sql
 *.sql.gz
 uploads/**/products/*
 uploads/**/logo/*
