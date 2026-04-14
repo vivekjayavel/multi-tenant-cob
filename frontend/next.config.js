@@ -2,13 +2,15 @@
 const nextConfig = {
   reactStrictMode: true,
 
+  experimental: {
   // Tell Next.js these packages are only used server-side (in getServerSideProps)
   // and should never be bundled for the client
-  serverExternalPackages: [
+  serverComponentsExternalPackages: [
     'mysql2', 'bcryptjs', 'jsonwebtoken', 'winston', 'winston-daily-rotate-file',
     'lru-cache', 'nodemailer', 'razorpay', 'slugify', 'sharp', 'archiver',
     'node-cron', 'morgan', 'express',
-  ],
+    ],
+  },
   poweredByHeader: false,
 
   images: {
