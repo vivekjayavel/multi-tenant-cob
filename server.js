@@ -100,7 +100,27 @@ app.prepare().then(() => {
   server.all('*', (req, res) => handle(req, res));
 
   const PORT = parseInt(process.env.PORT) || 3000;
-  server.listen(PORT, () => logger.info('Server started', { port: PORT, env: process.env.NODE_ENV, pid: process.pid }));
+  const httpServer = server.listen(PORT, () =>
+    logger.info('Server started', { port: PORT, env: process.env.NODE_ENV, pid: process.pid })
+  );
+
+  // ── Forward WebSocket upgrades to Next.js HMR ──────────────
+  // Express handles HTTP only. Without this, /_next/webpack-hmr
+  // WebSocket never connects → HMR 404s → Fast Refresh full-reloads forever.
+  if (dev) {
+    const upgradeHandler = typeof app.getUpgradeHandler === 'function'
+      ? app.getUpgradeHandler()
+      : null;
+
+    if (upgradeHandler) {
+      httpServer.on('upgrade', (req, socket, head) => {
+        if (req.url && req.url.startsWith('/_next/webpack-hmr')) {
+          upgradeHandler(req, socket, head);
+        }
+      });
+      logger.info('HMR WebSocket proxy enabled for development');
+    }
+  }
 
   if (process.env.NODE_ENV === 'production') {
     const cron = require('node-cron');
