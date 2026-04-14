@@ -19,7 +19,9 @@
     "encrypt:secrets:dry-run": "node scripts/encrypt-secrets.js --dry-run",
     "encrypt:secrets:verify": "node scripts/encrypt-secrets.js --verify",
     "security:verify": "node scripts/verify-file-security.js",
-    "release:abandoned": "node scripts/release-abandoned-orders.js"
+    "release:abandoned": "node scripts/release-abandoned-orders.js",
+    "clean": "node -e \"const fs=require('fs');const p='frontend/.next';if(fs.existsSync(p)){fs.rmSync(p,{recursive:true,force:true});console.log('\u2705 Cleaned frontend/.next');}else{console.log('Nothing to clean');}\"",
+    "dev:fresh": "npm run clean && npm run dev"
   },
   "dependencies": {
     "next": "^14.2.0",

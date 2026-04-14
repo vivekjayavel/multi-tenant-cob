@@ -3,6 +3,7 @@ node_modules/
 .env.production
 .env.local
 .next/
+frontend/.next/
 out/
 logs/*.log
 backups/
