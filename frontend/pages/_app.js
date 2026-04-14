@@ -1,0 +1,29 @@
+import { useEffect } from 'react';
+import { TenantContext } from '../context/TenantContext';
+import { CartProvider } from '../context/CartContext';
+import '../styles/globals.css';
+
+export default function App({ Component, pageProps }) {
+  const { tenant } = pageProps;
+  useEffect(() => {
+    if (!tenant) return;
+    const root = document.documentElement;
+    root.style.setProperty('--tenant-primary',      tenant.theme_color || '#D97706');
+    root.style.setProperty('--tenant-primary-dark', _darken(tenant.theme_color || '#D97706', 15));
+  }, [tenant]);
+  return (
+    <TenantContext.Provider value={tenant || {}}>
+      <CartProvider>
+        <Component {...pageProps} />
+      </CartProvider>
+    </TenantContext.Provider>
+  );
+}
+
+function _darken(hex, amount) {
+  const num = parseInt(hex.replace('#', ''), 16);
+  const r = Math.max(0, (num >> 16) - amount);
+  const g = Math.max(0, ((num >> 8) & 0xFF) - amount);
+  const b = Math.max(0, (num & 0xFF) - amount);
+  return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+}

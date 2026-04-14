@@ -1,0 +1,58 @@
+'use strict';
+const db       = require('../config/db');
+const slugify  = require('slugify');
+const { ok, fail }               = require('../utils/responseUtils');
+const { invalidateProductCache } = require('../config/cache');
+const { getProductsOptimized }   = require('../utils/queryOptimizer');
+
+exports.list = async (req, res, next) => {
+  try {
+    const { category, search, page = 1, limit = 12 } = req.query;
+    const { products, total } = await getProductsOptimized(req.tenant.id, { category, search, page, limit });
+    const enriched = products.map(p => ({ ...p, available_qty: Math.max(0, (p.stock_qty || 0) - (p.reserved_qty || 0)) }));
+    ok(res, { products: enriched, total, page: parseInt(page), limit: parseInt(limit) });
+  } catch (err) { next(err); }
+};
+
+exports.getBySlug = async (req, res, next) => {
+  try {
+    const [rows] = await db.execute('SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1', [req.tenant.id, req.params.slug]);
+    if (!rows.length) return fail(res, 'Product not found', 404);
+    ok(res, { product: { ...rows[0], available_qty: Math.max(0, rows[0].stock_qty - rows[0].reserved_qty) } });
+  } catch (err) { next(err); }
+};
+
+exports.create = async (req, res, next) => {
+  try {
+    const { name, description, price, image_url, category, stock_qty = 0 } = req.body;
+    const tenantId = req.tenant.id;
+    const slug = req.body.slug || slugify(name, { lower: true, strict: true });
+    const [result] = await db.execute('INSERT INTO products (tenant_id, name, description, price, image_url, category, slug, stock_qty) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [tenantId, name, description, price, image_url, category, slug, stock_qty]);
+    invalidateProductCache(tenantId);
+    ok(res, { id: result.insertId, slug }, 'Product created', 201);
+  } catch (err) { next(err); }
+};
+
+exports.update = async (req, res, next) => {
+  try {
+    const { id } = req.params, tenantId = req.tenant.id;
+    const allowed = ['name','description','price','image_url','category','slug','is_active','stock_qty'];
+    const fields = [], values = [];
+    for (const key of allowed) { if (req.body[key] !== undefined) { fields.push(`${key} = ?`); values.push(req.body[key]); } }
+    if (!fields.length) return fail(res, 'No valid fields to update');
+    values.push(id, tenantId);
+    const [result] = await db.execute(`UPDATE products SET ${fields.join(', ')} WHERE id = ? AND tenant_id = ?`, values);
+    if (!result.affectedRows) return fail(res, 'Product not found', 404);
+    invalidateProductCache(tenantId);
+    ok(res, {}, 'Product updated');
+  } catch (err) { next(err); }
+};
+
+exports.remove = async (req, res, next) => {
+  try {
+    const [result] = await db.execute('UPDATE products SET is_active = 0 WHERE id = ? AND tenant_id = ?', [req.params.id, req.tenant.id]);
+    if (!result.affectedRows) return fail(res, 'Product not found', 404);
+    invalidateProductCache(req.tenant.id);
+    ok(res, {}, 'Product deleted');
+  } catch (err) { next(err); }
+};

@@ -1,0 +1,12 @@
+'use strict';
+const { baseTemplate } = require('./baseTemplate');
+function orderConfirmationTemplate({ tenant, order, items, user }) {
+  const primaryColor  = tenant.theme_color || '#D97706';
+  const formattedDate = new Date(order.created_at).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const itemRows = items.map(item => `<tr><td style="padding:10px 0;border-bottom:1px solid #f0efe9;font-size:14px;color:#374151;">${escHtml(item.product_name)} <span style="color:#9ca3af;">× ${item.quantity}</span></td><td style="padding:10px 0;border-bottom:1px solid #f0efe9;font-size:14px;text-align:right;font-weight:600;">₹${(parseFloat(item.price) * item.quantity).toLocaleString('en-IN')}</td></tr>`).join('');
+  const bodyHtml = `<h2 style="margin:0 0 6px;font-size:20px;font-weight:700;font-family:Georgia,serif;">Order confirmed! 🎉</h2><p style="margin:0 0 24px;font-size:15px;color:#6b7280;">Hi ${escHtml(user.name)}, thank you for ordering from <strong>${escHtml(tenant.name)}</strong>.</p><table role="presentation" width="100%" style="background:#fafaf8;border:1px solid #e5e4df;border-radius:10px;margin-bottom:24px;"><tr><td style="padding:18px 20px;"><p style="margin:0 0 4px;font-size:18px;font-weight:700;color:${primaryColor};">#${order.id}</p><p style="margin:0;font-size:13px;color:#374151;">${formattedDate}</p></td></tr></table><table role="presentation" width="100%">${itemRows}<tr><td style="padding:14px 0 0;font-size:15px;font-weight:700;color:#111827;">Total paid</td><td style="padding:14px 0 0;font-size:18px;font-weight:700;color:${primaryColor};text-align:right;">₹${parseFloat(order.total_price).toLocaleString('en-IN')}</td></tr></table>`;
+  const text = [`Order Confirmed — ${tenant.name}`, '', `Hi ${user.name}, your order #${order.id} is confirmed.`, `Date: ${formattedDate}`, '', 'ITEMS:', ...items.map(i => `  ${i.product_name} x${i.quantity}  ₹${(parseFloat(i.price) * i.quantity).toLocaleString('en-IN')}`), '', `TOTAL: ₹${parseFloat(order.total_price).toLocaleString('en-IN')}`].join('\n');
+  return { subject: `Order #${order.id} confirmed — ${tenant.name}`, html: baseTemplate({ tenant, title: `Order #${order.id} confirmed`, preheader: `Your order of ₹${parseFloat(order.total_price).toLocaleString('en-IN')} is confirmed.`, bodyHtml }), text };
+}
+function escHtml(str) { return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+module.exports = { orderConfirmationTemplate };
