@@ -49,7 +49,12 @@ exports.listAll = async (req, res, next) => {
     const params = [req.tenant.id];
     let where = 'WHERE o.tenant_id = ?';
     if (status) { where += ' AND o.status = ?'; params.push(status); }
-    const [orders] = await db.query(`SELECT o.id, o.total_price, o.status, o.created_at, u.name AS customer_name, u.email AS customer_email FROM orders o JOIN users u ON u.id = o.user_id ${where} ORDER BY o.created_at DESC LIMIT ? OFFSET ?`, [...params, parseInt(limit), offset]);
+    const limitInt  = parseInt(limit,  10) || 20;
+    const offsetInt = parseInt(offset, 10) || 0;
+    const [orders] = await db.query(
+      `SELECT o.id, o.total_price, o.status, o.created_at, u.name AS customer_name, u.email AS customer_email FROM orders o JOIN users u ON u.id = o.user_id ${where} ORDER BY o.created_at DESC LIMIT ${limitInt} OFFSET ${offsetInt}`,
+      params
+    );
     ok(res, { orders });
   } catch (err) { next(err); }
 };
