@@ -53,9 +53,16 @@ export default function CheckoutPage({ tenant }) {
     } catch (err) { setError(err?.response?.data?.message || 'Payment initialisation failed.'); setLoading(false); }
   };
 
-  // Only show empty cart screen after client hydration
-  // Before hydration, render nothing to avoid SSR/CSR mismatch
-  if (!hydrated) return null;
+  // Show skeleton before cart loads from localStorage
+  if (!hydrated) return (
+    <Layout tenant={tenant}>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 pb-20">
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => <div key={i} className="h-16 bg-gray-100 rounded-2xl animate-pulse" />)}
+        </div>
+      </div>
+    </Layout>
+  );
   if (items.length === 0 && step !== 3) return (
     <Layout tenant={tenant}>
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 pt-20">

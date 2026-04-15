@@ -10,7 +10,9 @@ if (fs.existsSync(rootEnv)) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: true,
+  // Strict mode causes double-renders in dev which can trigger hydration
+  // errors with certain patterns. Enabled in prod only.
+  reactStrictMode: process.env.NODE_ENV === 'production',
 
   experimental: {
   // Tell Next.js these packages are only used server-side (in getServerSideProps)
