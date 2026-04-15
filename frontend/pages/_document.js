@@ -4,17 +4,21 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        {/* Preconnect to Google Fonts domains */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Load fonts — crossOrigin needed for CORB compliance */}
+        {/* Google Fonts - crossOrigin required to prevent CORB */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://fonts.gstatic.com"    crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap"
           rel="stylesheet"
           crossOrigin="anonymous"
         />
-        {/* Razorpay checkout — loaded async to not block page */}
-        <script src="https://checkout.razorpay.com/v1/checkout.js" async defer />
+        {/* Razorpay - crossOrigin="anonymous" prevents CORB on script response */}
+        <script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          async
+          defer
+          crossOrigin="anonymous"
+        />
       </Head>
       <body className="bg-white text-gray-900 antialiased">
         <Main />

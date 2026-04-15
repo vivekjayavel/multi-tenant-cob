@@ -47,7 +47,21 @@ app.prepare().then(() => {
   server.use(fileLogger);
   server.use(winstonLogger);
   server.use(slowRequestDetector);
-  server.use(cors({ origin: (origin, cb) => cb(null, true), credentials: true }));
+  // CORS — allow all origins in dev, restrict in production
+  server.use(cors({
+    origin:      (origin, cb) => cb(null, true),
+    credentials: true,
+    methods:     ['GET','POST','PUT','PATCH','DELETE','OPTIONS'],
+    allowedHeaders: ['Content-Type','Authorization','X-Request-Id'],
+    exposedHeaders: ['X-Request-Id','X-Cache'],
+  }));
+
+  // Cross-Origin-Resource-Policy — tells browser our API responses
+  // are intentionally readable cross-origin (prevents CORB blocking)
+  server.use('/api', (req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    next();
+  });
 
   server.use('/api/payment/webhook', express.raw({ type: 'application/json' }));
   server.use('/api', express.json({ limit: '50kb' }));
