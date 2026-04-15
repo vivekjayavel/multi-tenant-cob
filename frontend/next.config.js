@@ -60,13 +60,13 @@ const nextConfig = {
     // In development, Next.js needs 'unsafe-eval' for hot module replacement
     // In production, we keep it strict
     const scriptSrc = isDev
-      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com"
-      : "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com";
+      ? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://cdn.razorpay.com https://*.razorpay.com"
+      : "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com https://cdn.razorpay.com https://*.razorpay.com";
 
     // In development, allow webpack HMR websocket connections
     const connectSrc = isDev
-      ? "connect-src 'self' https://api.razorpay.com ws://localhost:* http://localhost:* https://fonts.googleapis.com https://fonts.gstatic.com"
-      : "connect-src 'self' https://api.razorpay.com https://fonts.googleapis.com";
+      ? "connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://cdn.razorpay.com https://*.razorpay.com ws://localhost:* http://localhost:* https://fonts.googleapis.com https://fonts.gstatic.com"
+      : "connect-src 'self' https://api.razorpay.com https://checkout.razorpay.com https://cdn.razorpay.com https://*.razorpay.com https://fonts.googleapis.com";
 
     return [
       {
@@ -84,7 +84,7 @@ const nextConfig = {
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https:",
               connectSrc,
-              "frame-src https://api.razorpay.com",
+              "frame-src https://api.razorpay.com https://checkout.razorpay.com https://cdn.razorpay.com https://*.razorpay.com",
             ].join('; '),
           },
         ],
