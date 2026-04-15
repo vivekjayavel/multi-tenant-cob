@@ -1,3 +1,13 @@
+const path = require('path');
+const fs   = require('fs');
+
+// Load .env from project root (parent of frontend/)
+// This ensures env vars are available when running 'next dev frontend'
+const rootEnv = path.join(__dirname, '..', '.env');
+if (fs.existsSync(rootEnv)) {
+  require('dotenv').config({ path: rootEnv });
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
