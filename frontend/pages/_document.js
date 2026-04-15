@@ -4,7 +4,7 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        {/* Google Fonts - crossOrigin required to prevent CORB */}
+        {/* Google Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://fonts.gstatic.com"    crossOrigin="anonymous" />
         <link
@@ -12,13 +12,8 @@ export default function Document() {
           rel="stylesheet"
           crossOrigin="anonymous"
         />
-        {/* Razorpay - crossOrigin="anonymous" prevents CORB on script response */}
-        <script
-          src="https://checkout.razorpay.com/v1/checkout.js"
-          async
-          defer
-          crossOrigin="anonymous"
-        />
+        {/* NOTE: Razorpay script moved to checkout.js only — not loaded globally
+            Loading it on every page triggered CORB errors from risk detection */}
       </Head>
       <body className="bg-white text-gray-900 antialiased">
         <Main />

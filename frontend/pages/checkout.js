@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/layout/Layout';
@@ -68,6 +69,10 @@ export default function CheckoutPage({ tenant }) {
   return (
     <>
       <MetaTags seo={seo} tenant={tenant} />
+      <Head>
+        {/* Razorpay only loaded on checkout page */}
+        <script src="https://checkout.razorpay.com/v1/checkout.js" />
+      </Head>
       <Layout tenant={tenant}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 pb-20">
           {step < 3 && (
