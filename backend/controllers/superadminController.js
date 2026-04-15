@@ -35,14 +35,14 @@ exports.logout = (req, res) => { res.clearCookie('superadmin_token'); ok(res, {}
 
 exports.listTenants = async (req, res, next) => {
   try {
-    const [tenants] = await db.execute(`SELECT t.id, t.name, t.domain, t.logo_url, t.theme_color, t.whatsapp_number, t.is_active, t.created_at, (t.razorpay_key_id IS NOT NULL AND t.razorpay_key_id != '') AS has_razorpay, COUNT(DISTINCT p.id) AS product_count, COUNT(DISTINCT o.id) AS order_count FROM tenants t LEFT JOIN products p ON p.tenant_id = t.id AND p.is_active = 1 LEFT JOIN orders o ON o.tenant_id = t.id GROUP BY t.id ORDER BY t.created_at DESC`);
+    const [tenants] = await db.query(`SELECT t.id, t.name, t.domain, t.logo_url, t.theme_color, t.whatsapp_number, t.is_active, t.created_at, (t.razorpay_key_id IS NOT NULL AND t.razorpay_key_id != '') AS has_razorpay, COUNT(DISTINCT p.id) AS product_count, COUNT(DISTINCT o.id) AS order_count FROM tenants t LEFT JOIN products p ON p.tenant_id = t.id AND p.is_active = 1 LEFT JOIN orders o ON o.tenant_id = t.id GROUP BY t.id ORDER BY t.created_at DESC`);
     ok(res, { tenants });
   } catch (err) { next(err); }
 };
 
 exports.getTenant = async (req, res, next) => {
   try {
-    const [[tenant]] = await db.execute('SELECT id, name, domain, logo_url, theme_color, whatsapp_number, razorpay_key_id, is_active, created_at FROM tenants WHERE id = ? LIMIT 1', [req.params.id]);
+    const [[tenant]] = await db.query('SELECT id, name, domain, logo_url, theme_color, whatsapp_number, razorpay_key_id, is_active, created_at FROM tenants WHERE id = ? LIMIT 1', [req.params.id]);
     if (!tenant) return fail(res, 'Tenant not found', 404);
     if (tenant.razorpay_key_id) { tenant.razorpay_key_id_display = tenant.razorpay_key_id.slice(0, 12) + '••••'; delete tenant.razorpay_key_id; }
     ok(res, { tenant });
@@ -53,11 +53,11 @@ exports.createTenant = async (req, res, next) => {
   try {
     const { name, domain, theme_color = '#D97706', whatsapp_number, razorpay_key_id, razorpay_key_secret } = req.body;
     const normDomain = domain.toLowerCase().replace(/^www\./, '');
-    const [[existing]] = await db.execute('SELECT id FROM tenants WHERE domain = ? LIMIT 1', [normDomain]);
+    const [[existing]] = await db.query('SELECT id FROM tenants WHERE domain = ? LIMIT 1', [normDomain]);
     if (existing) return fail(res, `Domain "${normDomain}" already registered`, 409);
     let encryptedSecret = null;
     if (razorpay_key_secret) { try { encryptedSecret = encrypt(razorpay_key_secret); } catch { return fail(res, 'Failed to secure payment credentials', 500); } }
-    const [result] = await db.execute('INSERT INTO tenants (name, domain, theme_color, whatsapp_number, razorpay_key_id, razorpay_key_secret, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)', [name, normDomain, theme_color, whatsapp_number || null, razorpay_key_id || null, encryptedSecret]);
+    const [result] = await db.query('INSERT INTO tenants (name, domain, theme_color, whatsapp_number, razorpay_key_id, razorpay_key_secret, is_active) VALUES (?, ?, ?, ?, ?, ?, 1)', [name, normDomain, theme_color, whatsapp_number || null, razorpay_key_id || null, encryptedSecret]);
     const tenantId = result.insertId;
     _createTenantDirectories(tenantId);
     logger.info('New tenant created', { tenantId, domain: normDomain });
@@ -80,11 +80,11 @@ exports.updateTenant = async (req, res, next) => {
     if (!fields.length) return fail(res, 'No valid fields to update');
     if (req.body.domain) {
       const newDomain = req.body.domain.toLowerCase().replace(/^www\./, '');
-      const [[conflict]] = await db.execute('SELECT id FROM tenants WHERE domain = ? AND id != ? LIMIT 1', [newDomain, tenantId]);
+      const [[conflict]] = await db.query('SELECT id FROM tenants WHERE domain = ? AND id != ? LIMIT 1', [newDomain, tenantId]);
       if (conflict) return fail(res, `Domain "${newDomain}" already registered`, 409);
     }
     values.push(tenantId);
-    const [result] = await db.execute(`UPDATE tenants SET ${fields.join(', ')} WHERE id = ?`, values);
+    const [result] = await db.query(`UPDATE tenants SET ${fields.join(', ')} WHERE id = ?`, values);
     if (!result.affectedRows) return fail(res, 'Tenant not found', 404);
     if (req.body.domain) { const d = req.body.domain.toLowerCase().replace(/^www\./, ''); tenantMiddleware.invalidate(d); tenantCache.delete(`domain:${d}`); }
     logger.info('Tenant updated', { tenantId });
@@ -94,7 +94,7 @@ exports.updateTenant = async (req, res, next) => {
 
 exports.deactivateTenant = async (req, res, next) => {
   try {
-    const [result] = await db.execute('UPDATE tenants SET is_active = 0 WHERE id = ?', [req.params.id]);
+    const [result] = await db.query('UPDATE tenants SET is_active = 0 WHERE id = ?', [req.params.id]);
     if (!result.affectedRows) return fail(res, 'Tenant not found', 404);
     logger.info('Tenant deactivated', { tenantId: req.params.id });
     ok(res, {}, 'Tenant deactivated');
@@ -104,11 +104,11 @@ exports.deactivateTenant = async (req, res, next) => {
 exports.getChecklist = async (req, res, next) => {
   try {
     const tenantId = req.params.id;
-    const [[tenant]] = await db.execute('SELECT id, name, domain, whatsapp_number, razorpay_key_id, logo_url FROM tenants WHERE id = ? LIMIT 1', [tenantId]);
+    const [[tenant]] = await db.query('SELECT id, name, domain, whatsapp_number, razorpay_key_id, logo_url FROM tenants WHERE id = ? LIMIT 1', [tenantId]);
     if (!tenant) return fail(res, 'Tenant not found', 404);
     const uploadsDir   = path.resolve(__dirname, '../../uploads', String(tenantId));
     const uploadsExist = fs.existsSync(uploadsDir);
-    const [[adminCheck]] = await db.execute("SELECT COUNT(*) AS count FROM users WHERE tenant_id = ? AND role = 'admin' AND is_active = 1", [tenantId]);
+    const [[adminCheck]] = await db.query("SELECT COUNT(*) AS count FROM users WHERE tenant_id = ? AND role = 'admin' AND is_active = 1", [tenantId]);
     let dnsStatus = 'unknown', dnsAddress = null;
     try { const addresses = await dns.resolve4(tenant.domain); dnsAddress = addresses[0] || null; dnsStatus = addresses.length > 0 ? 'resolved' : 'not_resolved'; } catch { dnsStatus = 'not_resolved'; }
     const checklist = [
@@ -128,12 +128,12 @@ exports.seedAdminUser = async (req, res, next) => {
   try {
     const tenantId = req.params.id;
     const { name, email, password } = req.body;
-    const [[tenant]] = await db.execute('SELECT id FROM tenants WHERE id = ? AND is_active = 1 LIMIT 1', [tenantId]);
+    const [[tenant]] = await db.query('SELECT id FROM tenants WHERE id = ? AND is_active = 1 LIMIT 1', [tenantId]);
     if (!tenant) return fail(res, 'Tenant not found', 404);
-    const [[existing]] = await db.execute('SELECT id FROM users WHERE tenant_id = ? AND email = ? LIMIT 1', [tenantId, email]);
+    const [[existing]] = await db.query('SELECT id FROM users WHERE tenant_id = ? AND email = ? LIMIT 1', [tenantId, email]);
     if (existing) return fail(res, 'Email already registered for this tenant', 409);
     const hashed = await hash(password);
-    const [result] = await db.execute("INSERT INTO users (tenant_id, name, email, password, role) VALUES (?, ?, ?, ?, 'admin')", [tenantId, name, email, hashed]);
+    const [result] = await db.query("INSERT INTO users (tenant_id, name, email, password, role) VALUES (?, ?, ?, ?, 'admin')", [tenantId, name, email, hashed]);
     logger.info('Admin seeded for tenant', { tenantId, email, userId: result.insertId });
     ok(res, { userId: result.insertId }, 'Admin user created', 201);
   } catch (err) { next(err); }

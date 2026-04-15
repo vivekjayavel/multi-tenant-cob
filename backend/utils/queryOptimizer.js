@@ -10,18 +10,18 @@ async function getProductsOptimized(tenantId, { category, search, page = 1, limi
   if (search)   { where += ' AND p.name LIKE ?';  params.push(`%${search}%`); }
 
   const [products, countResult] = await Promise.all([
-    db.execute(
+    db.query(
       `SELECT p.id, p.name, p.description, p.price, p.image_url, p.category, p.slug, p.stock_qty, p.reserved_qty
        FROM products p ${where} ORDER BY p.created_at DESC LIMIT ? OFFSET ?`,
       [...params, parseInt(limit), offset]
     ),
-    db.execute(`SELECT COUNT(*) AS total FROM products p ${where}`, params),
+    db.query(`SELECT COUNT(*) AS total FROM products p ${where}`, params),
   ]);
   return { products: products[0], total: parseInt(countResult[0][0].total) };
 }
 
 async function reconcilePendingOrders(maxAgeMinutes = 60) {
-  const [pendingOrders] = await db.execute(
+  const [pendingOrders] = await db.query(
     `SELECT id, tenant_id, total_price, razorpay_order_id FROM orders
      WHERE status = 'pending' AND razorpay_order_id IS NOT NULL
        AND created_at BETWEEN DATE_SUB(NOW(), INTERVAL ? MINUTE) AND DATE_SUB(NOW(), INTERVAL 5 MINUTE)`,
@@ -33,7 +33,7 @@ async function reconcilePendingOrders(maxAgeMinutes = 60) {
     try {
       const Razorpay = require('razorpay');
       const { safeDecrypt } = require('./encryption');
-      const [[tenant]] = await db.execute('SELECT razorpay_key_id, razorpay_key_secret FROM tenants WHERE id = ? LIMIT 1', [order.tenant_id]);
+      const [[tenant]] = await db.query('SELECT razorpay_key_id, razorpay_key_secret FROM tenants WHERE id = ? LIMIT 1', [order.tenant_id]);
       if (!tenant?.razorpay_key_id) continue;
       const secret = safeDecrypt(tenant.razorpay_key_secret);
       const rzp    = new Razorpay({ key_id: tenant.razorpay_key_id, key_secret: secret });

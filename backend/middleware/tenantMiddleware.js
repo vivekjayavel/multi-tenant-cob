@@ -10,7 +10,7 @@ async function tenantMiddleware(req, res, next) {
     const cacheKey = `domain:${domain}`;
     const cached   = tenantCache.get(cacheKey);
     if (cached) { req.tenant = cached; return next(); }
-    const [rows] = await db.execute(
+    const [rows] = await db.query(
       `SELECT id, name, domain, logo_url, theme_color, whatsapp_number, razorpay_key_id, razorpay_key_secret
        FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1`, [domain]
     );

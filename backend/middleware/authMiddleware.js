@@ -13,7 +13,7 @@ async function authMiddleware(req, res, next) {
       logger.warn('Token tenant mismatch', { tokenTenant: decoded.tenantId, requestTenant: req.tenant.id, ip: req.ip });
       return res.status(403).json({ success: false, message: 'Forbidden' });
     }
-    const [[dbUser]] = await db.execute(
+    const [[dbUser]] = await db.query(
       'SELECT token_version, is_active FROM users WHERE id = ? AND tenant_id = ? LIMIT 1',
       [decoded.userId, req.tenant.id]
     );

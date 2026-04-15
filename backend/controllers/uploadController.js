@@ -13,9 +13,9 @@ exports.productImage = async (req, res, next) => {
     const publicUrl    = `/uploads/${relativePath}`;
     if (req.body.product_id) {
       const productId = parseInt(req.body.product_id);
-      const [rows] = await db.execute('SELECT image_url FROM products WHERE id = ? AND tenant_id = ? LIMIT 1', [productId, tenantId]);
+      const [rows] = await db.query('SELECT image_url FROM products WHERE id = ? AND tenant_id = ? LIMIT 1', [productId, tenantId]);
       if (rows.length && rows[0].image_url) _deleteOldFile(rows[0].image_url);
-      await db.execute('UPDATE products SET image_url = ? WHERE id = ? AND tenant_id = ?', [publicUrl, productId, tenantId]);
+      await db.query('UPDATE products SET image_url = ? WHERE id = ? AND tenant_id = ?', [publicUrl, productId, tenantId]);
     }
     ok(res, { url: publicUrl, filename: req.file.filename, size: req.file.size, mimetype: req.file.detectedMime || req.file.mimetype }, 'Image uploaded', 201);
   } catch (err) { next(err); }
@@ -27,9 +27,9 @@ exports.logo = async (req, res, next) => {
     const tenantId    = req.tenant.id;
     const relativePath = path.join(String(tenantId), 'logo', req.file.filename).replace(/\\/g, '/');
     const publicUrl    = `/uploads/${relativePath}`;
-    const [rows] = await db.execute('SELECT logo_url FROM tenants WHERE id = ? LIMIT 1', [tenantId]);
+    const [rows] = await db.query('SELECT logo_url FROM tenants WHERE id = ? LIMIT 1', [tenantId]);
     if (rows.length && rows[0].logo_url) _deleteOldFile(rows[0].logo_url);
-    await db.execute('UPDATE tenants SET logo_url = ? WHERE id = ?', [publicUrl, tenantId]);
+    await db.query('UPDATE tenants SET logo_url = ? WHERE id = ?', [publicUrl, tenantId]);
     ok(res, { url: publicUrl }, 'Logo uploaded', 201);
   } catch (err) { next(err); }
 };

@@ -4,9 +4,9 @@ const { ok, fail } = require('../utils/responseUtils');
 const { logger }   = require('../config/logger');
 
 async function incrementTokenVersion(userId, tenantId) {
-  const [result] = await db.execute('UPDATE users SET token_version = token_version + 1 WHERE id = ? AND tenant_id = ?', [userId, tenantId]);
+  const [result] = await db.query('UPDATE users SET token_version = token_version + 1 WHERE id = ? AND tenant_id = ?', [userId, tenantId]);
   if (result.affectedRows === 0) throw Object.assign(new Error('User not found'), { status: 404 });
-  const [[user]] = await db.execute('SELECT token_version FROM users WHERE id = ? AND tenant_id = ? LIMIT 1', [userId, tenantId]);
+  const [[user]] = await db.query('SELECT token_version FROM users WHERE id = ? AND tenant_id = ? LIMIT 1', [userId, tenantId]);
   return user.token_version;
 }
 
@@ -23,7 +23,7 @@ exports.revokeUserSessions = async (req, res, next) => {
   try {
     const targetUserId = parseInt(req.body.userId);
     const tenantId     = req.tenant.id;
-    const [[targetUser]] = await db.execute('SELECT id, name, email FROM users WHERE id = ? AND tenant_id = ? LIMIT 1', [targetUserId, tenantId]);
+    const [[targetUser]] = await db.query('SELECT id, name, email FROM users WHERE id = ? AND tenant_id = ? LIMIT 1', [targetUserId, tenantId]);
     if (!targetUser) return fail(res, 'User not found in your tenant', 404);
     await incrementTokenVersion(targetUserId, tenantId);
     logger.info('Admin revoked user sessions', { adminUserId: req.user.userId, targetUserId, tenantId });
@@ -33,7 +33,7 @@ exports.revokeUserSessions = async (req, res, next) => {
 
 exports.sessionInfo = async (req, res, next) => {
   try {
-    const [[user]] = await db.execute('SELECT id, name, email, role, token_version FROM users WHERE id = ? AND tenant_id = ? LIMIT 1', [req.user.userId, req.tenant.id]);
+    const [[user]] = await db.query('SELECT id, name, email, role, token_version FROM users WHERE id = ? AND tenant_id = ? LIMIT 1', [req.user.userId, req.tenant.id]);
     if (!user) return fail(res, 'User not found', 404);
     const jwt     = require('jsonwebtoken');
     const token   = req.cookies?.token || req.headers.authorization?.slice(7);

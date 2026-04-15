@@ -8,9 +8,9 @@ function escXml(str) { return String(str).replace(/&/g,'&amp;').replace(/</g,'&l
 router.get('/sitemap.xml', async (req, res, next) => {
   try {
     const domain = (req.headers.host || '').split(':')[0].toLowerCase();
-    const [[tenant]] = await db.execute('SELECT id FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1', [domain]);
+    const [[tenant]] = await db.query('SELECT id FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1', [domain]);
     if (!tenant) return res.status(404).send('Not found');
-    const [products] = await db.execute('SELECT slug, updated_at FROM products WHERE tenant_id = ? AND is_active = 1', [tenant.id]);
+    const [products] = await db.query('SELECT slug, updated_at FROM products WHERE tenant_id = ? AND is_active = 1', [tenant.id]);
     const base = `https://${domain}`;
     const urls = [
       { loc: base,               changefreq: 'daily',  priority: '1.0' },

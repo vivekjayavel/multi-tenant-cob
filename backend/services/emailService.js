@@ -20,7 +20,7 @@ async function sendOrderConfirmation({ tenant, order, items, user }) {
 }
 
 async function sendNewOrderAlert({ db, tenant, order, items, customer }) {
-  const [admins] = await db.execute("SELECT email FROM users WHERE tenant_id = ? AND role = 'admin' AND is_active = 1", [tenant.id]);
+  const [admins] = await db.query("SELECT email FROM users WHERE tenant_id = ? AND role = 'admin' AND is_active = 1", [tenant.id]);
   let adminEmails = admins.map(a => a.email);
   if (!adminEmails.length) {
     if (process.env.DEFAULT_ADMIN_EMAIL) adminEmails = [process.env.DEFAULT_ADMIN_EMAIL];

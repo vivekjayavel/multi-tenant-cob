@@ -28,9 +28,9 @@ async function fulfillOrder(orderId, tenantId, razorpayPaymentId, razorpaySignat
     await conn.commit();
   } catch (err) { await conn.rollback(); throw err; } finally { conn.release(); }
 
-  const [[order]] = await db.execute(`SELECT o.id, o.total_price, o.status, o.delivery_address, o.notes, o.created_at, u.name AS user_name, u.email AS user_email FROM orders o JOIN users u ON u.id = o.user_id WHERE o.id = ? AND o.tenant_id = ? LIMIT 1`, [orderId, tenantId]);
-  const [emailItems] = await db.execute('SELECT product_name, quantity, price FROM order_items WHERE order_id = ?', [orderId]);
-  const [[tenant]] = await db.execute('SELECT id, name, domain, logo_url, theme_color, whatsapp_number FROM tenants WHERE id = ? LIMIT 1', [tenantId]);
+  const [[order]] = await db.query(`SELECT o.id, o.total_price, o.status, o.delivery_address, o.notes, o.created_at, u.name AS user_name, u.email AS user_email FROM orders o JOIN users u ON u.id = o.user_id WHERE o.id = ? AND o.tenant_id = ? LIMIT 1`, [orderId, tenantId]);
+  const [emailItems] = await db.query('SELECT product_name, quantity, price FROM order_items WHERE order_id = ?', [orderId]);
+  const [[tenant]] = await db.query('SELECT id, name, domain, logo_url, theme_color, whatsapp_number FROM tenants WHERE id = ? LIMIT 1', [tenantId]);
   const user = { name: order.user_name, email: order.user_email };
   const customer = { name: order.user_name, email: order.user_email, phone: null };
   Promise.all([
@@ -68,7 +68,7 @@ exports.verifyPayment = async (req, res, next) => {
     const body     = `${razorpay_order_id}|${razorpay_payment_id}`;
     const expected = crypto.createHmac('sha256', keySecret).update(body).digest('hex');
     if (expected !== razorpay_signature) { logPaymentVerificationFailed({ tenantId: req.tenant.id, orderId, razorpayOrderId: razorpay_order_id, razorpayPaymentId: razorpay_payment_id, reason: 'HMAC mismatch', userId: req.user.userId }); return fail(res, 'Payment verification failed', 400); }
-    const [[dbOrder]] = await db.execute('SELECT id, total_price, status, razorpay_order_id FROM orders WHERE id = ? AND tenant_id = ? AND user_id = ? LIMIT 1', [orderId, req.tenant.id, req.user.userId]);
+    const [[dbOrder]] = await db.query('SELECT id, total_price, status, razorpay_order_id FROM orders WHERE id = ? AND tenant_id = ? AND user_id = ? LIMIT 1', [orderId, req.tenant.id, req.user.userId]);
     if (!dbOrder) return fail(res, 'Order not found', 404);
     if (dbOrder.status === 'paid') return ok(res, { paymentId: razorpay_payment_id }, 'Payment successful');
     if (dbOrder.razorpay_order_id !== razorpay_order_id) { logPaymentVerificationFailed({ tenantId: req.tenant.id, orderId, razorpayOrderId: razorpay_order_id, razorpayPaymentId: razorpay_payment_id, reason: 'Order ID mismatch', userId: req.user.userId, securityEvent: true }); return fail(res, 'Payment verification failed', 400); }
@@ -98,11 +98,11 @@ exports.handleWebhook = async (req, res) => {
     const tenantId = parseInt(notes.tenant_id), orderId = parseInt(notes.order_id), razorpayPayId = payment?.id;
     if (!tenantId || !orderId || !razorpayPayId) return res.status(200).json({ success: true, reason: 'missing_fields_acked' });
     try {
-      const [[orderCheck]] = await db.execute('SELECT id, status FROM orders WHERE id = ? AND tenant_id = ? LIMIT 1', [orderId, tenantId]);
+      const [[orderCheck]] = await db.query('SELECT id, status FROM orders WHERE id = ? AND tenant_id = ? LIMIT 1', [orderId, tenantId]);
       if (!orderCheck) return res.status(200).json({ success: true, reason: 'order_not_found_acked' });
       const fulfilled = await fulfillOrder(orderId, tenantId, razorpayPayId, null);
       if (!fulfilled) {
-        const [[orderState]] = await db.execute('SELECT status FROM orders WHERE id = ? LIMIT 1', [orderId]);
+        const [[orderState]] = await db.query('SELECT status FROM orders WHERE id = ? LIMIT 1', [orderId]);
         if (orderState?.status === 'cancelled') logger.error('MANUAL ACTION REQUIRED: payment captured for cancelled order', { orderId, tenantId, razorpayPayId, action: 'Issue refund via Razorpay dashboard' });
       }
       logPaymentSuccess({ tenantId, orderId, razorpayPaymentId: razorpayPayId, razorpayOrderId: payment?.order_id, amount: payment?.amount, userId: null, source: 'webhook' });

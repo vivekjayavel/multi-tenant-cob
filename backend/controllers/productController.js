@@ -16,7 +16,7 @@ exports.list = async (req, res, next) => {
 
 exports.getBySlug = async (req, res, next) => {
   try {
-    const [rows] = await db.execute('SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1', [req.tenant.id, req.params.slug]);
+    const [rows] = await db.query('SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1', [req.tenant.id, req.params.slug]);
     if (!rows.length) return fail(res, 'Product not found', 404);
     ok(res, { product: { ...rows[0], available_qty: Math.max(0, rows[0].stock_qty - rows[0].reserved_qty) } });
   } catch (err) { next(err); }
@@ -27,7 +27,7 @@ exports.create = async (req, res, next) => {
     const { name, description, price, image_url, category, stock_qty = 0 } = req.body;
     const tenantId = req.tenant.id;
     const slug = req.body.slug || slugify(name, { lower: true, strict: true });
-    const [result] = await db.execute('INSERT INTO products (tenant_id, name, description, price, image_url, category, slug, stock_qty) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [tenantId, name, description, price, image_url, category, slug, stock_qty]);
+    const [result] = await db.query('INSERT INTO products (tenant_id, name, description, price, image_url, category, slug, stock_qty) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [tenantId, name, description, price, image_url, category, slug, stock_qty]);
     invalidateProductCache(tenantId);
     ok(res, { id: result.insertId, slug }, 'Product created', 201);
   } catch (err) { next(err); }
@@ -41,7 +41,7 @@ exports.update = async (req, res, next) => {
     for (const key of allowed) { if (req.body[key] !== undefined) { fields.push(`${key} = ?`); values.push(req.body[key]); } }
     if (!fields.length) return fail(res, 'No valid fields to update');
     values.push(id, tenantId);
-    const [result] = await db.execute(`UPDATE products SET ${fields.join(', ')} WHERE id = ? AND tenant_id = ?`, values);
+    const [result] = await db.query(`UPDATE products SET ${fields.join(', ')} WHERE id = ? AND tenant_id = ?`, values);
     if (!result.affectedRows) return fail(res, 'Product not found', 404);
     invalidateProductCache(tenantId);
     ok(res, {}, 'Product updated');
@@ -50,7 +50,7 @@ exports.update = async (req, res, next) => {
 
 exports.remove = async (req, res, next) => {
   try {
-    const [result] = await db.execute('UPDATE products SET is_active = 0 WHERE id = ? AND tenant_id = ?', [req.params.id, req.tenant.id]);
+    const [result] = await db.query('UPDATE products SET is_active = 0 WHERE id = ? AND tenant_id = ?', [req.params.id, req.tenant.id]);
     if (!result.affectedRows) return fail(res, 'Product not found', 404);
     invalidateProductCache(req.tenant.id);
     ok(res, {}, 'Product deleted');

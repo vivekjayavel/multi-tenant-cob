@@ -34,7 +34,7 @@ export default function AdminDashboard({ tenant, adminUser }) {
             <h1 className="font-display text-2xl text-gray-900">Welcome back, {adminUser?.name?.split(' ')[0] || 'Admin'} 👋</h1>
             <p className="text-sm text-gray-500 mt-1">{tenant.name} — Admin Panel</p>
           </div>
-          {loading ? (
+          {loading || !stats ? (
             <div className="grid sm:grid-cols-4 gap-4">{[...Array(4)].map((_, i) => <div key={i} className="h-28 bg-gray-100 rounded-2xl animate-pulse" />)}</div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

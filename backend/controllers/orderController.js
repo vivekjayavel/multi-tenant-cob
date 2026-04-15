@@ -36,7 +36,7 @@ exports.create = async (req, res, next) => {
 
 exports.myOrders = async (req, res, next) => {
   try {
-    const [orders] = await db.execute(`SELECT o.id, o.total_price, o.status, o.created_at, o.razorpay_order_id, o.payment_id, JSON_ARRAYAGG(JSON_OBJECT('product_name', oi.product_name, 'quantity', oi.quantity, 'price', oi.price)) AS items FROM orders o JOIN order_items oi ON oi.order_id = o.id WHERE o.tenant_id = ? AND o.user_id = ? GROUP BY o.id ORDER BY o.created_at DESC`, [req.tenant.id, req.user.userId]);
+    const [orders] = await db.query(`SELECT o.id, o.total_price, o.status, o.created_at, o.razorpay_order_id, o.payment_id, JSON_ARRAYAGG(JSON_OBJECT('product_name', oi.product_name, 'quantity', oi.quantity, 'price', oi.price)) AS items FROM orders o JOIN order_items oi ON oi.order_id = o.id WHERE o.tenant_id = ? AND o.user_id = ? GROUP BY o.id ORDER BY o.created_at DESC`, [req.tenant.id, req.user.userId]);
     const parsed = orders.map(o => ({ ...o, items: o.items ? (typeof o.items === 'string' ? JSON.parse(o.items) : o.items).filter(i => i !== null) : [] }));
     ok(res, { orders: parsed });
   } catch (err) { next(err); }
@@ -49,7 +49,7 @@ exports.listAll = async (req, res, next) => {
     const params = [req.tenant.id];
     let where = 'WHERE o.tenant_id = ?';
     if (status) { where += ' AND o.status = ?'; params.push(status); }
-    const [orders] = await db.execute(`SELECT o.id, o.total_price, o.status, o.created_at, u.name AS customer_name, u.email AS customer_email FROM orders o JOIN users u ON u.id = o.user_id ${where} ORDER BY o.created_at DESC LIMIT ? OFFSET ?`, [...params, parseInt(limit), offset]);
+    const [orders] = await db.query(`SELECT o.id, o.total_price, o.status, o.created_at, u.name AS customer_name, u.email AS customer_email FROM orders o JOIN users u ON u.id = o.user_id ${where} ORDER BY o.created_at DESC LIMIT ? OFFSET ?`, [...params, parseInt(limit), offset]);
     ok(res, { orders });
   } catch (err) { next(err); }
 };
