@@ -95,7 +95,7 @@ VALUES ('Sweet Cakes', 'localhost', '#D97706', '919876543210');
 -- Seed: admin user (password: Admin@123)
 INSERT INTO users (tenant_id, name, email, password, role)
 VALUES (1, 'Admin User', 'admin@sweetcakes.com',
-  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewdBpj2Xk4oZ5GIy', 'admin');
+  '$2a$12$5zV0I0/hNDj2i1NxRGVJaurtGR3OgJ.n6DApm.t5c6AWptoiXB0aO', 'admin');
 
 -- Seed: sample products
 INSERT INTO products (tenant_id, name, description, price, category, slug, stock_qty) VALUES
