@@ -7,7 +7,7 @@
     "node": ">=18.0.0 <20.0.0"
   },
   "scripts": {
-    "dev": "node -e \"process.env.NODE_ENV='development'; require('./server.js')\"",
+    "dev": "next dev frontend -p 3000",
     "build": "next build frontend",
     "start": "node -e \"process.env.NODE_ENV='production'; require('./server.js')\"",
     "backup": "node scripts/backup.js",
@@ -21,7 +21,10 @@
     "security:verify": "node scripts/verify-file-security.js",
     "release:abandoned": "node scripts/release-abandoned-orders.js",
     "clean": "node -e \"const fs=require('fs');const p='frontend/.next';if(fs.existsSync(p)){fs.rmSync(p,{recursive:true,force:true});console.log('\u2705 Cleaned frontend/.next');}else{console.log('Nothing to clean');}\"",
-    "dev:fresh": "npm run clean && npm run dev"
+    "dev:fresh": "npm run clean && npm run dev",
+    "dev:next": "next dev frontend -p 3001",
+    "dev:api": "node -e \"process.env.NODE_ENV='development'; process.env.PORT='3001'; require('./server.js')\"",
+    "dev:all": "node scripts/dev-start.js"
   },
   "dependencies": {
     "next": "^14.2.0",

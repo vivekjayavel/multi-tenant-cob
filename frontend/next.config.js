@@ -29,6 +29,21 @@ const nextConfig = {
       ? { exclude: ['warn', 'error'] } : false,
   },
 
+
+  async rewrites() {
+    // In development, proxy /api and /uploads to Express on port 3001
+    // In production, Express serves everything on one port (no proxy needed)
+    if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_API_URL) {
+      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      return [
+        { source: '/api/:path*',     destination: `${apiBase}/api/:path*`     },
+        { source: '/uploads/:path*', destination: `${apiBase}/uploads/:path*` },
+        { source: '/health',         destination: `${apiBase}/health`         },
+      ];
+    }
+    return [];
+  },
+
   async headers() {
     const isDev = process.env.NODE_ENV !== 'production';
 
