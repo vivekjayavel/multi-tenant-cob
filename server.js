@@ -114,7 +114,18 @@ app.prepare().then(() => {
   server.use('/api/upload',   uploadRoutes);
   server.use('/api/payment',  paymentRoutes);
   server.use(errorHandler);
-  server.all('*', (req, res) => handle(req, res));
+  // In dev API-only mode, redirect page requests to Next.js dev server
+  if (process.env.API_ONLY === 'true') {
+    const nextPort = parseInt(process.env.PORT || 3001) - 1;
+    server.all('*', (req, res) => {
+      if (!req.path.startsWith('/api') && !req.path.startsWith('/uploads')) {
+        return res.redirect(`http://localhost:${nextPort}${req.originalUrl}`);
+      }
+      res.status(404).json({ success: false, message: 'Not found' });
+    });
+  } else {
+    server.all('*', (req, res) => handle(req, res));
+  }
 
   const PORT = parseInt(process.env.PORT) || 3000;
   const httpServer = server.listen(PORT, () =>
