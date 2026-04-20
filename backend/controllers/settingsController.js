@@ -61,15 +61,31 @@ function mergeDeep(defaults, overrides) {
 
 exports.getSettings = async (req, res, next) => {
   try {
-    const [[tenant]] = await db.query(
-      'SELECT tenant_settings FROM tenants WHERE id = ? LIMIT 1',
-      [req.tenant.id]
-    );
-    const saved    = tenant?.tenant_settings
-      ? (typeof tenant.tenant_settings === 'string'
+    let saved = {};
+    try {
+      const [[tenant]] = await db.query(
+        'SELECT tenant_settings FROM tenants WHERE id = ? LIMIT 1',
+        [req.tenant.id]
+      );
+      if (tenant?.tenant_settings) {
+        saved = typeof tenant.tenant_settings === 'string'
           ? JSON.parse(tenant.tenant_settings)
-          : tenant.tenant_settings)
-      : {};
+          : tenant.tenant_settings;
+      }
+    } catch (dbErr) {
+      // Column doesn't exist yet — auto-create it then return defaults
+      if (dbErr.code === 'ER_BAD_FIELD_ERROR' || dbErr.message?.includes('tenant_settings')) {
+        try {
+          await db.query('ALTER TABLE tenants ADD COLUMN tenant_settings JSON DEFAULT NULL AFTER whatsapp_number');
+          logger.info('Auto-created tenant_settings column');
+        } catch (alterErr) {
+          if (!alterErr.message?.includes('Duplicate column')) {
+            logger.error('Failed to create tenant_settings column', { error: alterErr.message });
+          }
+        }
+      }
+      // Return defaults either way
+    }
     const settings = mergeDeep(DEFAULT_SETTINGS, saved);
     ok(res, { settings });
   } catch (err) { next(err); }
@@ -83,15 +99,27 @@ exports.updateSettings = async (req, res, next) => {
     const allowed = ['hero','features','footer','seo'];
     if (!allowed.includes(section)) return fail(res, `Invalid section: ${section}`);
 
-    const [[tenant]] = await db.query(
-      'SELECT tenant_settings FROM tenants WHERE id = ? LIMIT 1',
-      [req.tenant.id]
-    );
-    const current = tenant?.tenant_settings
-      ? (typeof tenant.tenant_settings === 'string'
+    let current = {};
+    try {
+      const [[tenant]] = await db.query(
+        'SELECT tenant_settings FROM tenants WHERE id = ? LIMIT 1',
+        [req.tenant.id]
+      );
+      if (tenant?.tenant_settings) {
+        current = typeof tenant.tenant_settings === 'string'
           ? JSON.parse(tenant.tenant_settings)
-          : tenant.tenant_settings)
-      : {};
+          : tenant.tenant_settings;
+      }
+    } catch (dbErr) {
+      if (dbErr.code === 'ER_BAD_FIELD_ERROR' || dbErr.message?.includes('tenant_settings')) {
+        try {
+          await db.query('ALTER TABLE tenants ADD COLUMN tenant_settings JSON DEFAULT NULL AFTER whatsapp_number');
+          logger.info('Auto-created tenant_settings column');
+        } catch (alterErr) {
+          if (!alterErr.message?.includes('Duplicate column')) throw alterErr;
+        }
+      }
+    }
 
     current[section] = data;
 
