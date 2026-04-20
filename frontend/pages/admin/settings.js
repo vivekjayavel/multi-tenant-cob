@@ -101,7 +101,8 @@ function HeroSection({ data, onSave, saving, tenant }) {
     setUploading(true);
     try {
       const fd = new FormData(); fd.append('image', file);
-      const { data } = await api.post('/settings/hero-image', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      // Do NOT set Content-Type manually — axios auto-sets multipart/form-data WITH boundary
+      const { data } = await api.post('/settings/hero-image', fd);
       setForm(p => ({ ...p, image_url: data.url }));
     } catch { alert('Image upload failed'); } finally { setUploading(false); }
   };
