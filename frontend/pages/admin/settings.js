@@ -326,14 +326,28 @@ function BrandingSection({ tenant, saving, setSaving, setError, setSaved }) {
   const handleLogoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Validate file type client-side before uploading
+    const allowed = ['image/jpeg','image/jpg','image/png','image/webp'];
+    if (!allowed.includes(file.type)) {
+      setError('Only JPG, PNG and WebP images are allowed');
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Logo must be under 5MB');
+      return;
+    }
     setLogoUploading(true);
+    setError(null);
     try {
       const fd = new FormData();
       fd.append('image', file);
+      // Do NOT set Content-Type header — axios sets it with boundary automatically
       const { data } = await api.post('/upload/logo', fd);
       setLogoUrl(data.url);
     } catch (err) {
-      setError(err?.response?.data?.message || 'Logo upload failed');
+      const msg = err?.response?.data?.message || err?.message || 'Logo upload failed';
+      setError(`Upload failed: ${msg}`);
+      console.error('Logo upload error:', err?.response?.data || err);
     } finally { setLogoUploading(false); }
   };
 
