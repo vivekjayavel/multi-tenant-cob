@@ -99,7 +99,7 @@ export default function AdminProducts({ tenant, adminUser }) {
                     { key: 'price',     label: 'Price (₹)',    required: true,  type: 'number', min: '0', step: '0.01' },
                     { key: 'stock_qty', label: 'Stock qty',    required: true,  type: 'number', min: '0' },
                     { key: 'category',  label: 'Category',     required: false, type: 'text',   placeholder: 'Cakes / Breads / Cupcakes' },
-                    { key: 'slug',      label: 'URL slug',     required: true,  type: 'text',   pattern: '[a-z0-9-]+' },
+                    { key: 'slug',      label: 'URL slug',     required: true,  type: 'text',   pattern: '[a-z0-9]+(-[a-z0-9]+)*' },
                   ].map(({ key, label, ...rest }) => (
                     <div key={key}>
                       <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">{label}</label>
