@@ -25,7 +25,7 @@ async function verifyAdminToken(token, domain) {
     throw Object.assign(new Error('Admin access required'), { reason: 'unauthorized' });
 
   const [[tenant]] = await db.query(
-    'SELECT id, name, domain, logo_url, theme_color, whatsapp_number, is_active FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1',
+    'SELECT id, name, domain, logo_url, theme_color, whatsapp_number, tenant_settings, is_active FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1',
     [domain]
   );
   if (!tenant)

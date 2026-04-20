@@ -4,21 +4,19 @@
 // statement issues ("Incorrect arguments to mysqld_stmt_execute").
 
 async function getTenantFromRequest(req) {
-  const db = require('../../backend/config/db');
-  const { tenantCache } = require('../../backend/config/cache');
-
-  const domain   = (req.headers.host || '').split(':')[0].toLowerCase();
-  const cacheKey = `domain:${domain}`;
-  const cached   = tenantCache.get(cacheKey);
-  if (cached) return cached;
+  // Always fetch fresh from DB — no cache.
+  // In dev, Next.js and Express run in separate processes with separate
+  // in-memory caches. Caching here would show stale theme_color/settings
+  // after admin changes. Tenant queries are tiny (1 row, indexed) so
+  // the DB hit is negligible.
+  const db     = require('../../backend/config/db');
+  const domain = (req.headers.host || '').split(':')[0].toLowerCase();
 
   const [rows] = await db.query(
     'SELECT id, name, domain, logo_url, theme_color, whatsapp_number, tenant_settings FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1',
     [domain]
   );
-  const tenant = rows[0] || null;
-  if (tenant) tenantCache.set(cacheKey, tenant);
-  return tenant;
+  return rows[0] || null;
 }
 
 async function getProductsForPage(tenantId, category = null) {

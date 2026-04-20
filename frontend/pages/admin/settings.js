@@ -333,7 +333,9 @@ function BrandingSection({ tenant, saving, setSaving, setError, setSaved }) {
     try {
       await api.put('/settings/branding', { theme_color: color, name, whatsapp_number: whatsapp });
       setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+      // Reload after 1s so SSR fetches fresh tenant data (new color, name etc.)
+      // This ensures the entire app reflects the change immediately
+      setTimeout(() => { window.location.reload(); }, 1000);
     } catch (err) {
       setError(err?.response?.data?.message || 'Save failed');
     } finally { setSaving(false); }
