@@ -13,7 +13,7 @@ async function getTenantFromRequest(req) {
   if (cached) return cached;
 
   const [rows] = await db.query(
-    'SELECT id, name, domain, logo_url, theme_color, whatsapp_number FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1',
+    'SELECT id, name, domain, logo_url, theme_color, whatsapp_number, tenant_settings FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1',
     [domain]
   );
   const tenant = rows[0] || null;

@@ -22,6 +22,7 @@ const productRoutes    = require('./backend/routes/productRoutes');
 const orderRoutes      = require('./backend/routes/orderRoutes');
 const uploadRoutes     = require('./backend/routes/uploadRoutes');
 const paymentRoutes    = require('./backend/routes/paymentRoutes');
+const settingsRoutes   = require('./backend/routes/settingsRoutes');
 const seoRoutes        = require('./backend/routes/seoRoutes');
 const superadminRoutes = require('./backend/routes/superadminRoutes');
 
@@ -98,7 +99,7 @@ app.prepare().then(() => {
     const parts = urlPath.split('/').filter(Boolean);
     // Expected: ['1', 'products', 'filename.jpg']
     if (parts.length < 3 || !/^\d+$/.test(parts[0])) return res.status(403).json({ success: false, message: 'Forbidden' });
-    if (!['products','logo'].includes(parts[1])) return res.status(403).json({ success: false, message: 'Forbidden' });
+    if (!['products','logo','hero','banner'].includes(parts[1])) return res.status(403).json({ success: false, message: 'Forbidden' });
     next();
   }, express.static(uploadsPath, { maxAge: '7d', etag: true, index: false,
     setHeaders(res) { res.setHeader('X-Content-Type-Options', 'nosniff'); res.setHeader('Content-Security-Policy', "default-src 'none'"); },
@@ -113,6 +114,7 @@ app.prepare().then(() => {
   server.use('/api/orders',   orderRoutes);
   server.use('/api/upload',   uploadRoutes);
   server.use('/api/payment',  paymentRoutes);
+  server.use('/api/settings', settingsRoutes);
   server.use(errorHandler);
   // In dev API-only mode, redirect page requests to Next.js dev server
   if (process.env.API_ONLY === 'true') {
