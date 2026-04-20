@@ -24,7 +24,8 @@
     "dev:fresh": "npm run clean && npm run dev",
     "dev:next": "next dev frontend -p 3000",
     "dev:api": "node -e \"require('dotenv').config(); process.env.NODE_ENV='development'; process.env.PORT='3001'; require('./server.js')\"",
-    "dev:all": "node scripts/dev-start.js"
+    "dev:all": "node scripts/dev-start.js",
+    "verify:uploads": "node scripts/verify-uploads.js"
   },
   "dependencies": {
     "archiver": "^7.0.1",

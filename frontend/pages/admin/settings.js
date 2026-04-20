@@ -99,7 +99,7 @@ function HeroSection({ data, onSave, saving, tenant }) {
     setUploading(true);
     try {
       const fd = new FormData(); fd.append('image', file);
-      const { data } = await api.post('/upload/product-image', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
+      const { data } = await api.post('/settings/hero-image', fd, { headers: { 'Content-Type': 'multipart/form-data' } });
       setForm(p => ({ ...p, image_url: data.url }));
     } catch { alert('Image upload failed'); } finally { setUploading(false); }
   };
