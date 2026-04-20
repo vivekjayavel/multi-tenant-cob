@@ -86,7 +86,7 @@ const nextConfig = {
               scriptSrc,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https:",
+              "img-src 'self' data: blob: https: http://localhost:*",
               connectSrc,
               "frame-src https://api.razorpay.com https://checkout.razorpay.com https://cdn.razorpay.com https://*.razorpay.com",
             ].join('; '),

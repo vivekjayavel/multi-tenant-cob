@@ -89,11 +89,14 @@ app.prepare().then(() => {
 
   const uploadsPath = path.join(__dirname, 'uploads');
   server.use('/uploads', (req, res, next) => {
-    const n = path.normalize(req.path);
-    if (n.includes('..')) return res.status(403).json({ success: false, message: 'Forbidden' });
-    const ext = path.extname(n).toLowerCase();
+    // Use forward-slash split (not path.normalize which uses backslashes on Windows)
+    const urlPath = req.path.replace(/\\/g, '/');
+    // Block path traversal
+    if (urlPath.includes('..')) return res.status(403).json({ success: false, message: 'Forbidden' });
+    const ext = urlPath.slice(urlPath.lastIndexOf('.')).toLowerCase();
     if (!['.jpg','.jpeg','.png','.webp','.avif'].includes(ext)) return res.status(403).json({ success: false, message: 'Forbidden' });
-    const parts = n.split('/').filter(Boolean);
+    const parts = urlPath.split('/').filter(Boolean);
+    // Expected: ['1', 'products', 'filename.jpg']
     if (parts.length < 3 || !/^\d+$/.test(parts[0])) return res.status(403).json({ success: false, message: 'Forbidden' });
     if (!['products','logo'].includes(parts[1])) return res.status(403).json({ success: false, message: 'Forbidden' });
     next();
