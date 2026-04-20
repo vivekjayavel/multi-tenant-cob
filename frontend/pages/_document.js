@@ -4,7 +4,6 @@ export default function Document() {
   return (
     <Html lang="en">
       <Head>
-        {/* Google Fonts */}
         <link rel="preconnect" href="https://fonts.googleapis.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://fonts.gstatic.com"    crossOrigin="anonymous" />
         <link
@@ -12,10 +11,8 @@ export default function Document() {
           rel="stylesheet"
           crossOrigin="anonymous"
         />
-        {/* NOTE: Razorpay script moved to checkout.js only — not loaded globally
-            Loading it on every page triggered CORB errors from risk detection */}
       </Head>
-      <body className="bg-white text-gray-900 antialiased">
+      <body className="bg-white text-gray-900 antialiased" suppressHydrationWarning>
         <Main />
         <NextScript />
       </body>

@@ -6,8 +6,6 @@ import '../styles/globals.css';
 export default function App({ Component, pageProps }) {
   const { tenant } = pageProps;
 
-  // Set CSS variables client-side only via useEffect
-  // globals.css :root has default amber (#D97706) as fallback
   useEffect(() => {
     if (!tenant?.theme_color) return;
     const root = document.documentElement;
