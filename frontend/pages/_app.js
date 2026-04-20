@@ -16,7 +16,7 @@ export default function App({ Component, pageProps }) {
 
   return (
     // LazyMotion loads animation features only on client, preventing SSR mismatch
-    <LazyMotion features={domAnimation} strict>
+    <LazyMotion features={domAnimation}>
       <TenantContext.Provider value={tenant || {}}>
         <CartProvider>
           <Component {...pageProps} />
