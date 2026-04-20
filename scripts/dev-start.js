@@ -1,39 +1,49 @@
 #!/usr/bin/env node
 'use strict';
 
-// Dev startup: runs both Next.js dev server and Express API server concurrently
+/**
+ * Dev startup script — runs Express API (port 3001) and Next.js (port 3000) together.
+ * Usage: npm run dev:all
+ *
+ * Next.js proxies /api/* and /uploads/* to Express via next.config.js rewrites.
+ */
+
+require('dotenv').config();
 const { spawn } = require('child_process');
 
-process.env.NODE_ENV = 'development';
+const procs = [];
 
-function start(cmd, args, env = {}) {
+function run(label, cmd, args, env = {}) {
   const proc = spawn(cmd, args, {
-    stdio:  'inherit',
-    shell:  true,
-    env:    { ...process.env, ...env },
+    stdio: 'inherit',
+    shell: true,
+    env: { ...process.env, ...env },
   });
   proc.on('exit', (code) => {
-    if (code !== 0) {
-      console.error(`Process ${cmd} exited with code ${code}`);
+    if (code && code !== 0) {
+      console.error(`[${label}] exited with code ${code}`);
+      procs.forEach(p => p.kill());
       process.exit(code);
     }
   });
+  procs.push(proc);
   return proc;
 }
 
-console.log('Starting bakery platform dev servers...\n');
-console.log('  Next.js frontend: http://localhost:3000');
-console.log('  Express API:      http://localhost:3001\n');
+console.log('\n🎂 Bakery Platform — Dev Servers\n');
+console.log('  Express API  → http://localhost:3001');
+console.log('  Next.js App  → http://localhost:3000\n');
 
-// Start Express API server on port 3001
-const api = start('node', ['server.js'], { PORT: '3001', API_ONLY: 'true' });
-
-// Start Next.js dev server on port 3000 (with API proxy to :3001)
-setTimeout(() => {
-  start('npx', ['next', 'dev', 'frontend', '-p', '3000']);
-}, 1000);
-
-process.on('SIGINT', () => {
-  api.kill();
-  process.exit(0);
+// Start Express API on port 3001
+run('API', 'node', ['server.js'], {
+  NODE_ENV: 'development',
+  PORT: '3001',
 });
+
+// Give Express a moment to start, then start Next.js
+setTimeout(() => {
+  run('NEXT', 'npx', ['next', 'dev', 'frontend', '-p', '3000']);
+}, 1500);
+
+process.on('SIGINT',  () => { procs.forEach(p => p.kill()); process.exit(0); });
+process.on('SIGTERM', () => { procs.forEach(p => p.kill()); process.exit(0); });
