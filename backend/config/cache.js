@@ -11,7 +11,15 @@ function buildKey(tenantId, ...parts) { return `${tenantId}:${parts.filter(Boole
 function invalidateProductCache(tenantId) {
   const prefix = `${tenantId}:`;
   let count = 0;
-  for (const key of productCache.keys()) { if (key.startsWith(prefix)) { productCache.delete(key); count++; } }
+  // Clear productCache (SSR prefetch cache)
+  for (const key of productCache.keys()) {
+    if (key.startsWith(prefix)) { productCache.delete(key); count++; }
+  }
+  // Also clear responseCache (API response cache used by memCache middleware)
+  // Without this, admin /api/products returns stale responses without new images
+  for (const key of responseCache.keys()) {
+    if (key.startsWith(prefix)) { responseCache.delete(key); count++; }
+  }
   if (count > 0) logger.info('Product cache invalidated', { tenantId, entriesRemoved: count });
 }
 
