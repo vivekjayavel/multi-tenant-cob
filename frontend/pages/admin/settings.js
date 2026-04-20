@@ -6,6 +6,7 @@ import api from '../../lib/api';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
 
 const TABS = [
+  { key: 'branding', label: 'Branding',      icon: '🎨' },
   { key: 'hero',     label: 'Hero Section',  icon: '🏠' },
   { key: 'features', label: 'Features',      icon: '⭐' },
   { key: 'footer',   label: 'Footer',        icon: '📄' },
@@ -73,6 +74,7 @@ export default function AdminSettings({ tenant, adminUser }) {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-5">{error}</p>}
 
+            {tab === 'branding' && <BrandingSection tenant={tenant} saving={saving} setSaving={setSaving} setError={setError} setSaved={setSaved} />}
             {tab === 'hero'     && <HeroSection     data={settings?.hero}     onSave={d => save('hero', d)}     saving={saving} tenant={tenant} />}
             {tab === 'features' && <FeaturesSection data={settings?.features} onSave={d => save('features', d)} saving={saving} />}
             {tab === 'footer'   && <FooterSection   data={settings?.footer}   onSave={d => save('footer', d)}   saving={saving} />}
@@ -297,3 +299,135 @@ function SaveBtn({ saving, onClick }) {
 }
 
 export const getServerSideProps = withAdminAuth(async ({ tenant }) => ({ props: { tenant } }));
+
+/* ─── Branding Section ─────────────────────────────────── */
+const PRESET_COLORS = [
+  { name: 'Amber',     hex: '#D97706' },
+  { name: 'Rose',      hex: '#E11D48' },
+  { name: 'Violet',    hex: '#7C3AED' },
+  { name: 'Emerald',   hex: '#059669' },
+  { name: 'Sky',       hex: '#0284C7' },
+  { name: 'Orange',    hex: '#EA580C' },
+  { name: 'Pink',      hex: '#DB2777' },
+  { name: 'Teal',      hex: '#0D9488' },
+  { name: 'Indigo',    hex: '#4F46E5' },
+  { name: 'Slate',     hex: '#475569' },
+];
+
+function BrandingSection({ tenant, saving, setSaving, setError, setSaved }) {
+  const [name,     setName]     = useState(tenant?.name            || '');
+  const [color,    setColor]    = useState(tenant?.theme_color     || '#D97706');
+  const [whatsapp, setWhatsapp] = useState(tenant?.whatsapp_number || '');
+  const [preview,  setPreview]  = useState(tenant?.theme_color     || '#D97706');
+
+  const handleColorChange = (hex) => {
+    setColor(hex);
+    setPreview(hex);
+    // Live preview — update CSS variable immediately
+    document.documentElement.style.setProperty('--tenant-primary',      hex);
+    document.documentElement.style.setProperty('--tenant-primary-dark', darken(hex, 15));
+  };
+
+  const handleSave = async () => {
+    setSaving(true); setError(null); setSaved(false);
+    try {
+      await api.put('/settings/branding', { theme_color: color, name, whatsapp_number: whatsapp });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      setError(err?.response?.data?.message || 'Save failed');
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <div className="space-y-6">
+      <h2 className="font-semibold text-gray-800">Branding & Theme</h2>
+
+      {/* Store name */}
+      <div>
+        <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Store name</label>
+        <input value={name} onChange={e => setName(e.target.value)}
+          placeholder="Sweet Cakes"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 transition-all" />
+      </div>
+
+      {/* WhatsApp */}
+      <div>
+        <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">WhatsApp number <span className="text-gray-400 normal-case font-normal">(digits only, no spaces)</span></label>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500 bg-gray-50 border border-gray-200 px-3 py-3 rounded-xl">+</span>
+          <input value={whatsapp} onChange={e => setWhatsapp(e.target.value.replace(/\D/g,''))}
+            placeholder="919876543210" maxLength={15}
+            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 transition-all" />
+        </div>
+        <p className="text-xs text-gray-400 mt-1">Include country code — e.g. 91 for India</p>
+      </div>
+
+      {/* Theme color */}
+      <div>
+        <label className="block text-xs font-semibold text-gray-600 mb-3 uppercase tracking-wide">Theme color</label>
+
+        {/* Live preview bar */}
+        <div className="mb-4 p-4 rounded-2xl border border-gray-100 bg-stone-50 space-y-3">
+          <p className="text-xs text-gray-500 font-medium">Live preview</p>
+          <div className="flex items-center gap-3 flex-wrap">
+            <div className="h-10 px-5 rounded-full text-white text-sm font-semibold flex items-center"
+              style={{ backgroundColor: preview }}>Primary button</div>
+            <div className="h-10 px-5 rounded-full text-sm font-semibold border-2 flex items-center"
+              style={{ borderColor: preview, color: preview }}>Outline button</div>
+            <span className="text-sm font-bold" style={{ color: preview }}>Link text</span>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold"
+              style={{ backgroundColor: preview }}>3</div>
+          </div>
+        </div>
+
+        {/* Preset swatches */}
+        <div className="grid grid-cols-5 sm:grid-cols-10 gap-2 mb-4">
+          {PRESET_COLORS.map(p => (
+            <button key={p.hex} onClick={() => handleColorChange(p.hex)}
+              title={p.name}
+              className={`w-full aspect-square rounded-xl transition-all duration-150 hover:scale-110 ${color === p.hex ? 'ring-2 ring-offset-2 ring-gray-400 scale-110' : ''}`}
+              style={{ backgroundColor: p.hex }} />
+          ))}
+        </div>
+
+        {/* Custom color input */}
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <input type="color" value={color} onChange={e => handleColorChange(e.target.value)}
+              className="w-12 h-12 rounded-xl border border-gray-200 cursor-pointer p-1" />
+          </div>
+          <div className="flex-1">
+            <label className="block text-xs text-gray-500 mb-1">Custom hex color</label>
+            <input value={color}
+              onChange={e => { if (/^#[0-9A-Fa-f]{0,6}$/.test(e.target.value)) handleColorChange(e.target.value); }}
+              placeholder="#D97706" maxLength={7}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-200 text-sm font-mono focus:outline-none focus:ring-2 transition-all" />
+          </div>
+          <div className="text-center">
+            <p className="text-xs text-gray-500 mb-1">Current</p>
+            <div className="w-12 h-12 rounded-xl border border-gray-100 shadow-sm"
+              style={{ backgroundColor: preview }} />
+          </div>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">Changes preview instantly. Click Save to apply permanently.</p>
+      </div>
+
+      <button onClick={handleSave} disabled={saving}
+        className="w-full text-white font-semibold py-3.5 rounded-xl transition-all duration-200 disabled:opacity-60 hover:-translate-y-0.5 hover:shadow-lg"
+        style={{ backgroundColor: 'var(--tenant-primary)' }}>
+        {saving ? 'Saving…' : 'Save branding'}
+      </button>
+    </div>
+  );
+}
+
+function darken(hex, amount) {
+  try {
+    const num = parseInt(hex.replace('#',''), 16);
+    const r   = Math.max(0, (num >> 16) - amount);
+    const g   = Math.max(0, ((num >> 8) & 0xFF) - amount);
+    const b   = Math.max(0, (num & 0xFF) - amount);
+    return '#' + [r,g,b].map(v => v.toString(16).padStart(2,'0')).join('');
+  } catch { return '#B45309'; }
+}

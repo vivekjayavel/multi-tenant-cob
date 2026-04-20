@@ -15,3 +15,5 @@ router.post('/banner-image', authMiddleware, adminOnly, uploadLimiter,
   upload.single('image'), validateMagicBytes, ctrl.uploadBannerImage);
 
 module.exports = router;
+
+router.put('/branding', authMiddleware, adminOnly, require('../controllers/brandingController').updateBranding);
