@@ -12,7 +12,7 @@ const path = require('path');
 const http = require('http');
 
 const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
-const PORT        = process.env.PORT || 3001;
+const PORT        = process.env.VERIFY_PORT || process.env.PORT || 3001;
 
 function checkDirectory(dir, label) {
   if (!fs.existsSync(dir)) {
@@ -89,7 +89,7 @@ async function run() {
     console.log('  ⚠️  No uploaded images found to test serving');
     console.log('  Upload a product image via the admin panel first, then re-run');
   } else {
-    const url = `http://localhost:${PORT}${testFile}`;
+    const url = `http://localhost:3001${testFile}`;
     const res = await httpGet(url);
     if (res.status === 200) {
       console.log(`  ✅ Serving OK: ${testFile}`);
@@ -104,6 +104,7 @@ async function run() {
     } else if (res.status === 0) {
       console.log(`  ⚠️  Cannot connect to ${url}`);
       console.log('  Make sure npm run dev:api is running on port 3001');
+  console.log(`  URL tested: ${url}`);
     } else {
       console.log(`  ❌ HTTP ${res.status}: ${testFile}`);
     }
@@ -117,7 +118,7 @@ async function run() {
     '/uploads/1/notallowed/test.jpg',
   ];
   for (const bad of badPaths) {
-    const res = await httpGet(`http://localhost:${PORT}${bad}`);
+    const res = await httpGet(`http://localhost:3001${bad}`);
     if (res.status === 403 || res.status === 404) {
       console.log(`  ✅ Blocked (${res.status}): ${bad}`);
     } else {
