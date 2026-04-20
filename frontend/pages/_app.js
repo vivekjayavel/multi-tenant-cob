@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
-import { TenantContext } from '../context/TenantContext';
+import { TenantContext, SettingsContext } from '../context/TenantContext';
 import { CartProvider } from '../context/CartContext';
 import '../styles/globals.css';
 
