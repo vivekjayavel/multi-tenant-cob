@@ -13,7 +13,21 @@ export default function Footer({ tenant, settings }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid sm:grid-cols-3 gap-8 pb-10 border-b border-gray-800">
           <div>
-            <p className="font-display text-lg font-bold mb-3" style={{ color: 'var(--tenant-primary)' }}>{tenant?.name || 'Bakery'}</p>
+            {/* Logo or shop name */}
+            <div className="mb-3">
+              {tenant?.logo_url ? (
+                <img
+                  src={tenant.logo_url}
+                  alt={tenant?.name || 'Bakery'}
+                  className="h-12 w-auto object-contain max-w-[160px]"
+                  style={{ filter: 'brightness(0) invert(1)', opacity: 0.95 }}
+                />
+              ) : (
+                <p className="font-display text-xl font-bold" style={{ color: 'var(--tenant-primary)' }}>
+                  {tenant?.name || 'Bakery'}
+                </p>
+              )}
+            </div>
             <p className="text-sm leading-relaxed">{tagline}</p>
             {footer.address && <p className="text-sm mt-2 leading-relaxed">📍 {footer.address}</p>}
             {footer.hours   && <p className="text-sm mt-1">🕐 {footer.hours}</p>}

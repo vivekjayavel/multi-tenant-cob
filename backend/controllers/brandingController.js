@@ -6,7 +6,7 @@ const { logger }        = require('../config/logger');
 
 exports.updateBranding = async (req, res, next) => {
   try {
-    const { theme_color, name, whatsapp_number } = req.body;
+    const { theme_color, name, whatsapp_number, logo_url } = req.body;
     const tenantId = req.tenant.id;
     const fields   = [];
     const values   = [];
@@ -15,6 +15,10 @@ exports.updateBranding = async (req, res, next) => {
       if (!/^#[0-9A-Fa-f]{6}$/.test(theme_color))
         return fail(res, 'Invalid color format. Use hex like #D97706');
       fields.push('theme_color = ?'); values.push(theme_color);
+    }
+    if (logo_url !== undefined) {
+      // logo_url can be a path or empty string (to remove logo)
+      fields.push('logo_url = ?'); values.push(logo_url || null);
     }
     if (name !== undefined) {
       if (!name.trim()) return fail(res, 'Store name cannot be empty');

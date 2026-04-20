@@ -26,7 +26,10 @@ export default function AdminLayout({ children, tenant, active, adminUser }) {
     <div className="min-h-screen bg-stone-50 flex">
       <aside className="w-56 flex-shrink-0 bg-white border-r border-gray-100 flex flex-col fixed top-0 bottom-0 z-30 hidden md:flex">
         <div className="px-5 py-5 border-b border-gray-50">
-          {tenant?.logo_url ? <img src={tenant.logo_url} alt={tenant.name} className="h-7 object-contain" /> : <p className="font-display font-bold text-sm" style={{ color: 'var(--tenant-primary)' }}>{tenant?.name}</p>}
+          {tenant?.logo_url
+            ? <img src={tenant.logo_url} alt={tenant.name} className="h-8 w-auto object-contain max-w-[140px]" />
+            : <p className="font-display font-bold text-sm" style={{ color: 'var(--tenant-primary)' }}>{tenant?.name}</p>
+          }
           <p className="text-[10px] text-gray-400 mt-0.5 uppercase tracking-widest">Admin Panel</p>
         </div>
         {adminUser && <div className="px-5 py-3 border-b border-gray-50 bg-stone-50"><p className="text-xs font-medium text-gray-700 truncate">{adminUser.name}</p><p className="text-[10px] text-gray-400 truncate">{adminUser.email}</p></div>}
