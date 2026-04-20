@@ -2,8 +2,9 @@ import { useRouter } from 'next/router';
 import { m as motion } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useTenant } from '../../context/TenantContext';
+import CinematicImage from './CinematicImage';
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, index = 0 }) {
   const { dispatch } = useCart();
   const tenant  = useTenant();
   const router  = useRouter();
@@ -16,94 +17,97 @@ export default function ProductCard({ product }) {
 
   const addToCart = (e) => {
     e.stopPropagation();
-    dispatch({
-      type: 'ADD',
-      item: {
-        id:        product.id,
-        name:      product.name,
-        price:     parseFloat(product.price),
-        image_url: product.image_url,
-        slug:      product.slug,
-      },
-    });
+    dispatch({ type: 'ADD', item: {
+      id: product.id, name: product.name,
+      price: parseFloat(product.price),
+      image_url: product.image_url, slug: product.slug,
+    }});
   };
 
-  const goToProduct = () => router.push(`/products/${product.slug}`);
-
-  // ── Fix: No <Link> wrapping block elements — use onClick for navigation
-  // This avoids the invalid HTML pattern of <div> or <a> inside <a>
-  // which causes React hydration mismatches.
   return (
     <motion.article
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-50px' }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -4 }}
-      onClick={goToProduct}
-      className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 cursor-pointer"
+      viewport={{ once: true, margin: '-40px' }}
+      transition={{ duration: 0.6, delay: (index % 4) * 0.08, ease: [0.16, 1, 0.3, 1] }}
+      onClick={() => router.push(`/products/${product.slug}`)}
+      className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-shadow duration-500 border border-gray-100 cursor-pointer"
     >
-      {/* Image */}
+      {/* ── Cinematic product image ── */}
       <div className="relative aspect-square overflow-hidden bg-stone-100">
-        {product.image_url ? (
-          <img
-            src={product.image_url}
-            alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-5xl opacity-30">🎂</div>
-        )}
+        <CinematicImage
+          src={product.image_url}
+          alt={product.name}
+          reveal="scale"
+          delay={(index % 4) * 0.06}
+          className="transition-transform duration-700 group-hover:scale-[1.07]"
+          containerClassName="w-full h-full"
+        />
 
+        {/* Category badge */}
         {product.category && (
-          <span className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-600 px-2.5 py-1 rounded-full">
+          <motion.span
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 + (index % 4) * 0.06 }}
+            className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-600 px-2.5 py-1 rounded-full shadow-sm z-10"
+          >
             {product.category}
-          </span>
+          </motion.span>
         )}
 
+        {/* Sold out overlay */}
         {available === 0 && (
-          <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-            <span className="bg-gray-800 text-white text-xs font-bold px-3 py-1.5 rounded-full">Sold Out</span>
+          <div className="absolute inset-0 bg-white/70 backdrop-blur-[2px] flex items-center justify-center z-10">
+            <span className="bg-gray-900/80 text-white text-xs font-bold px-4 py-2 rounded-full tracking-wide">
+              Sold Out
+            </span>
           </div>
         )}
 
-        {/* WhatsApp overlay — stopPropagation so it doesn't navigate */}
+        {/* Hover overlay with WhatsApp */}
         {whatsappHref && available > 0 && (
-          <div className="absolute inset-0 bg-black/20 flex items-end p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="w-full bg-[#25D366] text-white text-xs font-semibold py-2.5 rounded-xl text-center hover:bg-[#1ebe5d] transition-colors"
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileHover={{ opacity: 1 }}
+            className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-end p-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <a href={whatsappHref} target="_blank" rel="noopener noreferrer"
+              onClick={e => e.stopPropagation()}
+              className="w-full bg-[#25D366] text-white text-xs font-semibold py-2.5 rounded-xl text-center hover:bg-[#1ebe5d] transition-colors backdrop-blur-sm"
             >
-              Enquire on WhatsApp
+              💬 Enquire on WhatsApp
             </a>
-          </div>
+          </motion.div>
         )}
       </div>
 
-      {/* Info */}
+      {/* ── Product info ── */}
       <div className="p-4">
-        <h3 className="font-display font-semibold text-gray-800 text-base leading-snug line-clamp-2">
+        <h3 className="font-display font-semibold text-gray-800 text-base leading-snug line-clamp-2 group-hover:text-gray-900 transition-colors">
           {product.name}
         </h3>
         {product.description && (
           <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">{product.description}</p>
         )}
         <div className="flex items-center justify-between mt-3">
-          <p className="font-bold text-lg" style={{ color: 'var(--tenant-primary)' }}>
+          <motion.p
+            className="font-bold text-lg"
+            style={{ color: 'var(--tenant-primary)' }}
+          >
             ₹{parseFloat(product.price).toLocaleString('en-IN')}
-          </p>
-          <button
+          </motion.p>
+          <motion.button
             onClick={addToCart}
             disabled={available === 0}
-            className="text-white text-xs font-semibold px-4 py-2 rounded-xl transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="text-white text-xs font-semibold px-4 py-2 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden relative"
             style={{ backgroundColor: 'var(--tenant-primary)' }}
+            whileHover={{ scale: 1.06 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
           >
             Add
-          </button>
+          </motion.button>
         </div>
       </div>
     </motion.article>

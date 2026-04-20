@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { m as motion } from 'framer-motion';
 import Layout from '../../components/layout/Layout';
+import CinematicImage from '../../components/ui/CinematicImage';
 import MetaTags from '../../components/seo/MetaTags';
 import { useCart } from '../../context/CartContext';
 const { productDetailSeo }    = require('../../lib/seo');
@@ -24,9 +25,21 @@ export default function ProductDetailPage({ tenant, product }) {
       <Layout tenant={tenant}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-32 pb-20">
           <div className="grid md:grid-cols-2 gap-12 items-start">
-            <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }} className="relative aspect-square rounded-3xl overflow-hidden bg-stone-100 shadow-lg">
-              {product.image_url ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-8xl opacity-20">🎂</div>}
-              {product.category && <span className="absolute top-4 left-4 bg-white text-xs font-semibold text-gray-600 px-3 py-1.5 rounded-full shadow-sm">{product.category}</span>}
+            <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="relative aspect-square rounded-3xl overflow-hidden bg-stone-100 shadow-2xl">
+              <CinematicImage
+                src={product.image_url}
+                alt={product.name}
+                reveal="blur"
+                tilt={true}
+                containerClassName="w-full h-full"
+                fallback={<div className="w-full h-full flex items-center justify-center text-8xl opacity-20">🎂</div>}
+              />
+              {product.category && (
+                <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-600 px-3 py-1.5 rounded-full shadow-sm">
+                  {product.category}
+                </span>
+              )}
             </motion.div>
             <motion.div initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className="space-y-6 pt-4">
               <div>
