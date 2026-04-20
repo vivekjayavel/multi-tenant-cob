@@ -102,7 +102,7 @@ function HeroSection({ data, onSave, saving, tenant }) {
     try {
       const fd = new FormData(); fd.append('image', file);
       // Do NOT set Content-Type manually — axios auto-sets multipart/form-data WITH boundary
-      const { data } = await api.post('/settings/hero-image', fd);
+      const { data } = await uploadApi.post('/settings/hero-image', fd);
       setForm(p => ({ ...p, image_url: data.url }));
     } catch { alert('Image upload failed'); } finally { setUploading(false); }
   };
@@ -342,7 +342,7 @@ function BrandingSection({ tenant, saving, setSaving, setError, setSaved }) {
       const fd = new FormData();
       fd.append('image', file);
       // Do NOT set Content-Type header — axios sets it with boundary automatically
-      const { data } = await api.post('/upload/logo', fd);
+      const { data } = await uploadApi.post('/upload/logo', fd);
       setLogoUrl(data.url);
     } catch (err) {
       const msg = err?.response?.data?.message || err?.message || 'Logo upload failed';
