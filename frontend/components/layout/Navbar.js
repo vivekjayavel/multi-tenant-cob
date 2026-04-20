@@ -26,7 +26,7 @@ export default function Navbar({ tenant }) {
         <nav className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between">
 
           {/* Logo */}
-          <Link href="/" className="font-display text-xl font-bold text-gray-900">
+          <Link href="/" className="font-display text-xl font-bold transition-colors" style={{ color: 'var(--tenant-primary)' }}>
             {tenant?.logo_url
               ? <img src={tenant.logo_url} alt={tenant.name} className="h-9 w-auto object-contain" />
               : tenant?.name || 'Bakery'

@@ -13,7 +13,7 @@ export default function Footer({ tenant, settings }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid sm:grid-cols-3 gap-8 pb-10 border-b border-gray-800">
           <div>
-            <p className="font-display text-white text-lg font-semibold mb-3">{tenant?.name || 'Bakery'}</p>
+            <p className="font-display text-lg font-bold mb-3" style={{ color: 'var(--tenant-primary)' }}>{tenant?.name || 'Bakery'}</p>
             <p className="text-sm leading-relaxed">{tagline}</p>
             {footer.address && <p className="text-sm mt-2 leading-relaxed">📍 {footer.address}</p>}
             {footer.hours   && <p className="text-sm mt-1">🕐 {footer.hours}</p>}
@@ -38,7 +38,7 @@ export default function Footer({ tenant, settings }) {
             )}
           </div>
         </div>
-        <p className="text-xs text-center text-gray-600 pt-8">© {year} {tenant?.name}. All rights reserved.</p>
+        <p className="text-xs text-center text-gray-600 pt-8">© {year} <span style={{ color: 'var(--tenant-primary)', fontWeight: 600 }}>{tenant?.name}</span>. All rights reserved.</p>
       </div>
     </footer>
   );
