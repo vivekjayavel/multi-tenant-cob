@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import MetaTags from '../components/seo/MetaTags';
 const { noindexSeo }           = require('../lib/seo');
 const { getTenantFromRequest } = require('../lib/prefetch');

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import Link from 'next/link';
 import Layout from '../components/layout/Layout';
 import HeroSection from '../components/ui/HeroSection';

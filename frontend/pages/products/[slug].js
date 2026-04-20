@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import Layout from '../../components/layout/Layout';
 import MetaTags from '../../components/seo/MetaTags';
 import { useCart } from '../../context/CartContext';

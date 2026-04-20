@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useTenant } from '../../context/TenantContext';
 

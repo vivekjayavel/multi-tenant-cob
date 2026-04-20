@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 
 export default function CartDrawer({ open, onClose }) {

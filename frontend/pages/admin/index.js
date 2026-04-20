@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import Head from 'next/head';
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../lib/api';
 const { withAdminAuth } = require('../../lib/withAdminAuth');

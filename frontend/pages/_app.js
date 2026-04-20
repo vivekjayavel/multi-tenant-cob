@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { LazyMotion, domAnimation } from 'framer-motion';
 import { TenantContext } from '../context/TenantContext';
 import { CartProvider } from '../context/CartContext';
 import '../styles/globals.css';
@@ -14,11 +15,14 @@ export default function App({ Component, pageProps }) {
   }, [tenant?.theme_color]);
 
   return (
-    <TenantContext.Provider value={tenant || {}}>
-      <CartProvider>
-        <Component {...pageProps} />
-      </CartProvider>
-    </TenantContext.Provider>
+    // LazyMotion loads animation features only on client, preventing SSR mismatch
+    <LazyMotion features={domAnimation} strict>
+      <TenantContext.Provider value={tenant || {}}>
+        <CartProvider>
+          <Component {...pageProps} />
+        </CartProvider>
+      </TenantContext.Provider>
+    </LazyMotion>
   );
 }
 

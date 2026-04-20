@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m as motion, AnimatePresence } from 'framer-motion';
 import Layout from '../../components/layout/Layout';
 import ProductCard from '../../components/ui/ProductCard';
 import MetaTags from '../../components/seo/MetaTags';

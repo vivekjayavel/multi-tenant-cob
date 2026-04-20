@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 export default function WhatsAppButton({ number }) {
   if (!number) return null;
   const href = `https://wa.me/${number}?text=${encodeURIComponent("Hello! I'd like to place an order. Could you help me?")}`;
