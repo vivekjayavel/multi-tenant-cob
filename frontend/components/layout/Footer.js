@@ -13,17 +13,17 @@ export default function Footer({ tenant, settings }) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid sm:grid-cols-3 gap-8 pb-10 border-b border-gray-800">
           <div>
-            {/* Logo + shop name together */}
-            <div className="flex items-center gap-3 mb-3">
+            {/* Logo + shop name: logo on top, name below */}
+            <div className="mb-4">
               {tenant?.logo_url && (
                 <img
                   src={tenant.logo_url}
                   alt={tenant?.name || 'Bakery'}
-                  className="h-10 w-auto object-contain max-w-[40px] flex-shrink-0"
-                  style={{ filter: 'brightness(0) invert(1)', opacity: 0.95 }}
+                  className="h-10 w-auto object-contain mb-2"
+                  style={{ filter: 'brightness(0) invert(1)', opacity: 0.95, maxWidth: '120px' }}
                 />
               )}
-              <p className="font-display text-xl font-bold" style={{ color: 'var(--tenant-primary)' }}>
+              <p className="font-display text-lg font-bold" style={{ color: 'var(--tenant-primary)' }}>
                 {tenant?.name || 'Bakery'}
               </p>
             </div>
