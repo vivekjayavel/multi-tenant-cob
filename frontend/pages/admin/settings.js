@@ -424,8 +424,8 @@ function BrandingSection({ tenant, saving, setSaving, setError, setSaved }) {
                     <img
                       src={logoUrl}
                       alt="logo preview dark"
-                      className="h-8 w-auto object-contain flex-shrink-0"
-                      style={{ filter: 'brightness(0) invert(1)', opacity: 0.95, maxWidth: '36px' }}
+                      className="h-8 w-auto object-contain flex-shrink-0 rounded"
+                      style={{ maxWidth: '36px', background: 'rgba(255,255,255,0.12)', padding: '3px' }}
                     />
                   ) : null}
                   <span className="font-display font-bold text-sm" style={{ color: 'var(--tenant-primary)' }}>

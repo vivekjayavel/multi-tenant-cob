@@ -16,12 +16,15 @@ export default function Footer({ tenant, settings }) {
             {/* Logo + shop name: logo on top, name below */}
             <div className="mb-4">
               {tenant?.logo_url && (
-                <img
-                  src={tenant.logo_url}
-                  alt={tenant?.name || 'Bakery'}
-                  className="h-10 w-auto object-contain mb-2"
-                  style={{ filter: 'brightness(0) invert(1)', opacity: 0.95, maxWidth: '120px' }}
-                />
+                <div className="inline-flex items-center justify-center p-1.5 rounded-lg mb-2"
+                  style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
+                  <img
+                    src={tenant.logo_url}
+                    alt={tenant?.name || 'Bakery'}
+                    className="h-9 w-auto object-contain"
+                    style={{ maxWidth: '110px' }}
+                  />
+                </div>
               )}
               <p className="font-display text-lg font-bold" style={{ color: 'var(--tenant-primary)' }}>
                 {tenant?.name || 'Bakery'}
