@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../lib/api';
+import uploadApi from '../../lib/uploadApi';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
 
 const TABS = [
