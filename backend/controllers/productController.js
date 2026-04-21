@@ -16,7 +16,7 @@ exports.list = async (req, res, next) => {
 
 exports.getBySlug = async (req, res, next) => {
   try {
-    const [rows] = await db.query('SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1', [req.tenant.id, req.params.slug]);
+    const [rows] = await db.query('SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1', [req.tenant.id, req.params.slug]);
     if (!rows.length) return fail(res, 'Product not found', 404);
     ok(res, { product: { ...rows[0], available_qty: Math.max(0, rows[0].stock_qty - rows[0].reserved_qty) } });
   } catch (err) { next(err); }

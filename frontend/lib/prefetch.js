@@ -28,7 +28,7 @@ async function getProductsForPage(tenantId, category = null) {
   if (cached) return cached;
 
   const params = category ? [tenantId, category] : [tenantId];
-  const sql = `SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty
+  const sql = `SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options
                FROM products
                WHERE tenant_id = ? AND is_active = 1
                ${category ? 'AND category = ?' : ''}
