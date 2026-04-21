@@ -414,20 +414,42 @@ function BrandingSection({ tenant, saving, setSaving, setError, setSaved }) {
               </button>
             )}
             <p className="text-xs text-gray-400">PNG with transparent background recommended · Max 5MB</p>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="text-xs text-gray-400">Preview on dark:</span>
-              <div className="bg-gray-900 rounded-lg px-3 py-1.5 inline-flex items-center">
-                {logoUrl
-                  ? <img src={logoUrl} alt="preview" className="h-6 w-auto object-contain" style={{ filter: 'brightness(0) invert(1)' }} />
-                  : <span className="text-white text-xs font-bold" style={{ color: 'var(--tenant-primary)' }}>{name || 'Shop Name'}</span>
-                }
+            {/* ── Logo preview panels ── */}
+            <div className="mt-3 space-y-2">
+              {/* Dark preview (Footer) */}
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Footer (dark background)</p>
+                <div className="bg-gray-900 rounded-xl px-4 py-3 flex items-center gap-3 w-full max-w-xs">
+                  {logoUrl ? (
+                    <img
+                      src={logoUrl}
+                      alt="logo preview dark"
+                      className="h-8 w-auto object-contain flex-shrink-0"
+                      style={{ filter: 'brightness(0) invert(1)', opacity: 0.95, maxWidth: '36px' }}
+                    />
+                  ) : null}
+                  <span className="font-display font-bold text-sm" style={{ color: 'var(--tenant-primary)' }}>
+                    {name || 'Shop Name'}
+                  </span>
+                </div>
               </div>
-              <span className="text-xs text-gray-400">on light:</span>
-              <div className="bg-white border rounded-lg px-3 py-1.5 inline-flex items-center">
-                {logoUrl
-                  ? <img src={logoUrl} alt="preview" className="h-6 w-auto object-contain" />
-                  : <span className="text-xs font-bold" style={{ color: 'var(--tenant-primary)' }}>{name || 'Shop Name'}</span>
-                }
+
+              {/* Light preview (Navbar) */}
+              <div>
+                <p className="text-[10px] text-gray-400 uppercase tracking-wide mb-1">Navbar (light background)</p>
+                <div className="bg-white border border-gray-200 rounded-xl px-4 py-3 flex items-center gap-3 w-full max-w-xs shadow-sm">
+                  {logoUrl ? (
+                    <img
+                      src={logoUrl}
+                      alt="logo preview light"
+                      className="h-8 w-auto object-contain flex-shrink-0"
+                      style={{ maxWidth: '36px' }}
+                    />
+                  ) : null}
+                  <span className="font-display font-bold text-sm" style={{ color: 'var(--tenant-primary)' }}>
+                    {name || 'Shop Name'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
