@@ -48,12 +48,20 @@ export default function LoginPage({ tenant }) {
           transition={{ duration: 0.5 }}
           className="w-full max-w-md"
         >
-          {/* Brand */}
+          {/* Brand: logo + name */}
           <div className="text-center mb-8">
-            {tenant?.logo_url
-              ? <img src={tenant.logo_url} alt={tenant.name} className="h-12 mx-auto object-contain mb-4" />
-              : <p className="font-display text-2xl font-bold text-gray-900 mb-1">{tenant?.name}</p>
-            }
+            <div className="flex items-center justify-center gap-3 mb-2">
+              {tenant?.logo_url && (
+                <img
+                  src={tenant.logo_url}
+                  alt={tenant?.name}
+                  className="h-12 w-auto object-contain max-w-[48px]"
+                />
+              )}
+              <p className="font-display text-2xl font-bold" style={{ color: 'var(--tenant-primary)' }}>
+                {tenant?.name}
+              </p>
+            </div>
             <p className="text-gray-500 text-sm">Sign in to your account</p>
           </div>
 

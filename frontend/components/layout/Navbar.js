@@ -46,29 +46,28 @@ export default function Navbar({ tenant: tenantProp }) {
       >
         <nav className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between">
 
-          {/* ── Logo / Brand ── */}
-          <Link href="/" className="flex items-center group">
-            {tenant?.logo_url ? (
+          {/* ── Logo + Brand name ── */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            {tenant?.logo_url && (
               <motion.img
                 src={tenant.logo_url}
                 alt={tenant.name || 'Bakery'}
-                className={`h-10 w-auto object-contain max-w-[160px] transition-all duration-300 ${
+                className={`h-9 w-auto object-contain max-w-[40px] flex-shrink-0 transition-all duration-300 ${
                   isTransparent ? 'brightness-0 invert' : ''
                 }`}
-                whileHover={{ scale: 1.04 }}
+                whileHover={{ scale: 1.06 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 onError={e => { e.target.style.display = 'none'; }}
               />
-            ) : (
-              <motion.span
-                className="font-display text-xl font-bold transition-colors duration-300"
-                style={{ color: logoColor }}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              >
-                {tenant?.name || 'Bakery'}
-              </motion.span>
             )}
+            <motion.span
+              className="font-display text-xl font-bold transition-colors duration-300 leading-none"
+              style={{ color: logoColor }}
+              whileHover={{ scale: 1.01 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            >
+              {tenant?.name || 'Bakery'}
+            </motion.span>
           </Link>
 
           {/* ── Desktop nav links ── */}
