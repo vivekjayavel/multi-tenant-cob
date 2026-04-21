@@ -5,7 +5,7 @@ import OrderTable from '../../components/admin/OrderTable';
 import api from '../../lib/api';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
 
-const FILTERS = ['all','pending','paid','processing','shipped','delivered','cancelled'];
+const FILTERS = ['all','pending','cod_pending','paid','processing','shipped','delivered','cancelled'];
 
 export default function AdminOrders({ tenant, adminUser }) {
   const [orders,   setOrders]   = useState([]);

@@ -15,5 +15,5 @@ router.post('/', authMiddleware, orderLimiter, [
 router.get('/my',  authMiddleware, ctrl.myOrders);
 router.get('/',    authMiddleware, adminOnly, ctrl.listAll);
 router.patch('/:id/status', authMiddleware, adminOnly,
-  body('status').isIn(['processing','shipped','delivered','cancelled','refunded']), validate, ctrl.updateStatus);
+  body('status').isIn(['processing','shipped','delivered','cancelled','refunded','cod_confirmed']), validate, ctrl.updateStatus);
 module.exports = router;
