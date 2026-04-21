@@ -24,10 +24,11 @@ exports.getBySlug = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
   try {
-    const { name, description, price, image_url, category, stock_qty = 0 } = req.body;
+    const { name, description, price, image_url, category, stock_qty = 0, customization_options } = req.body;
     const tenantId = req.tenant.id;
     const slug = req.body.slug || slugify(name, { lower: true, strict: true });
-    const [result] = await db.query('INSERT INTO products (tenant_id, name, description, price, image_url, category, slug, stock_qty) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', [tenantId, name, description, price, image_url, category, slug, stock_qty]);
+    const custOpts = customization_options ? JSON.stringify(customization_options) : null;
+    const [result] = await db.query('INSERT INTO products (tenant_id, name, description, price, image_url, category, slug, stock_qty, customization_options) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', [tenantId, name, description, price, image_url, category, slug, stock_qty, custOpts]);
     invalidateProductCache(tenantId);
     ok(res, { id: result.insertId, slug }, 'Product created', 201);
   } catch (err) { next(err); }
@@ -36,7 +37,7 @@ exports.create = async (req, res, next) => {
 exports.update = async (req, res, next) => {
   try {
     const { id } = req.params, tenantId = req.tenant.id;
-    const allowed = ['name','description','price','image_url','category','slug','is_active','stock_qty'];
+    const allowed = ['name','description','price','image_url','category','slug','is_active','stock_qty','customization_options'];
     const fields = [], values = [];
     for (const key of allowed) { if (req.body[key] !== undefined) { fields.push(`${key} = ?`); values.push(req.body[key]); } }
     if (!fields.length) return fail(res, 'No valid fields to update');

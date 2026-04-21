@@ -42,17 +42,26 @@ export default function CartPage({ tenant }) {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-800 truncate">{item.name}</p>
                       <p className="font-semibold mt-1" style={{ color: 'var(--tenant-primary)' }}>₹{item.price}</p>
+                      {item.customization && (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {Object.entries(item.customization).map(([k, v]) => v && (
+                            <span key={k} className="inline-flex items-center gap-1 text-[10px] bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                              <span className="capitalize font-medium">{k}:</span> {v.length > 20 ? v.slice(0,20)+'…' : v}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 mt-2">
-                        <button onClick={() => dispatch({ type: 'UPDATE_QTY', id: item.id, quantity: item.quantity - 1 })}
+                        <button onClick={() => dispatch({ type: 'UPDATE_QTY', key: item._key || String(item.id), quantity: item.quantity - 1 })}
                           className="w-7 h-7 rounded-full border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-gray-50">−</button>
                         <span className="text-sm font-semibold w-5 text-center">{item.quantity}</span>
-                        <button onClick={() => dispatch({ type: 'UPDATE_QTY', id: item.id, quantity: item.quantity + 1 })}
+                        <button onClick={() => dispatch({ type: 'UPDATE_QTY', key: item._key || String(item.id), quantity: item.quantity + 1 })}
                           className="w-7 h-7 rounded-full border border-gray-200 text-gray-600 flex items-center justify-center hover:bg-gray-50">+</button>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-3">
                       <p className="font-bold text-gray-800">₹{(item.price * item.quantity).toFixed(2)}</p>
-                      <button onClick={() => dispatch({ type: 'REMOVE', id: item.id })}
+                      <button onClick={() => dispatch({ type: 'REMOVE', key: item._key || String(item.id) })}
                         className="text-gray-300 hover:text-red-400 transition-colors">
                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

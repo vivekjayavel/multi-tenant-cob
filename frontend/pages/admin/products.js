@@ -3,10 +3,11 @@ import Head from 'next/head';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import AdminLayout from '../../components/admin/AdminLayout';
 import ImageUploader from '../../components/admin/ImageUploader';
+import ProductCustomizationEditor from '../../components/admin/ProductCustomizationEditor';
 import api from '../../lib/api';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
 
-const EMPTY  = { name: '', description: '', price: '', category: '', slug: '', stock_qty: '', image_url: '' };
+const EMPTY  = { name: '', description: '', price: '', category: '', slug: '', stock_qty: '', image_url: '', customization_options: null };
 const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 export default function AdminProducts({ tenant, adminUser }) {
@@ -25,7 +26,7 @@ export default function AdminProducts({ tenant, adminUser }) {
   useEffect(() => { load(); }, [load]);
 
   const openNew  = () => { setEditId(null); setForm(EMPTY); setError(null); setPanel(true); };
-  const openEdit = p  => { setEditId(p.id); setForm({ name: p.name, description: p.description || '', price: p.price, category: p.category || '', slug: p.slug, stock_qty: p.stock_qty, image_url: p.image_url || '' }); setError(null); setPanel(true); };
+  const openEdit = p  => { setEditId(p.id); setForm({ name: p.name, description: p.description || '', price: p.price, category: p.category || '', slug: p.slug, stock_qty: p.stock_qty, image_url: p.image_url || '', customization_options: p.customization_options || null }); setError(null); setPanel(true); };
 
   const handleSave = async (e) => {
     e.preventDefault(); setSaving(true); setError(null);
@@ -110,6 +111,12 @@ export default function AdminProducts({ tenant, adminUser }) {
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Description</label>
                     <textarea rows={3} className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 transition-all placeholder-gray-300" placeholder="What makes this special…" {...f('description')} />
                   </div>
+                  {/* Customisation Options */}
+                  <ProductCustomizationEditor
+                    value={form.customization_options}
+                    onChange={val => setForm(f => ({ ...f, customization_options: val }))}
+                  />
+
                   <button type="submit" disabled={saving} className="w-full text-white font-semibold py-3.5 rounded-xl transition-all duration-200 mt-2 disabled:opacity-60 hover:-translate-y-0.5" style={{ backgroundColor: 'var(--tenant-primary)' }}>
                     {saving ? 'Saving…' : editId ? 'Update product' : 'Create product'}
                   </button>
