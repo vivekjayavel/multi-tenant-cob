@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import useOrderNotifications from '../../hooks/useOrderNotifications';
 
@@ -16,15 +16,23 @@ export default function NotificationBell() {
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
+  const bellRef = useRef(null);
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0 });
+
   const handleOpen = () => {
+    if (!open && bellRef.current) {
+      const rect = bellRef.current.getBoundingClientRect();
+      setDropPos({ top: rect.bottom + 8, left: rect.right + 8 });
+    }
     setOpen(o => !o);
     if (!open) clearNotifications();
   };
 
   return (
-    <div className="relative" ref={panelRef}>
+    <div ref={panelRef}>
       {/* Bell button */}
       <button
+        ref={bellRef}
         onClick={handleOpen}
         className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors text-gray-600"
         title="Order notifications"
@@ -62,7 +70,7 @@ export default function NotificationBell() {
             animate={{ opacity: 1, y: 0,  scale: 1    }}
             exit={{    opacity: 0, y: -8, scale: 0.97 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 top-12 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50"
+            className="fixed w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999]" style={{ top: dropPos.top, left: dropPos.left }}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
