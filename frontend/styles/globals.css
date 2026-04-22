@@ -25,3 +25,30 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
   .text-balance { text-wrap: balance; }
 }
+
+/* Swiper theme — uses tenant primary color */
+.swiper-themed .swiper-button-next,
+.swiper-themed .swiper-button-prev {
+  color: var(--tenant-primary);
+  background: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  --swiper-navigation-size: 14px;
+}
+.swiper-themed .swiper-button-next:after,
+.swiper-themed .swiper-button-prev:after {
+  font-size: 14px;
+  font-weight: 900;
+}
+.swiper-themed .swiper-pagination-bullet-active {
+  background: var(--tenant-primary) !important;
+}
+.swiper-themed .swiper-pagination-bullet {
+  background: var(--tenant-primary);
+  opacity: 0.3;
+}
+.swiper-themed {
+  padding-bottom: 40px !important;
+}

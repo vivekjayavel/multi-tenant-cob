@@ -6,6 +6,7 @@ import ProductCard from '../components/ui/ProductCard';
 import MetaTags from '../components/seo/MetaTags';
 
 const SwiperCarousel = dynamic(() => import('../components/ui/SwiperCarousel'), { ssr: false });
+const SwiperSlide = dynamic(() => import('../components/ui/SwiperCarousel').then(m => ({ default: m.SwiperSlide })), { ssr: false });
 
 const { homeSeo }               = require('../lib/seo');
 const { getTenantFromRequest, getFeaturedProducts } = require('../lib/prefetch');
@@ -55,9 +56,9 @@ export default function HomePage({ tenant, featuredProducts, settings }) {
                 }}
               >
                 {featuredProducts.map((p, i) => (
-                  <swiper-slide key={p.id} style={{ height: 'auto' }}>
+                  <SwiperSlide key={p.id} style={{ height: 'auto' }}>
                     <ProductCard product={p} index={i} />
-                  </swiper-slide>
+                  </SwiperSlide>
                 ))}
               </SwiperCarousel>
 
@@ -102,9 +103,9 @@ export default function HomePage({ tenant, featuredProducts, settings }) {
                   centeredSlides={true}
                 >
                   {feats.map((f, i) => (
-                    <swiper-slide key={i}>
+                    <SwiperSlide key={i}>
                       <FeatureCard f={f} />
-                    </swiper-slide>
+                    </SwiperSlide>
                   ))}
                 </SwiperCarousel>
               </div>

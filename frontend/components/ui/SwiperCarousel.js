@@ -1,8 +1,12 @@
-'use client';
-import { useEffect, useRef } from 'react';
-import { register } from 'swiper/element/bundle';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 
-register();
+// Swiper v9 CSS
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
+export { SwiperSlide };
 
 export default function SwiperCarousel({
   children,
@@ -17,51 +21,27 @@ export default function SwiperCarousel({
   className       = '',
   centeredSlides  = false,
 }) {
-  const swiperRef = useRef(null);
-
-  useEffect(() => {
-    const el = swiperRef.current;
-    if (!el) return;
-
-    const params = {
-      slidesPerView,
-      spaceBetween,
-      loop,
-      centeredSlides,
-      grabCursor: true,
-      ...(autoplay && { autoplay: { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true } }),
-      ...(pagination && { pagination: { clickable: true } }),
-      ...(navigation && { navigation: true }),
-      ...(breakpoints && { breakpoints }),
-      injectStyles: [
-        `
-        :host .swiper-button-next,
-        :host .swiper-button-prev {
-          color: var(--tenant-primary);
-          background: white;
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-          --swiper-navigation-size: 16px;
-        }
-        :host .swiper-pagination-bullet-active {
-          background: var(--tenant-primary);
-        }
-        :host .swiper-pagination-bullet {
-          opacity: 0.4;
-        }
-        `,
-      ],
-    };
-
-    Object.assign(el, params);
-    el.initialize();
-  }, []);
+  const modules = [
+    ...(navigation ? [Navigation] : []),
+    ...(pagination ? [Pagination] : []),
+    ...(autoplay   ? [Autoplay]   : []),
+  ];
 
   return (
-    <swiper-container ref={swiperRef} init="false" class={className}>
+    <Swiper
+      modules={modules}
+      slidesPerView={slidesPerView}
+      spaceBetween={spaceBetween}
+      loop={loop}
+      centeredSlides={centeredSlides}
+      grabCursor={true}
+      navigation={navigation}
+      pagination={pagination ? { clickable: true } : false}
+      autoplay={autoplay ? { delay: autoplayDelay, disableOnInteraction: false, pauseOnMouseEnter: true } : false}
+      breakpoints={breakpoints}
+      className={`swiper-themed ${className}`}
+    >
       {children}
-    </swiper-container>
+    </Swiper>
   );
 }
