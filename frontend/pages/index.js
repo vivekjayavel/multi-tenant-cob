@@ -1,8 +1,12 @@
 import { m as motion } from 'framer-motion';
+import dynamic from 'next/dynamic';
 import CinematicHero from '../components/ui/CinematicHero';
 import Layout from '../components/layout/Layout';
 import ProductCard from '../components/ui/ProductCard';
 import MetaTags from '../components/seo/MetaTags';
+
+const SwiperCarousel = dynamic(() => import('../components/ui/SwiperCarousel'), { ssr: false });
+
 const { homeSeo }               = require('../lib/seo');
 const { getTenantFromRequest, getFeaturedProducts } = require('../lib/prefetch');
 
@@ -26,69 +30,93 @@ export default function HomePage({ tenant, featuredProducts, settings }) {
 
         {/* ── Featured Products ── */}
         {featuredProducts.length > 0 && (
-          <section className="max-w-6xl mx-auto px-4 sm:px-6 py-24">
-            <motion.div
-              initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }}
-              viewport={{ once:true }} transition={{ duration:0.6 }}
-              className="text-center mb-12"
-            >
-              <p className="text-sm font-semibold tracking-widest uppercase mb-2"
-                style={{ color:'var(--tenant-primary)' }}>This Week's Picks</p>
-              <h2 className="font-display text-4xl text-gray-900">Fresh From the Oven</h2>
-            </motion.div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredProducts.map((p, i) => (
-                <ProductCard key={p.id} product={p} index={i} />
-              ))}
-            </div>
-
-            <motion.div
-              initial={{ opacity:0 }} whileInView={{ opacity:1 }}
-              viewport={{ once:true }} className="text-center mt-12"
-            >
-              <motion.a href="/products"
-                className="inline-flex items-center gap-2 border font-semibold px-7 py-3 rounded-full transition-all duration-200"
-                style={{ borderColor:'var(--tenant-primary)', color:'var(--tenant-primary)' }}
-                whileHover={{ scale:1.04, y:-2, backgroundColor:'var(--tenant-primary)', color:'#fff' }}
-                whileTap={{ scale:0.97 }}
-                transition={{ type:'spring', stiffness:400, damping:25 }}
+          <section className="py-24 overflow-hidden">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ duration: 0.6 }}
+                className="text-center mb-12"
               >
-                View Full Menu
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </motion.a>
-            </motion.div>
+                <p className="text-sm font-semibold tracking-widest uppercase mb-2"
+                  style={{ color: 'var(--tenant-primary)' }}>This Week's Picks</p>
+                <h2 className="font-display text-4xl text-gray-900">Fresh From the Oven</h2>
+              </motion.div>
+
+              {/* Swiper on all screen sizes */}
+              <SwiperCarousel
+                slidesPerView={1.2}
+                spaceBetween={16}
+                navigation={true}
+                pagination={true}
+                breakpoints={{
+                  480:  { slidesPerView: 2,   spaceBetween: 16 },
+                  768:  { slidesPerView: 3,   spaceBetween: 20 },
+                  1024: { slidesPerView: 4,   spaceBetween: 24 },
+                }}
+              >
+                {featuredProducts.map((p, i) => (
+                  <swiper-slide key={p.id} style={{ height: 'auto' }}>
+                    <ProductCard product={p} index={i} />
+                  </swiper-slide>
+                ))}
+              </SwiperCarousel>
+
+              <motion.div
+                initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+                viewport={{ once: true }} className="text-center mt-10"
+              >
+                <motion.a href="/products"
+                  className="inline-flex items-center gap-2 border font-semibold px-7 py-3 rounded-full transition-all duration-200"
+                  style={{ borderColor: 'var(--tenant-primary)', color: 'var(--tenant-primary)' }}
+                  whileHover={{ scale: 1.04, y: -2, backgroundColor: 'var(--tenant-primary)', color: '#fff' }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  View Full Menu
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </motion.a>
+              </motion.div>
+            </div>
           </section>
         )}
 
-        {/* ── Features / Why Choose Us ── */}
+        {/* ── Features — swiper on mobile ── */}
         {feats.length > 0 && (
-          <section className="bg-stone-50 py-20">
+          <section className="bg-stone-50 py-20 overflow-hidden">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
               <motion.h2
-                initial={{ opacity:0, y:16 }} whileInView={{ opacity:1, y:0 }}
-                viewport={{ once:true }} transition={{ duration:0.6 }}
-                className="font-display text-3xl text-center text-gray-900 mb-12"
+                initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ duration: 0.6 }}
+                className="font-display text-3xl text-center text-gray-900 mb-10"
               >
                 Why Choose {tenant.name}
               </motion.h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+
+              {/* Mobile swiper / desktop grid */}
+              <div className="block sm:hidden">
+                <SwiperCarousel
+                  slidesPerView={1.1}
+                  spaceBetween={12}
+                  pagination={true}
+                  centeredSlides={true}
+                >
+                  {feats.map((f, i) => (
+                    <swiper-slide key={i}>
+                      <FeatureCard f={f} />
+                    </swiper-slide>
+                  ))}
+                </SwiperCarousel>
+              </div>
+
+              <div className="hidden sm:grid sm:grid-cols-3 gap-8">
                 {feats.map((f, i) => (
                   <motion.div key={i}
-                    initial={{ opacity:0, y:20 }} whileInView={{ opacity:1, y:0 }}
-                    viewport={{ once:true }} transition={{ delay:i*0.1, duration:0.6 }}
-                    whileHover={{ y:-6, transition:{ duration:0.3 } }}
-                    className="bg-white rounded-2xl p-7 text-center shadow-sm hover:shadow-xl transition-shadow duration-300"
+                    initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.6 }}
+                    whileHover={{ y: -6 }}
                   >
-                    <motion.span className="text-4xl block"
-                      whileHover={{ scale:1.2, rotate:[0,10,-10,0] }}
-                      transition={{ duration:0.5 }}>
-                      {f.icon}
-                    </motion.span>
-                    <h3 className="font-display font-semibold text-gray-800 mt-4 mb-2">{f.title}</h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+                    <FeatureCard f={f} />
                   </motion.div>
                 ))}
               </div>
@@ -97,6 +125,16 @@ export default function HomePage({ tenant, featuredProducts, settings }) {
         )}
       </Layout>
     </>
+  );
+}
+
+function FeatureCard({ f }) {
+  return (
+    <div className="bg-white rounded-2xl p-7 text-center shadow-sm hover:shadow-xl transition-shadow duration-300 h-full">
+      <span className="text-4xl block">{f.icon}</span>
+      <h3 className="font-display font-semibold text-gray-800 mt-4 mb-2">{f.title}</h3>
+      <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
+    </div>
   );
 }
 
