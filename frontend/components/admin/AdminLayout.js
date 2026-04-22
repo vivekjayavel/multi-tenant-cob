@@ -1,4 +1,8 @@
 import { useEffect } from 'react';
+import dynamic from 'next/dynamic';
+
+// Dynamic import: NotificationBell uses localStorage — must be client-only
+const NotificationBell = dynamic(() => import('./NotificationBell'), { ssr: false });
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
