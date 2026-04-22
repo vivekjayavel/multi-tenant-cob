@@ -110,28 +110,47 @@ function HeroSection({ data, onSave, saving, tenant }) {
     <div className="space-y-5">
       <h2 className="font-semibold text-gray-800">Hero Section</h2>
 
-      {/* Hero Image */}
+      {/* Hero Images (multiple) */}
       <div>
-        <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Hero / Banner Image</label>
-        <div className="flex items-center gap-4">
-          {form.image_url ? (
-            <div className="relative w-32 h-20 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0">
-              <img src={form.image_url} alt="Hero" className="w-full h-full object-cover" />
-              <button onClick={() => setForm(p => ({ ...p, image_url: '' }))}
-                className="absolute top-1 right-1 bg-white rounded-full w-5 h-5 flex items-center justify-center text-gray-600 shadow text-xs hover:text-red-500">×</button>
-            </div>
-          ) : (
-            <div className="w-32 h-20 rounded-xl bg-stone-100 flex items-center justify-center text-gray-400 text-xs text-center px-2 flex-shrink-0">No image</div>
-          )}
-          <div>
-            <label className="cursor-pointer inline-flex items-center gap-2 text-sm font-medium border border-gray-200 px-4 py-2 rounded-xl hover:bg-gray-50 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-              {uploading ? 'Uploading…' : 'Upload image'}
-              <input type="file" accept=".jpg,.jpeg,.png,.webp" className="hidden" onChange={handleImageUpload} disabled={uploading} />
-            </label>
-            <p className="text-xs text-gray-400 mt-1">Recommended: 1200×600px, JPG/PNG/WebP</p>
-          </div>
+        <div className="flex items-center justify-between mb-2">
+          <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide">Hero / Banner Images</label>
+          <span className="text-xs text-gray-400">{(form.images || []).length + (form.image_url ? 1 : 0)} image(s) — swipe slideshow</span>
         </div>
+
+        {/* Existing images grid */}
+        {(() => {
+          const imgs = [...(form.images || []).map(i => i.url), ...(form.image_url && !(form.images||[]).find(i=>i.url===form.image_url) ? [form.image_url] : [])];
+          return imgs.length > 0 && (
+            <div className="flex gap-2 flex-wrap mb-3">
+              {imgs.map((url, idx) => (
+                <div key={idx} className="relative w-28 h-16 rounded-xl overflow-hidden bg-stone-100 flex-shrink-0 group">
+                  <img src={url} alt={`Hero ${idx+1}`} className="w-full h-full object-cover" />
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <button onClick={() => {
+                      const newImgs = imgs.filter((_, i) => i !== idx);
+                      setForm(p => ({
+                        ...p,
+                        images: newImgs.slice(0, -1).map(u => ({url:u})).concat(newImgs.length ? [] : []),
+                        image_url: newImgs[newImgs.length - 1] || '',
+                      }));
+                    }} className="bg-white rounded-full w-6 h-6 flex items-center justify-center text-red-500 text-sm font-bold shadow">×</button>
+                  </div>
+                  {idx === 0 && <span className="absolute top-1 left-1 bg-black/60 text-white text-[9px] px-1.5 py-0.5 rounded-full">Main</span>}
+                </div>
+              ))}
+            </div>
+          );
+        })()}
+
+        {/* Upload button */}
+        <label className="cursor-pointer inline-flex items-center gap-2 text-sm font-medium border border-dashed border-gray-300 px-4 py-2.5 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-colors">
+          <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          </svg>
+          {uploading ? 'Uploading…' : 'Add image'}
+          <input type="file" accept=".jpg,.jpeg,.png,.webp" className="hidden" onChange={handleImageUpload} disabled={uploading} />
+        </label>
+        <p className="text-xs text-gray-400 mt-1.5">1920×1080px recommended · JPG/PNG/WebP · Add up to 5 images for slideshow</p>
       </div>
 
       {/* Overlay Toggle + Intensity — only shown when image is uploaded */}

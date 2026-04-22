@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
     heading:          'Handcrafted with Love & Butter',
     subheading:       'From our oven to your table — every cake, croissant and pastry is baked fresh each morning.',
     image_url:        '',
+    images:           [],  // array of { url } for slideshow
     cta_primary:      'Explore Menu',
     cta_whatsapp:     'Order via WhatsApp',
     overlay_enabled:  true,
