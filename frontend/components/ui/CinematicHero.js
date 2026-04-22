@@ -28,18 +28,14 @@ export default function CinematicHero({ hero = {} }) {
   })();
 
   const [activeIdx,  setActiveIdx]  = useState(0);
-  const [nextIdx,    setNextIdx]    = useState(null);
-  const [transitioning, setTransitioning] = useState(false);
+  const [direction,  setDirection]  = useState(1); // 1 = forward, -1 = backward
 
   // Auto-advance slideshow
   const advance = useCallback(() => {
     if (allImages.length < 2) return;
-    setNextIdx(i => {
-      const next = ((i ?? activeIdx) + 1) % allImages.length;
-      return next;
-    });
-    setTransitioning(true);
-  }, [allImages.length, activeIdx]);
+    setDirection(1);
+    setActiveIdx(i => (i + 1) % allImages.length);
+  }, [allImages.length]);
 
   useEffect(() => {
     if (allImages.length < 2) return;
@@ -47,18 +43,11 @@ export default function CinematicHero({ hero = {} }) {
     return () => clearInterval(id);
   }, [advance, allImages.length]);
 
-  const handleTransitionEnd = () => {
-    if (nextIdx !== null) {
-      setActiveIdx(nextIdx);
-      setNextIdx(null);
-      setTransitioning(false);
-    }
-  };
 
   const goTo = (idx) => {
     if (idx === activeIdx) return;
-    setNextIdx(idx);
-    setTransitioning(true);
+    setDirection(idx > activeIdx ? 1 : -1);
+    setActiveIdx(idx);
   };
 
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
@@ -97,51 +86,43 @@ export default function CinematicHero({ hero = {} }) {
     <section ref={heroRef}
       className={`relative min-h-screen flex items-center overflow-hidden ${hasImages ? 'bg-stone-950' : 'bg-stone-50'}`}>
 
-      {/* ── Slideshow images ── */}
+      {/* ── Slideshow images — cinematic transitions, clickable ── */}
       {hasImages && (
-        <motion.div className="absolute inset-0" style={{ y }}>
-          {/* Current image */}
-          <AnimatePresence initial={false}>
+        <motion.div className="absolute inset-0 cursor-pointer" style={{ y }}
+          onClick={() => { window.location.href = '/products'; }}>
+          <AnimatePresence initial={false} custom={direction}>
             <motion.div
               key={activeIdx}
+              custom={direction}
               className="absolute inset-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.2, ease: 'easeInOut' }}
+              variants={{
+                enter:  (d) => ({ x: d > 0 ? '100%' : '-100%', opacity: 0, filter: 'brightness(0.6)' }),
+                center: { x: 0, opacity: 1, filter: 'brightness(1)',
+                  transition: { x: { duration: 0.9, ease: [0.16, 1, 0.3, 1] }, opacity: { duration: 0.4 }, filter: { duration: 0.9 } } },
+                exit:   (d) => ({ x: d > 0 ? '-30%' : '30%', opacity: 0.3, filter: 'brightness(0.5)',
+                  transition: { x: { duration: 0.9, ease: [0.16, 1, 0.3, 1] }, opacity: { duration: 0.4 } } }),
+              }}
+              initial="enter"
+              animate="center"
+              exit="exit"
             >
-              <motion.img
+              <img
                 src={allImages[activeIdx]}
                 alt={tenant?.name}
                 className="w-full h-full object-cover"
-                animate={{ scale: [1, 1.07, 1] }}
-                transition={{ duration: 14, ease: 'easeInOut', repeat: Infinity, repeatType: 'mirror' }}
+                draggable={false}
               />
             </motion.div>
           </AnimatePresence>
 
-          {/* Transition image */}
-          {transitioning && nextIdx !== null && (
-            <motion.div
-              key={`next-${nextIdx}`}
-              className="absolute inset-0"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.2, ease: 'easeInOut' }}
-              onAnimationComplete={handleTransitionEnd}
-            >
-              <img src={allImages[nextIdx]} alt="" className="w-full h-full object-cover" />
-            </motion.div>
-          )}
-
           {/* Gradient overlays */}
           {overlayEnabled && (
             <>
-              <div className="absolute inset-0"
+              <div className="absolute inset-0 pointer-events-none"
                 style={{ background: `linear-gradient(135deg, rgba(0,0,0,${oLeft}) 0%, rgba(0,0,0,${oMid}) 50%, rgba(0,0,0,0.05) 100%)` }} />
-              <div className="absolute inset-0"
+              <div className="absolute inset-0 pointer-events-none"
                 style={{ background: `linear-gradient(to top, rgba(0,0,0,${oBottom}) 0%, transparent 50%)` }} />
-              <div className="absolute inset-0"
+              <div className="absolute inset-0 pointer-events-none"
                 style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 30%)' }} />
             </>
           )}
@@ -234,21 +215,46 @@ export default function CinematicHero({ hero = {} }) {
         </motion.div>
       </motion.div>
 
-      {/* ── Slide dots ── */}
+      {/* ── Nav arrows + dots ── */}
       {allImages.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
-          {allImages.map((_, i) => (
-            <button key={i} onClick={() => goTo(i)}
-              className="rounded-full transition-all duration-300"
-              style={{
-                width:           activeIdx === i ? '24px' : '8px',
-                height:          '8px',
-                backgroundColor: activeIdx === i ? 'var(--tenant-primary)' : 'rgba(255,255,255,0.5)',
-              }}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
+        <>
+          {/* Left arrow */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setDirection(-1); setActiveIdx(i => (i - 1 + allImages.length) % allImages.length); }}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-all"
+            aria-label="Previous slide"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+
+          {/* Right arrow */}
+          <button
+            onClick={(e) => { e.stopPropagation(); setDirection(1); setActiveIdx(i => (i + 1) % allImages.length); }}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-black/30 hover:bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-all"
+            aria-label="Next slide"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+
+          {/* Dot indicators */}
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 pointer-events-none">
+            {allImages.map((_, i) => (
+              <button key={i} onClick={(e) => { e.stopPropagation(); goTo(i); }}
+                className="rounded-full transition-all duration-300 pointer-events-auto"
+                style={{
+                  width:           activeIdx === i ? '24px' : '8px',
+                  height:          '8px',
+                  backgroundColor: activeIdx === i ? '#fff' : 'rgba(255,255,255,0.45)',
+                }}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {/* ── Scroll indicator (single image or first slide) ── */}
