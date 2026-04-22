@@ -39,14 +39,11 @@ export default function CheckoutPage({ tenant }) {
       if (i.customization) {
         const cust = Object.entries(i.customization).filter(([,v]) => v);
         if (cust.length) {
-          line += '
-' + cust.map(([k,v]) => `   › ${k}: ${v}`).join('
-');
+          line += '\n' + cust.map(([k,v]) => `   \u203a ${k}: ${v}`).join('\n');
         }
       }
       return line;
-    }).join('
-');
+    }).join('\n');
 
     const msg = [
       `🛒 *New Order #${oId}*`,
@@ -64,10 +61,8 @@ export default function CheckoutPage({ tenant }) {
       `📞 ${snap.form.phone}`,
       `🏠 ${snap.form.address}`,
       `    ${snap.form.city} — ${snap.form.pincode}`,
-      snap.form.notes ? `
-📝 *Notes:* ${snap.form.notes}` : '',
-    ].filter(l => l !== undefined).join('
-');
+      snap.form.notes ? `\n📝 *Notes:* ${snap.form.notes}` : '',
+    ].filter(l => l !== undefined).join('\n');
 
     return encodeURIComponent(msg);
   };
