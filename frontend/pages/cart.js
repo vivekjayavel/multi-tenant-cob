@@ -14,7 +14,7 @@ export default function CartPage({ tenant }) {
     <>
       <MetaTags seo={seo} tenant={tenant} />
       <Layout tenant={tenant}>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-32 pb-20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-36 pb-20">
           <h1 className="font-display text-3xl text-gray-900 mb-8">Your Cart</h1>
 
           {/* Show skeleton until cart is hydrated from localStorage */}

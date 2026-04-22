@@ -21,7 +21,7 @@ export default function ProductsPage({ tenant, products, categories, initialCate
     <>
       <MetaTags seo={seo} tenant={tenant} />
       <Layout tenant={tenant}>
-        <div className="bg-stone-50 pt-32 pb-16">
+        <div className="bg-stone-50 pt-36 pb-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-sm font-semibold tracking-widest uppercase mb-3" style={{ color: 'var(--tenant-primary)' }}>Our Menu</motion.p>
             <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="font-display text-5xl text-gray-900">Fresh Baked Goods</motion.h1>

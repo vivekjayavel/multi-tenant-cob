@@ -44,7 +44,7 @@ export default function ProductDetailPage({ tenant, product }) {
     <>
       <MetaTags seo={seo} tenant={tenant} />
       <Layout tenant={tenant}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-32 pb-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-36 pb-20">
           <div className="grid md:grid-cols-2 gap-12 items-start">
 
             {/* Image */}

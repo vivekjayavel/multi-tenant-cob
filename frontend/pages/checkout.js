@@ -161,7 +161,7 @@ export default function CheckoutPage({ tenant }) {
       <MetaTags seo={seo} tenant={tenant} />
       {paymentMethod === 'online' && <Head><script src="https://checkout.razorpay.com/v1/checkout.js" /></Head>}
       <Layout tenant={tenant}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 pb-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-36 pb-20">
 
           {/* Step indicators */}
           {step < 3 && (
