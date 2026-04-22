@@ -28,7 +28,7 @@ async function getProductsForPage(tenantId, category = null) {
   if (cached) return cached;
 
   const params = category ? [tenantId, category] : [tenantId];
-  const sql = `SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options
+  const sql = `SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options, delivery_time
                FROM products
                WHERE tenant_id = ? AND is_active = 1
                ${category ? 'AND category = ?' : ''}
@@ -50,7 +50,7 @@ async function getFeaturedProducts(tenantId, limit = 8) {
   if (cached) return cached;
 
   const [products] = await db.query(
-    'SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options FROM products WHERE tenant_id = ? AND is_active = 1 ORDER BY created_at DESC LIMIT ?',
+    'SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options, delivery_time FROM products WHERE tenant_id = ? AND is_active = 1 ORDER BY created_at DESC LIMIT ?',
     [tenantId, limit]
   );
   const enriched   = products.map(p => ({ ...p, available_qty: Math.max(0, p.stock_qty - p.reserved_qty) }));

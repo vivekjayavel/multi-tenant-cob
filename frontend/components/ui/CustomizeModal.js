@@ -81,6 +81,14 @@ export default function CustomizeModal({ product, onClose }) {
               <p className="font-bold text-base mt-0.5" style={{ color: 'var(--tenant-primary)' }}>
                 ₹{parseFloat(product.price).toLocaleString('en-IN')}
               </p>
+              {product.delivery_time && (
+                <div className="flex items-center gap-1.5 mt-1.5">
+                  <svg className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span className="text-xs text-amber-700 font-medium">{product.delivery_time}</span>
+                </div>
+              )}
             </div>
             <button onClick={onClose}
               className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-400">

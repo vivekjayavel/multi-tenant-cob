@@ -104,6 +104,14 @@ export default function ProductCard({ product, index = 0 }) {
           {product.description && (
             <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">{product.description}</p>
           )}
+          {product.delivery_time && (
+            <div className="flex items-center gap-1.5 mt-2">
+              <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-xs text-gray-500">{product.delivery_time}</span>
+            </div>
+          )}
           <div className="flex items-center justify-between mt-3">
             <p className="font-bold text-lg" style={{ color: 'var(--tenant-primary)' }}>
               ₹{parseFloat(product.price).toLocaleString('en-IN')}

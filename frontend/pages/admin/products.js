@@ -8,7 +8,7 @@ import ProductCustomizationEditor from '../../components/admin/ProductCustomizat
 import api from '../../lib/api';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
 
-const EMPTY  = { name: '', description: '', price: '', category: '', slug: '', stock_qty: '', image_url: '', customization_options: null };
+const EMPTY  = { name: '', description: '', price: '', category: '', slug: '', stock_qty: '', image_url: '', customization_options: null, delivery_time: '' };
 const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 export default function AdminProducts({ tenant, adminUser }) {
@@ -27,7 +27,7 @@ export default function AdminProducts({ tenant, adminUser }) {
   useEffect(() => { load(); }, [load]);
 
   const openNew  = () => { setEditId(null); setForm(EMPTY); setError(null); setPanel(true); };
-  const openEdit = p  => { setEditId(p.id); setForm({ name: p.name, description: p.description || '', price: p.price, category: p.category || '', slug: p.slug, stock_qty: p.stock_qty, image_url: p.image_url || '', customization_options: p.customization_options || null }); setError(null); setPanel(true); };
+  const openEdit = p  => { setEditId(p.id); setForm({ name: p.name, description: p.description || '', price: p.price, category: p.category || '', slug: p.slug, stock_qty: p.stock_qty, image_url: p.image_url || '', customization_options: p.customization_options || null, delivery_time: p.delivery_time || '' }); setError(null); setPanel(true); };
 
   const handleSave = async (e) => {
     e.preventDefault(); setSaving(true); setError(null);
