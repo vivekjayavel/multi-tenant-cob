@@ -44,7 +44,18 @@ exports.update = async (req, res, next) => {
     const { id } = req.params, tenantId = req.tenant.id;
     const allowed = ['name','description','price','image_url','category','slug','is_active','stock_qty','customization_options'];
     const fields = [], values = [];
+
+    // If stock_qty is being reduced, cap reserved_qty to not exceed new stock_qty
+    // This prevents violating the chk_reserved_lte_stock constraint
+    if (req.body.stock_qty !== undefined) {
+      const newStock = parseInt(req.body.stock_qty, 10) || 0;
+      fields.push('stock_qty = ?');
+      fields.push('reserved_qty = LEAST(reserved_qty, ?)');
+      values.push(newStock, newStock);
+    }
+
     for (const key of allowed) {
+      if (key === 'stock_qty') continue; // already handled above
       if (req.body[key] !== undefined) {
         let val = req.body[key];
         // JSON column: mysql2 needs a string, not an object
