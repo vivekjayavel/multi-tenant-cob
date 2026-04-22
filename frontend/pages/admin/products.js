@@ -112,6 +112,23 @@ export default function AdminProducts({ tenant, adminUser }) {
                     <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">Description</label>
                     <textarea rows={3} className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 transition-all placeholder-gray-300" placeholder="What makes this special…" {...f('description')} />
                   </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+                      Delivery Time
+                      <span className="ml-1 text-gray-400 font-normal normal-case">(optional)</span>
+                    </label>
+                    <div className="relative">
+                      <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <input
+                        type="text"
+                        placeholder="e.g. 2-3 hours, Next day delivery, Order 24hrs in advance"
+                        className="w-full pl-9 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 transition-all placeholder-gray-300"
+                        {...f('delivery_time')}
+                      />
+                    </div>
+                  </div>
                   {/* Customisation Options */}
                   <ProductCustomizationEditor
                     value={form.customization_options}
