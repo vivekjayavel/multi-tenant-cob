@@ -40,7 +40,15 @@ export default function AdminLayout({ children, tenant, active, adminUser }) {
           </div>
           <p className="text-[10px] text-gray-400 mt-0.5 uppercase tracking-widest">Admin Panel</p>
         </div>
-        {adminUser && <div className="px-5 py-3 border-b border-gray-50 bg-stone-50"><p className="text-xs font-medium text-gray-700 truncate">{adminUser.name}</p><p className="text-[10px] text-gray-400 truncate">{adminUser.email}</p></div>}
+        {adminUser && (
+          <div className="px-4 py-3 border-b border-gray-50 bg-stone-50 flex items-center justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-gray-700 truncate">{adminUser.name}</p>
+              <p className="text-[10px] text-gray-400 truncate">{adminUser.email}</p>
+            </div>
+            <NotificationBell />
+          </div>
+        )}
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
           {navItems.map(item => (
             <Link key={item.href} href={item.href} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-colors font-medium ${active === item.key ? 'bg-primary/10 text-primary' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`} style={active === item.key ? { backgroundColor: 'color-mix(in srgb, var(--tenant-primary) 10%, transparent)', color: 'var(--tenant-primary)' } : {}}>
