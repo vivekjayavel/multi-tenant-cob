@@ -5,7 +5,16 @@ import OrderTable from '../../components/admin/OrderTable';
 import api from '../../lib/api';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
 
-const FILTERS = ['all','pending','cod_pending','paid','processing','shipped','delivered','cancelled'];
+const FILTERS = [
+  { key: 'all',          label: 'All' },
+  { key: 'pending',      label: 'Pending' },
+  { key: 'cod_pending',  label: '💵 COD Pending' },
+  { key: 'paid',         label: 'Paid' },
+  { key: 'processing',   label: 'Processing' },
+  { key: 'shipped',      label: 'Shipped' },
+  { key: 'delivered',    label: 'Delivered' },
+  { key: 'cancelled',    label: 'Cancelled' },
+];
 
 export default function AdminOrders({ tenant, adminUser }) {
   const [orders,   setOrders]   = useState([]);
@@ -36,8 +45,12 @@ export default function AdminOrders({ tenant, adminUser }) {
         </div>
         <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1 mb-6">
           {FILTERS.map(f => (
-            <button key={f} onClick={() => setFilter(f)} className={`flex-shrink-0 text-xs font-semibold px-4 py-2 rounded-full transition-all ${filter === f ? 'text-white shadow-sm' : 'bg-white text-gray-500 hover:text-gray-800 border border-gray-200'}`} style={filter === f ? { backgroundColor: 'var(--tenant-primary)' } : {}}>
-              {f.charAt(0).toUpperCase() + f.slice(1)}
+            <button key={f.key} onClick={() => setFilter(f.key)}
+              className={`flex-shrink-0 text-xs font-semibold px-4 py-2 rounded-full transition-all whitespace-nowrap ${
+                filter === f.key ? 'text-white shadow-sm' : 'bg-white text-gray-500 hover:text-gray-800 border border-gray-200'
+              }`}
+              style={filter === f.key ? { backgroundColor: 'var(--tenant-primary)' } : {}}>
+              {f.label}
             </button>
           ))}
         </div>

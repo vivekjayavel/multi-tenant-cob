@@ -21,36 +21,41 @@ export default function CheckoutPage({ tenant }) {
   const [error,         setError]         = useState(null);
   const [orderId,       setOrderId]       = useState(null);
   const [form,          setForm]          = useState({ name:'', phone:'', address:'', city:'', pincode:'', notes:'' });
+  const [orderSnapshot, setOrderSnapshot] = useState(null); // captured before cart is cleared
   const seo  = noindexSeo(tenant, 'Checkout');
   const hasRazorpay = !!tenant?.razorpay_key_id;
   const field = key => ({ value: form[key], onChange: e => setForm(f => ({ ...f, [key]: e.target.value })) });
 
-  // Build WhatsApp order summary text
+  // Build WhatsApp message from snapshot (captured before cart is cleared)
   const buildWhatsAppMessage = (oId) => {
+    const snap   = orderSnapshot;
+    if (!snap) return encodeURIComponent(`Hi! I placed Order #${oId} at ${tenant?.name}.`);
+    const pmLabel = snap.paymentMethod === 'cod' ? 'Cash on Delivery 💵' : 'Online Payment 💳';
     const lines = [
-      `🛒 *New Order #${oId}*`,
-      `📍 *Payment:* Cash on Delivery`,
+      `🛒 *New Order #${oId} — ${tenant?.name || ''}*`,
+      `📍 *Payment:* ${pmLabel}`,
       ``,
       `*Items:*`,
-      ...items.map(i => {
+      ...snap.items.map(i => {
         let line = `• ${i.name} × ${i.quantity} — ₹${(i.price * i.quantity).toFixed(2)}`;
         if (i.customization) {
           const details = Object.entries(i.customization)
             .filter(([,v]) => v)
-            .map(([k,v]) => `${k}: ${v}`)
-            .join(', ');
-          if (details) line += `\n  (${details})`;
+            .map(([k,v]) => `  › ${k}: ${v}`)
+            .join('\n');
+          if (details) line += `\n${details}`;
         }
         return line;
       }),
       ``,
-      `*Total: ₹${total.toFixed(2)}*`,
+      `💰 *Total: ₹${snap.total.toFixed(2)}*`,
       ``,
-      `*Delivery to:*`,
-      `${form.name}, ${form.phone}`,
-      `${form.address}, ${form.city} - ${form.pincode}`,
-      form.notes ? `Notes: ${form.notes}` : '',
-    ].filter(l => l !== undefined).join('\n');
+      `📦 *Deliver to:*`,
+      `${snap.form.name}`,
+      `📞 ${snap.form.phone}`,
+      `${snap.form.address}, ${snap.form.city} — ${snap.form.pincode}`,
+      snap.form.notes ? `📝 Notes: ${snap.form.notes}` : null,
+    ].filter(l => l !== null).join('\n');
     return encodeURIComponent(lines);
   };
 
@@ -104,6 +109,7 @@ export default function CheckoutPage({ tenant }) {
               razorpay_signature:  response.razorpay_signature,
               orderId,
             });
+            setOrderSnapshot({ items: [...items], total, form: { ...form }, paymentMethod: 'online' });
             dispatch({ type: 'CLEAR' });
             setStep(3);
           } catch {
