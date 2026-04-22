@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 const SwiperCarousel = dynamic(() => import('../../components/ui/SwiperCarousel'), { ssr: false });
-const SwiperSlide = dynamic(() => import('../../components/ui/SwiperCarousel').then(m => ({ default: m.SwiperSlide })), { ssr: false });
 import Layout from '../../components/layout/Layout';
 import ProductCard from '../../components/ui/ProductCard';
 import MetaTags from '../../components/seo/MetaTags';
