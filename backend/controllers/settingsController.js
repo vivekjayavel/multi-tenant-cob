@@ -8,12 +8,14 @@ const { logger }          = require('../config/logger');
 
 const DEFAULT_SETTINGS = {
   hero: {
-    badge:         'Fresh Baked Daily',
-    heading:       'Handcrafted with Love & Butter',
-    subheading:    'From our oven to your table — every cake, croissant and pastry is baked fresh each morning.',
-    image_url:     '',
-    cta_primary:   'Explore Menu',
-    cta_whatsapp:  'Order via WhatsApp',
+    badge:            'Fresh Baked Daily',
+    heading:          'Handcrafted with Love & Butter',
+    subheading:       'From our oven to your table — every cake, croissant and pastry is baked fresh each morning.',
+    image_url:        '',
+    cta_primary:      'Explore Menu',
+    cta_whatsapp:     'Order via WhatsApp',
+    overlay_enabled:  true,
+    overlay_intensity: 'medium', // 'light' | 'medium' | 'strong'
     stats: [
       { value: '500+', label: 'Happy customers' },
       { value: '50+',  label: 'Menu items'      },

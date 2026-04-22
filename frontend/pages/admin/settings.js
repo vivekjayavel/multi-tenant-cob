@@ -87,7 +87,10 @@ function HeroSection({ data, onSave, saving, tenant }) {
   const [form, setForm] = useState(data || {});
   const [stats, setStats] = useState(data?.stats || []);
   const [uploading, setUploading] = useState(false);
-  useEffect(() => { setForm(data || {}); setStats(data?.stats || []); }, [data]);
+  useEffect(() => {
+    setForm(data || {});
+    setStats(data?.stats || []);
+  }, [data]);
 
   const f = key => ({ value: form[key] || '', onChange: e => setForm(p => ({ ...p, [key]: e.target.value })) });
 
@@ -130,6 +133,55 @@ function HeroSection({ data, onSave, saving, tenant }) {
           </div>
         </div>
       </div>
+
+      {/* Overlay Toggle + Intensity — only shown when image is uploaded */}
+      {form.image_url && (
+        <div className="bg-stone-50 border border-gray-200 rounded-2xl p-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-gray-700">Background Overlay</p>
+              <p className="text-xs text-gray-400 mt-0.5">Darkens the hero image so text is readable</p>
+            </div>
+            <button type="button"
+              onClick={() => setForm(p => ({ ...p, overlay_enabled: !p.overlay_enabled }))}
+              className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${form.overlay_enabled !== false ? '' : 'bg-gray-200'}`}
+              style={form.overlay_enabled !== false ? { backgroundColor: 'var(--tenant-primary)' } : {}}>
+              <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${form.overlay_enabled !== false ? 'left-7' : 'left-1'}`} />
+            </button>
+          </div>
+
+          {form.overlay_enabled !== false && (
+            <div>
+              <p className="text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Overlay Intensity</p>
+              <div className="grid grid-cols-4 gap-2">
+                {['none','light','medium','strong'].map(lvl => (
+                  <button key={lvl} type="button"
+                    onClick={() => setForm(p => ({ ...p, overlay_intensity: lvl }))}
+                    className={`py-2 rounded-xl text-xs font-semibold border-2 transition-all capitalize ${
+                      (form.overlay_intensity || 'medium') === lvl ? 'text-white' : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}
+                    style={(form.overlay_intensity || 'medium') === lvl ? { backgroundColor: 'var(--tenant-primary)', borderColor: 'var(--tenant-primary)' } : {}}>
+                    {lvl}
+                  </button>
+                ))}
+              </div>
+              {/* Live preview strip */}
+              <div className="mt-3 h-16 rounded-xl overflow-hidden relative">
+                <img src={form.image_url} alt="preview" className="w-full h-full object-cover" />
+                <div className="absolute inset-0" style={{
+                  background: form.overlay_intensity === 'none'   ? 'none'
+                            : form.overlay_intensity === 'light'  ? 'linear-gradient(to right, rgba(0,0,0,0.45), rgba(0,0,0,0.1))'
+                            : form.overlay_intensity === 'strong' ? 'linear-gradient(to right, rgba(0,0,0,0.88), rgba(0,0,0,0.4))'
+                            : 'linear-gradient(to right, rgba(0,0,0,0.72), rgba(0,0,0,0.25))', // medium
+                }} />
+                <p className="absolute left-3 bottom-2 text-white text-xs font-bold drop-shadow">
+                  {form.overlay_intensity === 'none' ? 'No overlay — image only' : 'Text will show here'}
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <Field label="Badge text" placeholder="Fresh Baked Daily" {...f('badge')} />
       <Field label="Main heading" placeholder="Handcrafted with Love & Butter" {...f('heading')} />

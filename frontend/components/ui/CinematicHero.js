@@ -34,6 +34,17 @@ export default function CinematicHero({ hero = {} }) {
   const hasHeroImg   = !!hero.image_url;
   const headingLines = heading.split('\n');
 
+  // Overlay gradient intensity
+  const overlayEnabled = hasHeroImg && (hero.overlay_enabled !== false);
+  const intensityMap = {
+    none:   { left: 0,    mid: 0,    bottom: 0    },
+    light:  { left: 0.45, mid: 0.15, bottom: 0.25 },
+    medium: { left: 0.72, mid: 0.30, bottom: 0.50 },
+    strong: { left: 0.88, mid: 0.55, bottom: 0.70 },
+  };
+  const intensity = intensityMap[hero.overlay_intensity || 'medium'] || intensityMap.medium;
+  const { left: overlayLeft, mid: overlayMid, bottom: overlayBottom } = intensity;
+
   // Colour scheme: dark overlay → white text. No image → dark text on light bg
   const textCol     = hasHeroImg ? 'text-white'      : 'text-gray-900';
   const subCol      = hasHeroImg ? 'text-white/80'   : 'text-gray-600';
@@ -63,11 +74,15 @@ export default function CinematicHero({ hero = {} }) {
             transition={{ duration: 14, ease: 'easeInOut', repeat: Infinity, repeatType: 'mirror' }}
             onLoad={() => setImgLoaded(true)}
           />
-          {/* Gradient: left-heavy for text legibility */}
-          <div className="absolute inset-0"
-            style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0.08) 100%)' }} />
-          <div className="absolute inset-0"
-            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 55%)' }} />
+          {/* Dynamic gradient overlay */}
+          {overlayEnabled && (
+            <>
+              <div className="absolute inset-0"
+                style={{ background: `linear-gradient(to right, rgba(0,0,0,${overlayLeft}) 0%, rgba(0,0,0,${overlayMid}) 55%, rgba(0,0,0,0.05) 100%)` }} />
+              <div className="absolute inset-0"
+                style={{ background: `linear-gradient(to top, rgba(0,0,0,${overlayBottom}) 0%, transparent 55%)` }} />
+            </>
+          )}
         </motion.div>
       )}
 
