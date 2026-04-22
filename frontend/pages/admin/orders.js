@@ -3,6 +3,7 @@ import Head from 'next/head';
 import AdminLayout from '../../components/admin/AdminLayout';
 import OrderTable from '../../components/admin/OrderTable';
 import api from '../../lib/api';
+import { useToast } from '../../components/ui/Toast';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
 
 const FILTERS = [
@@ -21,6 +22,7 @@ export default function AdminOrders({ tenant, adminUser }) {
   const [loading,  setLoading]  = useState(true);
   const [filter,   setFilter]   = useState('all');
   const [updating, setUpdating] = useState(null);
+  const toast = useToast();
   const [error,    setError]    = useState(null);
 
   const load = async (status) => {
@@ -32,8 +34,13 @@ export default function AdminOrders({ tenant, adminUser }) {
 
   const handleStatusChange = async (orderId, status) => {
     setUpdating(orderId);
-    try { await api.patch(`/orders/${orderId}/status`, { status }); setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o)); }
-    catch (err) { alert(err?.response?.data?.message || 'Update failed.'); } finally { setUpdating(null); }
+    try {
+      await api.patch(`/orders/${orderId}/status`, { status });
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+      toast({ message: `Order #${orderId} → ${status}`, type: 'success' });
+    } catch (err) {
+      toast({ message: err?.response?.data?.message || 'Update failed', type: 'error' });
+    } finally { setUpdating(null); }
   };
 
   return (

@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { LazyMotion, domAnimation } from 'framer-motion';
+import { ToastProvider } from '../components/ui/Toast';
 import { TenantContext, SettingsContext } from '../context/TenantContext';
 import { CartProvider } from '../context/CartContext';
 import '../styles/globals.css';
@@ -17,11 +18,13 @@ export default function App({ Component, pageProps }) {
   return (
     // LazyMotion loads animation features only on client, preventing SSR mismatch
     <LazyMotion features={domAnimation}>
+      <ToastProvider>
       <TenantContext.Provider value={tenant || {}}>
         <CartProvider>
           <Component {...pageProps} />
         </CartProvider>
       </TenantContext.Provider>
+      </ToastProvider>
     </LazyMotion>
   );
 }

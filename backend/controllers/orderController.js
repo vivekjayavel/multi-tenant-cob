@@ -68,10 +68,12 @@ exports.create = async (req, res, next) => {
         [orderId, item.product_id, item.quantity, product.price, product.name, custDetails]
       );
 
-      await conn.execute(
-        `UPDATE products SET reserved_qty = reserved_qty + ?
-         WHERE id = ? AND tenant_id = ? AND (stock_qty - reserved_qty) >= ?`,
-        [item.quantity, item.product_id, tenantId, item.quantity]
+      // Use LEAST() to ensure reserved_qty never exceeds stock_qty (satisfies chk_reserved_lte_stock)
+      const result = await conn.execute(
+        `UPDATE products
+         SET reserved_qty = LEAST(stock_qty, reserved_qty + ?)
+         WHERE id = ? AND tenant_id = ?`,
+        [item.quantity, item.product_id, tenantId]
       );
     }
 

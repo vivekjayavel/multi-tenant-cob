@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../lib/api';
+import { useToast } from '../../components/ui/Toast';
 import uploadApi from '../../lib/uploadApi';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
 
@@ -15,6 +16,7 @@ const TABS = [
 ];
 
 export default function AdminSettings({ tenant, adminUser }) {
+  const toast = useToast();
   const [tab,      setTab]      = useState('hero');
   const [settings, setSettings] = useState(null);
   const [loading,  setLoading]  = useState(true);
@@ -27,14 +29,15 @@ export default function AdminSettings({ tenant, adminUser }) {
   }, []);
 
   const save = async (section, data) => {
-    setSaving(true); setError(null); setSaved(false);
+    setSaving(true); setError(null);
     try {
       await api.put('/settings', { section, data });
       setSettings(s => ({ ...s, [section]: data }));
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2500);
+      toast({ message: 'Settings saved successfully!', type: 'success' });
     } catch (err) {
-      setError(err?.response?.data?.message || 'Save failed');
+      const msg = err?.response?.data?.message || 'Save failed';
+      setError(msg);
+      toast({ message: msg, type: 'error' });
     } finally { setSaving(false); }
   };
 
@@ -47,15 +50,7 @@ export default function AdminSettings({ tenant, adminUser }) {
             <h1 className="font-display text-2xl text-gray-900">Site Settings</h1>
             <p className="text-sm text-gray-500 mt-0.5">Manage your homepage, features and footer content</p>
           </div>
-          <AnimatePresence>
-            {saved && (
-              <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                className="flex items-center gap-2 bg-green-50 border border-green-100 text-green-700 text-sm font-medium px-4 py-2 rounded-xl">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                Saved!
-              </motion.div>
-            )}
-          </AnimatePresence>
+
         </div>
 
         {/* Tabs */}
@@ -364,12 +359,12 @@ function BrandingSection({ tenant, saving, setSaving, setError, setSaved }) {
     setSaving(true); setError(null); setSaved(false);
     try {
       await api.put('/settings/branding', { theme_color: color, name, whatsapp_number: whatsapp, logo_url: logoUrl });
-      setSaved(true);
-      // Reload after 1s so SSR fetches fresh tenant data (new color, name etc.)
-      // This ensures the entire app reflects the change immediately
-      setTimeout(() => { window.location.reload(); }, 1000);
+      toast({ message: 'Branding saved! Refreshing…', type: 'success' });
+      setTimeout(() => { window.location.reload(); }, 1200);
     } catch (err) {
-      setError(err?.response?.data?.message || 'Save failed');
+      const msg = err?.response?.data?.message || 'Save failed';
+      setError(msg);
+      toast({ message: msg, type: 'error' });
     } finally { setSaving(false); }
   };
 

@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import AdminLayout from '../../components/admin/AdminLayout';
 import ImageUploader from '../../components/admin/ImageUploader';
+import { useToast } from '../../components/ui/Toast';
 import ProductCustomizationEditor from '../../components/admin/ProductCustomizationEditor';
 import api from '../../lib/api';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
@@ -39,7 +40,7 @@ export default function AdminProducts({ tenant, adminUser }) {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this product?')) return;
-    try { await api.delete(`/products/${id}`); load(); } catch (err) { alert(err?.response?.data?.message || 'Delete failed.'); }
+    try { await api.delete(`/products/${id}`); load(); toast({ message: 'Product deleted', type: 'info' }); } catch (err) { toast({ message: err?.response?.data?.message || 'Delete failed', type: 'error' }); }
   };
 
   const f = key => ({ value: form[key], onChange: e => { const val = e.target.value; setForm(prev => ({ ...prev, [key]: val, ...(key === 'name' && !editId ? { slug: slugify(val) } : {}) })); } });
