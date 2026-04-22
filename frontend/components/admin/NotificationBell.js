@@ -22,7 +22,9 @@ export default function NotificationBell() {
   const handleOpen = () => {
     if (!open && bellRef.current) {
       const rect = bellRef.current.getBoundingClientRect();
-      setDropPos({ top: rect.bottom + 8, left: rect.right + 8 });
+      // Always open to the right of the sidebar (224px wide), aligned with bell top
+      const sidebarWidth = 224;
+      setDropPos({ top: rect.bottom + 6, left: sidebarWidth + 8 });
     }
     setOpen(o => !o);
     if (!open) clearNotifications();
