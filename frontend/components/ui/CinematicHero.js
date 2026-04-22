@@ -84,7 +84,7 @@ export default function CinematicHero({ hero = {} }) {
 
   return (
     <section ref={heroRef}
-      className={`relative min-h-screen flex items-center overflow-hidden ${hasImages ? 'bg-stone-950' : 'bg-stone-50'}`}>
+      className={`relative flex items-center overflow-hidden ${hasImages ? 'bg-stone-950' : 'bg-stone-50'}`} style={{ minHeight: '70vh', maxHeight: '80vh', height: '75vh' }}>
 
       {/* ── Slideshow images — cinematic transitions, clickable ── */}
       {hasImages && (
@@ -94,7 +94,7 @@ export default function CinematicHero({ hero = {} }) {
             <motion.div
               key={activeIdx}
               custom={direction}
-              className="absolute inset-0"
+              className="absolute inset-0 w-full h-full"
               variants={{
                 enter:  (d) => ({ x: d > 0 ? '100%' : '-100%', opacity: 0, filter: 'brightness(0.6)' }),
                 center: { x: 0, opacity: 1, filter: 'brightness(1)',
@@ -147,9 +147,9 @@ export default function CinematicHero({ hero = {} }) {
       {hero.show_text_content !== false && (
       <motion.div
         className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 w-full"
-        style={{ opacity, paddingTop: 'clamp(140px, 18vh, 200px)', paddingBottom: 'clamp(80px, 12vh, 140px)' }}
+        style={{ opacity, paddingTop: '148px', paddingBottom: '48px' }}
       >
-        <motion.div variants={container} initial="hidden" animate="visible" className="max-w-xl space-y-5 sm:space-y-6">
+        <motion.div variants={container} initial="hidden" animate="visible" className="max-w-xl space-y-3 sm:space-y-4">
 
           {/* Badge */}
           <motion.div variants={textReveal}>
@@ -164,7 +164,7 @@ export default function CinematicHero({ hero = {} }) {
           {headingLines.map((line, i) => (
             <motion.div key={i} variants={textReveal} className="overflow-hidden leading-none">
               <h1 className={`font-display font-bold ${textCol}`}
-                style={{ fontSize: 'clamp(2.6rem, 5vw, 4.5rem)', lineHeight: 1.06 }}>
+                style={{ fontSize: 'clamp(1.9rem, 3.5vw, 3rem)', lineHeight: 1.1 }}>
                 {i === headingLines.length - 1 && headingLines.length > 1
                   ? <span style={{ color: hasImages ? '#fff' : 'var(--tenant-primary)' }}>{line}</span>
                   : line}
@@ -180,7 +180,7 @@ export default function CinematicHero({ hero = {} }) {
           {/* CTAs */}
           <motion.div variants={textReveal} className="flex flex-wrap gap-4 pt-2">
             <motion.a href="/products"
-              className="inline-flex items-center gap-2.5 font-semibold px-8 py-4 rounded-full text-white shadow-lg"
+              className="inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-full text-white shadow-md"
               style={{ backgroundColor: 'var(--tenant-primary)' }}
               whileHover={{ scale:1.05, y:-3, boxShadow:'0 24px 48px -12px color-mix(in srgb, var(--tenant-primary) 55%, transparent)' }}
               whileTap={{ scale:0.97 }} transition={{ type:'spring', stiffness:400, damping:25 }}>
@@ -193,7 +193,7 @@ export default function CinematicHero({ hero = {} }) {
             {tenant?.whatsapp_number && (
               <motion.a href={`https://wa.me/${tenant.whatsapp_number}?text=${encodeURIComponent("Hi! I would like to place an order at " + (tenant.name || "your store") + ". Please share the menu and availability. Thank you!")}`}
                 target="_blank" rel="noopener noreferrer"
-                className={`inline-flex items-center gap-2.5 font-semibold px-8 py-4 rounded-full border-2 backdrop-blur-sm transition-colors
+                className={`inline-flex items-center gap-2 font-semibold px-6 py-3 rounded-full border-2 backdrop-blur-sm transition-colors
                   ${hasImages ? 'text-white border-white/35 hover:bg-white/10' : 'text-gray-700 border-gray-300 hover:border-gray-400 hover:bg-white'}`}
                 whileHover={{ scale:1.05, y:-3 }} whileTap={{ scale:0.97 }}
                 transition={{ type:'spring', stiffness:400, damping:25 }}>
