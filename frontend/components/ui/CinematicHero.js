@@ -77,10 +77,15 @@ export default function CinematicHero({ hero = {} }) {
           {/* Dynamic gradient overlay */}
           {overlayEnabled && (
             <>
+              {/* Left/centre overlay for text legibility */}
               <div className="absolute inset-0"
-                style={{ background: `linear-gradient(to right, rgba(0,0,0,${overlayLeft}) 0%, rgba(0,0,0,${overlayMid}) 55%, rgba(0,0,0,0.05) 100%)` }} />
+                style={{ background: `linear-gradient(135deg, rgba(0,0,0,${overlayLeft}) 0%, rgba(0,0,0,${overlayMid}) 50%, rgba(0,0,0,0.05) 100%)` }} />
+              {/* Bottom overlay */}
               <div className="absolute inset-0"
-                style={{ background: `linear-gradient(to top, rgba(0,0,0,${overlayBottom}) 0%, transparent 55%)` }} />
+                style={{ background: `linear-gradient(to top, rgba(0,0,0,${overlayBottom}) 0%, transparent 50%)` }} />
+              {/* Top overlay — helps navbar readability */}
+              <div className="absolute inset-0"
+                style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 30%)' }} />
             </>
           )}
         </motion.div>
@@ -104,8 +109,8 @@ export default function CinematicHero({ hero = {} }) {
         style={{ backgroundImage:"url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundRepeat:'repeat', backgroundSize:'200px' }} />
 
       {/* ── Content ── */}
-      <motion.div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 py-32 w-full" style={{ opacity }}>
-        <motion.div variants={container} initial="hidden" animate="visible" className="max-w-2xl space-y-6">
+      <motion.div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 w-full" style={{ opacity, paddingTop: 'clamp(140px, 18vh, 200px)', paddingBottom: 'clamp(80px, 12vh, 140px)' }}>
+        <motion.div variants={container} initial="hidden" animate="visible" className="max-w-xl space-y-5 sm:space-y-6">
 
           {/* Badge */}
           <motion.div variants={textReveal}>
@@ -120,7 +125,7 @@ export default function CinematicHero({ hero = {} }) {
           {headingLines.map((line, i) => (
             <motion.div key={i} variants={textReveal} className="overflow-hidden leading-none">
               <h1 className={`font-display font-bold ${textCol}`}
-                style={{ fontSize: 'clamp(2.4rem, 5.5vw, 4.2rem)', lineHeight: 1.08 }}>
+                style={{ fontSize: 'clamp(2.6rem, 5vw, 4.5rem)', lineHeight: 1.06 }}>
                 {i === headingLines.length - 1 && headingLines.length > 1
                   ? <span style={{ color: hasHeroImg ? '#fff' : 'var(--tenant-primary)' }}>{line}</span>
                   : line}
