@@ -28,11 +28,11 @@ async function getProductsForPage(tenantId, category = null) {
   if (cached) return cached;
 
   const params = category ? [tenantId, category] : [tenantId];
-  const sql = `SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options, delivery_time
+  const sql = `SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options, delivery_time, sort_order
                FROM products
                WHERE tenant_id = ? AND is_active = 1
                ${category ? 'AND category = ?' : ''}
-               ORDER BY created_at DESC`;
+               ORDER BY sort_order ASC, created_at DESC`;
 
   const [products] = await db.query(sql, params);
   const enriched   = products.map(p => ({
@@ -59,7 +59,7 @@ async function getFeaturedProducts(tenantId, limit = 8) {
   if (cached) return cached;
 
   const [products] = await db.query(
-    'SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options, delivery_time FROM products WHERE tenant_id = ? AND is_active = 1 ORDER BY created_at DESC LIMIT ?',
+    'SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options, delivery_time, sort_order FROM products WHERE tenant_id = ? AND is_active = 1 ORDER BY sort_order ASC, created_at DESC LIMIT ?',
     [tenantId, limit]
   );
   const enriched   = products.map(p => ({
@@ -88,10 +88,10 @@ async function getProductsByCategory(tenantId) {
   const db = require('../../backend/config/db');
   const [products] = await db.query(
     `SELECT id, name, description, price, image_url, category, slug,
-            stock_qty, reserved_qty, customization_options, delivery_time
+            stock_qty, reserved_qty, customization_options, delivery_time, sort_order
      FROM products
      WHERE tenant_id = ? AND is_active = 1
-     ORDER BY category ASC, created_at DESC`,
+     ORDER BY category ASC, sort_order ASC, created_at DESC`,
     [tenantId]
   );
 
@@ -121,9 +121,12 @@ async function getProductsByCategory(tenantId) {
       if (!aP && bP) return  1;
       return a.localeCompare(b);
     })
-    .map(([category, products]) => ({
+    .map(([category, prods]) => ({
       category,
-      products: JSON.parse(JSON.stringify(products)),
+      // Sort within category by sort_order ASC then created_at DESC
+      products: JSON.parse(JSON.stringify(
+        [...prods].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+      )),
     }));
 }
 

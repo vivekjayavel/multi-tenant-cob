@@ -8,7 +8,7 @@ import ProductCustomizationEditor from '../../components/admin/ProductCustomizat
 import api from '../../lib/api';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
 
-const EMPTY  = { name: '', description: '', price: '', category: '', slug: '', stock_qty: '', image_url: '', customization_options: null, delivery_time: '' };
+const EMPTY  = { name: '', description: '', price: '', category: '', slug: '', stock_qty: '', image_url: '', customization_options: null, delivery_time: '', sort_order: '0' };
 const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 export default function AdminProducts({ tenant, adminUser }) {
@@ -40,7 +40,7 @@ export default function AdminProducts({ tenant, adminUser }) {
   useEffect(() => { load(); }, [load]);
 
   const openNew  = () => { setEditId(null); setForm(EMPTY); setError(null); setPanel(true); };
-  const openEdit = p  => { setEditId(p.id); setForm({ name: p.name, description: p.description || '', price: p.price, category: p.category || '', slug: p.slug, stock_qty: p.stock_qty, image_url: p.image_url || '', customization_options: p.customization_options || null, delivery_time: p.delivery_time || '' }); setError(null); setPanel(true); };
+  const openEdit = p  => { setEditId(p.id); setForm({ name: p.name, description: p.description || '', price: p.price, category: p.category || '', slug: p.slug, stock_qty: p.stock_qty, image_url: p.image_url || '', customization_options: p.customization_options || null, delivery_time: p.delivery_time || '', sort_order: String(p.sort_order ?? 0) }); setError(null); setPanel(true); };
 
   const handleSave = async (e) => {
     e.preventDefault(); setSaving(true); setError(null);
@@ -103,7 +103,22 @@ export default function AdminProducts({ tenant, adminUser }) {
                 </div>
                 <div className="p-4">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0"><p className="font-semibold text-gray-800 text-sm truncate">{p.name}</p><p className="text-xs text-gray-400 mt-0.5">{p.category}</p></div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-800 text-sm truncate">{p.name}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <p className="text-xs text-gray-400">{p.category}</p>
+                        {p.sort_order > 0 && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 text-amber-600 border border-amber-100">
+                            #{p.sort_order}
+                          </span>
+                        )}
+                        {p.sort_order === 0 && (
+                          <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-blue-50 text-blue-500 border border-blue-100">
+                            default
+                          </span>
+                        )}
+                      </div>
+                    </div>
                     <p className="font-bold text-sm flex-shrink-0" style={{ color: 'var(--tenant-primary)' }}>₹{parseFloat(p.price).toLocaleString('en-IN')}</p>
                   </div>
                   <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-50">
@@ -138,6 +153,7 @@ export default function AdminProducts({ tenant, adminUser }) {
                     { key: 'price',     label: 'Price (₹)',    required: true,  type: 'number', min: '0', step: '0.01' },
                     { key: 'stock_qty', label: 'Stock qty',    required: true,  type: 'number', min: '0' },
                     { key: 'category',  label: 'Category',     required: false, type: 'text',   placeholder: 'Cakes / Breads / Cupcakes' },
+                    { key: 'sort_order', label: 'Priority order', required: false, type: 'number', placeholder: '0', min: '0', title: 'Lower number = shown first. 0 is default.' },
                     { key: 'slug',      label: 'URL slug',     required: true,  type: 'text',   pattern: '[a-z0-9]+(-[a-z0-9]+)*' },
                   ].map(({ key, label, ...rest }) => (
                     <div key={key}>

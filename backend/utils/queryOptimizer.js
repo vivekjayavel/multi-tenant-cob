@@ -11,8 +11,8 @@ async function getProductsOptimized(tenantId, { category, search, page = 1, limi
 
   const [products, countResult] = await Promise.all([
     db.query(
-      `SELECT p.id, p.name, p.description, p.price, p.image_url, p.category, p.slug, p.stock_qty, p.reserved_qty, p.customization_options, p.delivery_time
-       FROM products p ${where} ORDER BY p.created_at DESC LIMIT ${parseInt(limit,10)||12} OFFSET ${parseInt(offset,10)||0}`,
+      `SELECT p.id, p.name, p.description, p.price, p.image_url, p.category, p.slug, p.stock_qty, p.reserved_qty, p.customization_options, p.delivery_time, p.sort_order
+       FROM products p ${where} ORDER BY p.sort_order ASC, p.created_at DESC LIMIT ${parseInt(limit,10)||12} OFFSET ${parseInt(offset,10)||0}`,
       params
     ),
     db.query(`SELECT COUNT(*) AS total FROM products p ${where}`, params),
