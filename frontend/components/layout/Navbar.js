@@ -7,8 +7,8 @@ import CartDrawer from '../ui/CartDrawer';
 import { useTenant, useSettings } from '../../context/TenantContext';
 
 const NAV_LINKS = [
-  { href: '/',         label: 'Home'    },
-  { href: '/products', label: 'Menu'    },
+  { href: '/',         label: 'Home' },
+  { href: '/products', label: 'Menu' },
 ];
 
 export default function Navbar({ tenant: tenantProp }) {
@@ -27,82 +27,72 @@ export default function Navbar({ tenant: tenantProp }) {
   }, []);
   useEffect(() => { setMobileOpen(false); }, [router.pathname]);
 
-  const heroHasImage = !!(settings?.hero?.image_url);
-  const isHomePage   = router.pathname === '/';
+  const heroHasImage  = !!(settings?.hero?.image_url);
+  const isHomePage    = router.pathname === '/';
   const isTransparent = isHomePage && !scrolled && heroHasImage;
+
+  const textCol    = isTransparent ? 'text-white'     : 'text-gray-700';
+  const hoverBg    = isTransparent ? 'hover:bg-white/10' : 'hover:bg-gray-100';
+  const borderCol  = isTransparent ? 'border-white/20' : 'border-gray-100';
 
   return (
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
-          scrolled ? 'shadow-md' : ''
-        } ${isTransparent ? 'bg-transparent' : 'bg-white'}`}
+          isTransparent ? 'bg-transparent' : 'bg-white'
+        } ${scrolled ? 'shadow-md' : ''}`}
       >
-        {/* ── Row 1: icons | logo | icons ── */}
-        <div className={`border-b transition-colors ${isTransparent ? 'border-white/20' : 'border-gray-100'}`}>
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16 sm:h-20">
+        {/* ── Row 1: Shop name left | Logo centre | Cart right ── */}
+        <div className={`border-b ${borderCol}`}>
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-20 sm:h-24">
 
-            {/* Left icons: search + account */}
-            <div className="flex items-center gap-3 w-24">
-              <button
-                className={`p-2 rounded-full transition-colors ${isTransparent ? 'text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}
-                aria-label="Search"
+            {/* Left: Shop name */}
+            <Link href="/" className="flex flex-col group min-w-0 flex-1">
+              <motion.span
+                className="font-display text-lg sm:text-xl font-bold leading-tight truncate"
+                style={{ color: isTransparent ? '#fff' : 'var(--tenant-primary)' }}
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
-                </svg>
-              </button>
-              <Link href="/login"
-                className={`p-2 rounded-full transition-colors ${isTransparent ? 'text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}
-                aria-label="Account"
+                {tenant?.name || 'Bakery'}
+              </motion.span>
+              <span
+                className="text-[10px] font-medium tracking-widest uppercase mt-0.5"
+                style={{ color: isTransparent ? 'rgba(255,255,255,0.6)' : 'color-mix(in srgb, var(--tenant-primary) 70%, gray)' }}
               >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"/>
-                </svg>
-              </Link>
-            </div>
-
-            {/* Centre: Logo */}
-            <Link href="/" className="flex flex-col items-center gap-0.5 group">
-              {tenant?.logo_url ? (
-                <motion.img
-                  src={tenant.logo_url}
-                  alt={tenant.name || 'Bakery'}
-                  className={`h-12 sm:h-14 w-auto object-contain transition-all duration-300 ${isTransparent ? '' : ''}`}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                  onError={e => { e.target.style.display = 'none'; }}
-                />
-              ) : (
-                <motion.span
-                  className="font-display text-xl sm:text-2xl font-bold"
-                  style={{ color: isTransparent ? '#fff' : 'var(--tenant-primary)' }}
-                  whileHover={{ scale: 1.03 }}
-                >
-                  {tenant?.name || 'Bakery'}
-                </motion.span>
-              )}
-              {/* Show name below logo when logo is present */}
-              {tenant?.logo_url && tenant?.name && (
-                <span
-                  className="text-[10px] font-semibold tracking-widest uppercase hidden sm:block"
-                  style={{ color: isTransparent ? 'rgba(255,255,255,0.7)' : 'var(--tenant-primary)' }}
-                >
-                  {tenant.name}
-                </span>
-              )}
+                Bakery & Cakes
+              </span>
             </Link>
 
-            {/* Right icons: wishlist + cart + hamburger */}
-            <div className="flex items-center gap-2 w-24 justify-end">
-              {/* Cart */}
+            {/* Centre: Circular logo */}
+            {tenant?.logo_url && (
+              <Link href="/" className="flex-shrink-0 mx-4">
+                <motion.div
+                  className="rounded-full overflow-hidden border-4 bg-white shadow-lg"
+                  style={{ width: 80, height: 80, borderColor: 'var(--tenant-primary)' }}
+                  whileHover={{ scale: 1.06 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                >
+                  <img
+                    src={tenant.logo_url}
+                    alt={tenant.name || 'Logo'}
+                    className="w-full h-full object-cover"
+                    onError={e => { e.target.parentElement.style.display = 'none'; }}
+                  />
+                </motion.div>
+              </Link>
+            )}
+
+            {/* Right: Cart + hamburger */}
+            <div className="flex items-center gap-2 flex-1 justify-end">
               <button
                 onClick={() => setCartOpen(true)}
-                className={`relative p-2 rounded-full transition-colors ${isTransparent ? 'text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}
+                className={`relative p-2.5 rounded-full transition-colors ${textCol} ${hoverBg}`}
                 aria-label="Open cart"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m12-9l2 9M9 21a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z"/>
+                  <path strokeLinecap="round" strokeLinejoin="round"
+                    d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2 9m12-9l2 9M9 21a1 1 0 100-2 1 1 0 000 2zm10 0a1 1 0 100-2 1 1 0 000 2z"/>
                 </svg>
                 {hydrated && itemCount > 0 && (
                   <motion.span
@@ -115,10 +105,10 @@ export default function Navbar({ tenant: tenantProp }) {
                 )}
               </button>
 
-              {/* Mobile hamburger */}
+              {/* Hamburger (mobile) */}
               <button
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className={`md:hidden p-2 rounded-full transition-colors ${isTransparent ? 'text-white hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'}`}
+                onClick={() => setMobileOpen(o => !o)}
+                className={`md:hidden p-2.5 rounded-full transition-colors ${textCol} ${hoverBg}`}
                 aria-label="Toggle menu"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -133,14 +123,16 @@ export default function Navbar({ tenant: tenantProp }) {
         </div>
 
         {/* ── Row 2: Nav links (desktop) ── */}
-        <div className={`hidden md:block transition-colors ${isTransparent ? 'bg-transparent' : 'bg-white border-b border-gray-100'}`}>
-          <nav className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-center gap-8 h-11">
+        <div className={`hidden md:block ${isTransparent ? '' : 'bg-white border-b border-gray-100'}`}>
+          <nav className="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-center gap-10 h-10">
             {NAV_LINKS.map(({ href, label }) => (
               <Link
                 key={href}
                 href={href}
-                className={`relative text-sm font-semibold tracking-wide transition-colors pb-0.5 ${
-                  router.pathname === href ? '' : isTransparent ? 'text-white/80 hover:text-white' : 'text-gray-600 hover:text-gray-900'
+                className={`relative text-sm font-semibold tracking-wide transition-colors ${
+                  router.pathname === href
+                    ? ''
+                    : isTransparent ? 'text-white/80 hover:text-white' : 'text-gray-500 hover:text-gray-900'
                 }`}
                 style={router.pathname === href ? { color: isTransparent ? '#fff' : 'var(--tenant-primary)' } : {}}
               >
@@ -148,7 +140,7 @@ export default function Navbar({ tenant: tenantProp }) {
                 {router.pathname === href && (
                   <motion.div
                     layoutId="navUnderline"
-                    className="absolute -bottom-0.5 left-0 right-0 h-0.5 rounded-full"
+                    className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full"
                     style={{ backgroundColor: isTransparent ? '#fff' : 'var(--tenant-primary)' }}
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
@@ -157,19 +149,6 @@ export default function Navbar({ tenant: tenantProp }) {
             ))}
           </nav>
         </div>
-
-        {/* ── Zigzag border ── */}
-        {!isTransparent && (
-          <div className="h-2 w-full overflow-hidden">
-            <svg viewBox="0 0 1200 8" preserveAspectRatio="none" className="w-full h-full" style={{ display: 'block' }}>
-              <path
-                d="M0 0 L20 8 L40 0 L60 8 L80 0 L100 8 L120 0 L140 8 L160 0 L180 8 L200 0 L220 8 L240 0 L260 8 L280 0 L300 8 L320 0 L340 8 L360 0 L380 8 L400 0 L420 8 L440 0 L460 8 L480 0 L500 8 L520 0 L540 8 L560 0 L580 8 L600 0 L620 8 L640 0 L660 8 L680 0 L700 8 L720 0 L740 8 L760 0 L780 8 L800 0 L820 8 L840 0 L860 8 L880 0 L900 8 L920 0 L940 8 L960 0 L980 8 L1000 0 L1020 8 L1040 0 L1060 8 L1080 0 L1100 8 L1120 0 L1140 8 L1160 0 L1180 8 L1200 0 L1200 8 L0 8 Z"
-                fill="var(--tenant-primary)"
-                opacity="0.15"
-              />
-            </svg>
-          </div>
-        )}
 
         {/* ── Mobile menu ── */}
         <AnimatePresence>
@@ -180,10 +159,10 @@ export default function Navbar({ tenant: tenantProp }) {
               exit={{ height: 0, opacity: 0 }}
               className="md:hidden overflow-hidden bg-white border-t border-gray-100"
             >
-              <nav className="px-4 py-4 flex flex-col gap-1">
+              <nav className="px-4 py-3 flex flex-col gap-1">
                 {[...NAV_LINKS, { href: '/login', label: 'Account' }].map(({ href, label }) => (
                   <Link key={href} href={href}
-                    className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="flex items-center px-4 py-2.5 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                     style={router.pathname === href ? { color: 'var(--tenant-primary)', backgroundColor: 'color-mix(in srgb, var(--tenant-primary) 8%, transparent)' } : {}}
                   >
                     {label}
