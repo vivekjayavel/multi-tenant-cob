@@ -70,7 +70,7 @@ export default function AdminSettings({ tenant, adminUser }) {
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-5">{error}</p>}
 
-            {tab === 'branding' && <BrandingSection tenant={tenant} saving={saving} setSaving={setSaving} setError={setError} setSaved={setSaved} />}
+            {tab === 'branding' && <BrandingSection tenant={tenant} saving={saving} setSaving={setSaving} setError={setError} setSaved={setSaved} toast={toast} />}
             {tab === 'hero'     && <HeroSection     data={settings?.hero}     onSave={d => save('hero', d)}     saving={saving} tenant={tenant} />}
             {tab === 'features' && <FeaturesSection data={settings?.features} onSave={d => save('features', d)} saving={saving} />}
             {tab === 'footer'   && <FooterSection   data={settings?.footer}   onSave={d => save('footer', d)}   saving={saving} />}
@@ -311,7 +311,7 @@ const PRESET_COLORS = [
   { name: 'Slate',     hex: '#475569' },
 ];
 
-function BrandingSection({ tenant, saving, setSaving, setError, setSaved }) {
+function BrandingSection({ tenant, saving, setSaving, setError, setSaved, toast }) {
   const [name,          setName]         = useState(tenant?.name            || '');
   const [color,         setColor]        = useState(tenant?.theme_color     || '#D97706');
   const [whatsapp,      setWhatsapp]     = useState(tenant?.whatsapp_number || '');
