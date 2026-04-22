@@ -84,4 +84,38 @@ function notFoundOrProps(data) {
   return { props: JSON.parse(JSON.stringify(data)) };
 }
 
-module.exports = { getTenantFromRequest, getProductsForPage, getFeaturedProducts, notFoundOrProps };
+async function getProductsByCategory(tenantId) {
+  const db = require('../../backend/config/db');
+  const [products] = await db.query(
+    `SELECT id, name, description, price, image_url, category, slug,
+            stock_qty, reserved_qty, customization_options, delivery_time
+     FROM products
+     WHERE tenant_id = ? AND is_active = 1
+     ORDER BY category ASC, created_at DESC`,
+    [tenantId]
+  );
+
+  // Group by category
+  const grouped = {};
+  for (const p of products) {
+    const cat = p.category || 'Other';
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push({
+      ...p,
+      available_qty: Math.max(0, p.stock_qty - p.reserved_qty),
+      customization_options: p.customization_options
+        ? (typeof p.customization_options === 'string'
+            ? p.customization_options
+            : JSON.stringify(p.customization_options))
+        : null,
+    });
+  }
+
+  // Return as array of { category, products }
+  return Object.entries(grouped).map(([category, products]) => ({
+    category,
+    products: JSON.parse(JSON.stringify(products)),
+  }));
+}
+
+module.exports = { getTenantFromRequest, getProductsForPage, getFeaturedProducts, getProductsByCategory, notFoundOrProps };

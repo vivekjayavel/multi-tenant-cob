@@ -9,7 +9,13 @@ const { productListSeo }                           = require('../../lib/seo');
 const { getTenantFromRequest, getProductsForPage } = require('../../lib/prefetch');
 
 export default function ProductsPage({ tenant, products, categories }) {
-  const [active, setActive] = useState('All');
+  const router = useRouter();
+  const [active, setActive] = useState(() => {
+    // Pre-select category from URL query (?category=Cakes)
+    return typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('category') || 'All'
+      : 'All';
+  });
   const seo      = productListSeo(tenant);
   const filtered = active === 'All' ? products : products.filter(p => p.category === active);
   return (

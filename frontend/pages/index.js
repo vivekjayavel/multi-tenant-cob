@@ -8,7 +8,7 @@ import MetaTags from '../components/seo/MetaTags';
 const SwiperCarousel = dynamic(() => import('../components/ui/SwiperCarousel'), { ssr: false });
 
 const { homeSeo }               = require('../lib/seo');
-const { getTenantFromRequest, getFeaturedProducts } = require('../lib/prefetch');
+const { getTenantFromRequest, getProductsByCategory } = require('../lib/prefetch');
 
 const DEFAULT_FEATURES = [
   { icon: '🌾', title: 'Real Ingredients',  desc: 'No preservatives, no shortcuts. Every recipe uses premium, natural ingredients.' },
@@ -16,7 +16,7 @@ const DEFAULT_FEATURES = [
   { icon: '🚚', title: 'Same-Day Delivery', desc: 'Order before noon and get delivery by evening within the city.' },
 ];
 
-export default function HomePage({ tenant, featuredProducts, settings }) {
+export default function HomePage({ tenant, categoryGroups, settings }) {
   const seo   = homeSeo(tenant);
   const feats = settings?.features?.length ? settings.features : DEFAULT_FEATURES;
 
@@ -28,92 +28,100 @@ export default function HomePage({ tenant, featuredProducts, settings }) {
         {/* ── Cinematic Hero ── */}
         <CinematicHero hero={settings?.hero} settings={settings} />
 
-        {/* ── Featured Products ── */}
-        {featuredProducts.length > 0 && (
-          <section className="py-24 overflow-hidden">
-            <div className="max-w-6xl mx-auto px-4 sm:px-6">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ duration: 0.6 }}
-                className="text-center mb-12"
-              >
-                <p className="text-sm font-semibold tracking-widest uppercase mb-2"
-                  style={{ color: 'var(--tenant-primary)' }}>This Week's Picks</p>
-                <h2 className="font-display text-4xl text-gray-900">Fresh From the Oven</h2>
-              </motion.div>
+        {/* ── Per-Category Product Sections ── */}
+        {categoryGroups.length > 0 && (
+          <div className="py-16 space-y-16">
+            {categoryGroups.map(({ category, products }, idx) => (
+              <section key={category} className="overflow-hidden">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6">
+                  {/* Category heading */}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: idx * 0.05 }}
+                    className="flex items-center justify-between mb-6"
+                  >
+                    <div className="flex items-center gap-3">
+                      {/* Accent line */}
+                      <div className="w-1 h-7 rounded-full" style={{ backgroundColor: 'var(--tenant-primary)' }} />
+                      <h2 className="font-display text-2xl text-gray-900">{category}</h2>
+                      <span className="text-xs font-semibold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">
+                        {products.length} item{products.length !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+                    <a
+                      href={`/products?category=${encodeURIComponent(category)}`}
+                      className="text-sm font-semibold transition-colors hover:opacity-70 flex items-center gap-1"
+                      style={{ color: 'var(--tenant-primary)' }}
+                    >
+                      View all
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </a>
+                  </motion.div>
 
-              {/* Swiper on all screen sizes */}
-              <SwiperCarousel
-                slidesPerView={1.2}
-                spaceBetween={16}
-                navigation={true}
-                pagination={true}
-                breakpoints={{
-                  480:  { slidesPerView: 2,   spaceBetween: 16 },
-                  768:  { slidesPerView: 3,   spaceBetween: 20 },
-                  1024: { slidesPerView: 4,   spaceBetween: 24 },
-                }}
-              >
-                {featuredProducts.map((p, i) => (
-                  <div key={p.id}>
-                    <ProductCard product={p} index={i} />
-                  </div>
-                ))}
-              </SwiperCarousel>
-
-              <motion.div
-                initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-                viewport={{ once: true }} className="text-center mt-10"
-              >
-                <motion.a href="/products"
-                  className="inline-flex items-center gap-2 border font-semibold px-7 py-3 rounded-full transition-all duration-200"
-                  style={{ borderColor: 'var(--tenant-primary)', color: 'var(--tenant-primary)' }}
-                  whileHover={{ scale: 1.04, y: -2, backgroundColor: 'var(--tenant-primary)', color: '#fff' }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  View Full Menu
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </motion.a>
-              </motion.div>
-            </div>
-          </section>
+                  {/* Products carousel for this category */}
+                  <SwiperCarousel
+                    slidesPerView={1.2}
+                    spaceBetween={16}
+                    navigation={products.length > 4}
+                    pagination={products.length > 2}
+                    breakpoints={{
+                      480:  { slidesPerView: 2,   spaceBetween: 16 },
+                      768:  { slidesPerView: 3,   spaceBetween: 20 },
+                      1024: { slidesPerView: 4,   spaceBetween: 24 },
+                    }}
+                  >
+                    {products.map((p, i) => (
+                      <div key={p.id}>
+                        <ProductCard product={p} index={i} />
+                      </div>
+                    ))}
+                  </SwiperCarousel>
+                </div>
+              </section>
+            ))}
+          </div>
         )}
 
-        {/* ── Features — swiper on mobile ── */}
+        {/* ── Empty state ── */}
+        {categoryGroups.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-32 gap-4">
+            <span className="text-6xl">🎂</span>
+            <p className="text-gray-500 text-lg">No products yet</p>
+          </div>
+        )}
+
+        {/* ── Features ── */}
         {feats.length > 0 && (
           <section className="bg-stone-50 py-20 overflow-hidden">
             <div className="max-w-6xl mx-auto px-4 sm:px-6">
               <motion.h2
-                initial={{ opacity: 0, y: 16 }} whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }} transition={{ duration: 0.6 }}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
                 className="font-display text-3xl text-center text-gray-900 mb-10"
               >
                 Why Choose {tenant.name}
               </motion.h2>
 
-              {/* Mobile swiper / desktop grid */}
+              {/* Mobile swiper */}
               <div className="block sm:hidden">
-                <SwiperCarousel
-                  slidesPerView={1.1}
-                  spaceBetween={12}
-                  pagination={true}
-                  centeredSlides={true}
-                >
+                <SwiperCarousel slidesPerView={1.1} spaceBetween={12} pagination={true} centeredSlides={true}>
                   {feats.map((f, i) => (
-                    <div key={i}>
-                      <FeatureCard f={f} />
-                    </div>
+                    <div key={i}><FeatureCard f={f} /></div>
                   ))}
                 </SwiperCarousel>
               </div>
 
+              {/* Desktop grid */}
               <div className="hidden sm:grid sm:grid-cols-3 gap-8">
                 {feats.map((f, i) => (
                   <motion.div key={i}
                     initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }} transition={{ delay: i * 0.1, duration: 0.6 }}
+                    viewport={{ once: true }} transition={{ delay: i * 0.1 }}
                     whileHover={{ y: -6 }}
                   >
                     <FeatureCard f={f} />
@@ -138,10 +146,12 @@ function FeatureCard({ f }) {
   );
 }
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps({ req, query }) {
   const tenant = await getTenantFromRequest(req);
   if (!tenant) return { notFound: true };
-  const featuredProducts = await getFeaturedProducts(tenant.id, 8);
+
+  const categoryGroups = await getProductsByCategory(tenant.id);
+
   let settings = null;
   if (tenant.tenant_settings) {
     try {
@@ -150,5 +160,6 @@ export async function getServerSideProps({ req }) {
         : tenant.tenant_settings;
     } catch {}
   }
-  return { props: { tenant, featuredProducts, settings } };
+
+  return { props: { tenant, categoryGroups, settings } };
 }
