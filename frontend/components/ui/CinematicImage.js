@@ -65,17 +65,11 @@ export default function CinematicImage({
     },
   };
 
-  // Per-effect image motion props
+  // Per-effect image motion props (no hooks inside — Rules of Hooks)
   const imageMotion = {
     zoom: {
       animate: hovered ? { scale: 1.12 } : { scale: 1 },
       transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-    },
-    pan: {
-      animate: hovered
-        ? { scale: 1.15, x: useTransform(mouseX, [0, 1], ['-5%', '5%']) }
-        : { scale: 1, x: '0%' },
-      transition: { duration: 0.5, ease: 'easeOut' },
     },
     tilt3d: {
       style: { rotateX, rotateY, scale: hovered ? 1.04 : 1 },

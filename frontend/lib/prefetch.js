@@ -111,11 +111,20 @@ async function getProductsByCategory(tenantId) {
     });
   }
 
-  // Return as array of { category, products }
-  return Object.entries(grouped).map(([category, products]) => ({
-    category,
-    products: JSON.parse(JSON.stringify(products)),
-  }));
+  // Return as array of { category, products } — Cakes first, then alphabetical
+  const PRIORITY = ['cakes', 'cake'];
+  return Object.entries(grouped)
+    .sort(([a], [b]) => {
+      const aP = PRIORITY.includes(a.toLowerCase());
+      const bP = PRIORITY.includes(b.toLowerCase());
+      if (aP && !bP) return -1;
+      if (!aP && bP) return  1;
+      return a.localeCompare(b);
+    })
+    .map(([category, products]) => ({
+      category,
+      products: JSON.parse(JSON.stringify(products)),
+    }));
 }
 
 module.exports = { getTenantFromRequest, getProductsForPage, getFeaturedProducts, getProductsByCategory, notFoundOrProps };

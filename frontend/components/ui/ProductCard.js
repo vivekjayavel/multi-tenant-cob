@@ -17,7 +17,7 @@ function hasCustomization(product) {
 }
 
 // Rotate through hover effects for visual variety
-const HOVER_EFFECTS = ['zoom', 'shine', 'reveal', 'zoom', 'shine'];
+const HOVER_EFFECTS = ['zoom', 'shine', 'reveal', 'zoom', 'shine', 'reveal'];
 
 export default function ProductCard({ product, index = 0 }) {
   const { dispatch }   = useCart();
