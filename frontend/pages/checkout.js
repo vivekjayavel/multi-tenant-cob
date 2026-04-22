@@ -26,37 +26,50 @@ export default function CheckoutPage({ tenant }) {
   const hasRazorpay = !!tenant?.razorpay_key_id;
   const field = key => ({ value: form[key], onChange: e => setForm(f => ({ ...f, [key]: e.target.value })) });
 
-  // Build WhatsApp message from snapshot (captured before cart is cleared)
+  // Build WhatsApp message — reads from snapshot (captured before cart clear)
   const buildWhatsAppMessage = (oId) => {
-    const snap   = orderSnapshot;
-    if (!snap) return encodeURIComponent(`Hi! I placed Order #${oId} at ${tenant?.name}.`);
-    const pmLabel = snap.paymentMethod === 'cod' ? 'Cash on Delivery 💵' : 'Online Payment 💳';
-    const lines = [
-      `🛒 *New Order #${oId} — ${tenant?.name || ''}*`,
+    const snap = orderSnapshot;
+    if (!snap || !snap.items || !snap.items.length) {
+      return encodeURIComponent(`Hi! I placed Order #${oId} at ${tenant?.name || 'your store'}. Please confirm.`);
+    }
+    const pmLabel  = snap.paymentMethod === 'cod' ? 'Cash on Delivery 💵' : 'Online Payment 💳';
+    const itemLines = snap.items.map(i => {
+      const subtotal = (i.price * i.quantity).toFixed(2);
+      let line = `• *${i.name}* × ${i.quantity}  ₹${subtotal}`;
+      if (i.customization) {
+        const cust = Object.entries(i.customization).filter(([,v]) => v);
+        if (cust.length) {
+          line += '
+' + cust.map(([k,v]) => `   › ${k}: ${v}`).join('
+');
+        }
+      }
+      return line;
+    }).join('
+');
+
+    const msg = [
+      `🛒 *New Order #${oId}*`,
+      `🏪 ${tenant?.name || 'Order'}`,
+      ``,
       `📍 *Payment:* ${pmLabel}`,
       ``,
-      `*Items:*`,
-      ...snap.items.map(i => {
-        let line = `• ${i.name} × ${i.quantity} — ₹${(i.price * i.quantity).toFixed(2)}`;
-        if (i.customization) {
-          const details = Object.entries(i.customization)
-            .filter(([,v]) => v)
-            .map(([k,v]) => `  › ${k}: ${v}`)
-            .join('\n');
-          if (details) line += `\n${details}`;
-        }
-        return line;
-      }),
+      `🧁 *Items:*`,
+      itemLines,
       ``,
-      `💰 *Total: ₹${snap.total.toFixed(2)}*`,
+      `💰 *Order Total: ₹${snap.total.toFixed(2)}*`,
       ``,
       `📦 *Deliver to:*`,
-      `${snap.form.name}`,
+      `👤 ${snap.form.name}`,
       `📞 ${snap.form.phone}`,
-      `${snap.form.address}, ${snap.form.city} — ${snap.form.pincode}`,
-      snap.form.notes ? `📝 Notes: ${snap.form.notes}` : null,
-    ].filter(l => l !== null).join('\n');
-    return encodeURIComponent(lines);
+      `🏠 ${snap.form.address}`,
+      `    ${snap.form.city} — ${snap.form.pincode}`,
+      snap.form.notes ? `
+📝 *Notes:* ${snap.form.notes}` : '',
+    ].filter(l => l !== undefined).join('
+');
+
+    return encodeURIComponent(msg);
   };
 
   const handlePlaceOrder = async (e) => {
@@ -76,7 +89,8 @@ export default function CheckoutPage({ tenant }) {
       setOrderId(data.orderId);
 
       if (paymentMethod === 'cod') {
-        // COD: skip payment, go directly to confirmation
+        // Capture snapshot BEFORE clearing cart so WhatsApp message has all details
+        setOrderSnapshot({ items: [...items], total, form: { ...form }, paymentMethod: 'cod' });
         dispatch({ type: 'CLEAR' });
         setStep(3);
       } else {
