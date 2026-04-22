@@ -20,10 +20,23 @@ export default function AdminProducts({ tenant, adminUser }) {
   const [error,    setError]    = useState(null);
   const [panel,    setPanel]    = useState(false);
 
+  const [activeCategory, setActiveCategory] = useState('All');
+
   const load = useCallback(async () => {
     setLoading(true);
     try { const { data } = await api.get('/products'); setProducts(data.products || []); } finally { setLoading(false); }
   }, []);
+
+  // Derive sorted categories from products (Cakes first)
+  const categories = ['All', ...[...new Set(products.map(p => p.category).filter(Boolean))].sort((a, b) => {
+    if (a.toLowerCase().includes('cake') && !b.toLowerCase().includes('cake')) return -1;
+    if (!a.toLowerCase().includes('cake') && b.toLowerCase().includes('cake')) return 1;
+    return a.localeCompare(b);
+  })];
+
+  const filteredProducts = activeCategory === 'All'
+    ? products
+    : products.filter(p => p.category === activeCategory);
   useEffect(() => { load(); }, [load]);
 
   const openNew  = () => { setEditId(null); setForm(EMPTY); setError(null); setPanel(true); };
@@ -34,7 +47,8 @@ export default function AdminProducts({ tenant, adminUser }) {
     try {
       if (editId) await api.put(`/products/${editId}`, form);
       else await api.post('/products', { ...form, slug: form.slug || slugify(form.name) });
-      setPanel(false); load();
+      setPanel(false); setEditId(null); setForm(EMPTY); load();
+      toast({ message: editId ? 'Product updated!' : 'Product created!', type: 'success' });
     } catch (err) { setError(err?.response?.data?.message || 'Save failed.'); } finally { setSaving(false); }
   };
 
@@ -50,16 +64,39 @@ export default function AdminProducts({ tenant, adminUser }) {
       <Head><title>{`Products — ${tenant.name}`}</title></Head>
       <AdminLayout tenant={tenant} active="products" adminUser={adminUser}>
         <div className="flex items-center justify-between mb-6">
-          <div><h1 className="font-display text-2xl text-gray-900">Products</h1><p className="text-sm text-gray-500 mt-0.5">{products.length} items</p></div>
+          <div><h1 className="font-display text-2xl text-gray-900">Products</h1><p className="text-sm text-gray-500 mt-0.5">{filteredProducts.length} of {products.length} items</p></div>
           <button onClick={openNew} className="text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all hover:-translate-y-0.5" style={{ backgroundColor: 'var(--tenant-primary)' }}>+ Add product</button>
         </div>
+        {/* Category filter tabs */}
+        {!loading && products.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 mb-5">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`flex-shrink-0 text-xs font-semibold px-4 py-2 rounded-full transition-all whitespace-nowrap ${
+                  activeCategory === cat ? 'text-white shadow-sm' : 'bg-white text-gray-500 hover:text-gray-800 border border-gray-200'
+                }`}
+                style={activeCategory === cat ? { backgroundColor: 'var(--tenant-primary)' } : {}}
+              >
+                {cat}
+                {cat !== 'All' && (
+                  <span className="ml-1.5 opacity-70">
+                    {products.filter(p => p.category === cat).length}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+
         {loading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">{[...Array(6)].map((_, i) => <div key={i} className="h-48 bg-gray-100 rounded-2xl animate-pulse" />)}</div>
-        ) : products.length === 0 ? (
-          <div className="text-center py-20 text-gray-400"><p className="text-4xl mb-3">🥐</p><p className="text-sm">No products yet.</p></div>
+        ) : filteredProducts.length === 0 ? (
+          <div className="text-center py-20 text-gray-400"><p className="text-4xl mb-3">🥐</p><p className="text-sm">{activeCategory === 'All' ? 'No products yet.' : `No products in "${activeCategory}".`}</p></div>
         ) : (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {products.map(p => (
+            {filteredProducts.map(p => (
               <motion.div key={p.id} layout initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden group">
                 <div className="aspect-video bg-stone-100 overflow-hidden">
                   {p.image_url ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" /> : <div className="w-full h-full flex items-center justify-center text-3xl opacity-20">🎂</div>}
