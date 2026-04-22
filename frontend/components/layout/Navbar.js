@@ -79,19 +79,15 @@ export default function Navbar({ tenant: tenantProp }) {
             {/* Centre: Circular logo */}
             {tenant?.logo_url && (
               <Link href="/" className="flex-shrink-0 mx-4">
-                <motion.div
-                  className="rounded-full overflow-hidden border-4 bg-white shadow-lg"
-                  style={{ width: 80, height: 80, borderColor: 'var(--tenant-primary)' }}
+                <motion.img
+                  src={tenant.logo_url}
+                  alt={tenant.name || 'Logo'}
+                  className="object-contain"
+                  style={{ width: 80, height: 80 }}
                   whileHover={{ scale: 1.06 }}
                   transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                >
-                  <img
-                    src={tenant.logo_url}
-                    alt={tenant.name || 'Logo'}
-                    className="w-full h-full object-cover"
-                    onError={e => { e.target.parentElement.style.display = 'none'; }}
-                  />
-                </motion.div>
+                  onError={e => { e.target.style.display = 'none'; }}
+                />
               </Link>
             )}
 
