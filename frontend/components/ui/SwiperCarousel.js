@@ -71,7 +71,7 @@ export default function SwiperCarousel({
       {/* Track */}
       <div
         ref={trackRef}
-        className="flex overflow-x-auto scrollbar-hide"
+        className="flex overflow-x-auto scrollbar-hide items-stretch"
         style={{
           scrollSnapType:    'x mandatory',
           gap:               `${spaceBetween}px`,
@@ -86,9 +86,11 @@ export default function SwiperCarousel({
               scrollSnapAlign: 'start',
               flex:             `0 0 calc((100% - ${(Math.floor(perView) - 1) * spaceBetween}px) / ${perView})`,
               minWidth:         0,
+              display:          'flex',
+              flexDirection:    'column',
             }}
           >
-            {child}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{child}</div>
           </div>
         ))}
       </div>

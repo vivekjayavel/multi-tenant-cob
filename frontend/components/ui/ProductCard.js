@@ -55,7 +55,7 @@ export default function ProductCard({ product, index = 0 }) {
         viewport={{ once: true, margin: '-40px' }}
         transition={{ duration: 0.6, delay: (index % 4) * 0.08, ease: [0.16, 1, 0.3, 1] }}
         onClick={() => router.push(`/products/${product.slug}`)}
-        className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-shadow duration-500 border border-gray-100 cursor-pointer"
+        className="group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-2xl transition-shadow duration-500 border border-gray-100 cursor-pointer flex flex-col h-full"
       >
         {/* Image */}
         <div className="relative aspect-square overflow-hidden bg-stone-100">
@@ -104,7 +104,7 @@ export default function ProductCard({ product, index = 0 }) {
         </div>
 
         {/* Info */}
-        <div className="p-4">
+        <div className="p-4 flex flex-col flex-1">
           <h3 className="font-display font-semibold text-gray-800 text-base leading-snug line-clamp-2">{product.name}</h3>
           {product.description && (
             <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">{product.description}</p>
@@ -117,7 +117,7 @@ export default function ProductCard({ product, index = 0 }) {
               <span className="text-xs text-gray-500">{product.delivery_time}</span>
             </div>
           )}
-          <div className="flex items-center justify-between mt-3">
+          <div className="flex items-center justify-between mt-auto pt-3">
             <p className="font-bold text-lg" style={{ color: 'var(--tenant-primary)' }}>
               ₹{parseFloat(product.price).toLocaleString('en-IN')}
             </p>
