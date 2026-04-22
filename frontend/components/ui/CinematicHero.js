@@ -144,6 +144,7 @@ export default function CinematicHero({ hero = {} }) {
         style={{ backgroundImage:"url(\"data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E\")", backgroundRepeat:'repeat', backgroundSize:'200px' }} />
 
       {/* ── Content ── */}
+      {hero.show_text_content !== false && (
       <motion.div
         className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 w-full"
         style={{ opacity, paddingTop: 'clamp(140px, 18vh, 200px)', paddingBottom: 'clamp(80px, 12vh, 140px)' }}
@@ -215,6 +216,7 @@ export default function CinematicHero({ hero = {} }) {
         </motion.div>
       </motion.div>
 
+      )}
       {/* ── Nav arrows + dots ── */}
       {allImages.length > 1 && (
         <>

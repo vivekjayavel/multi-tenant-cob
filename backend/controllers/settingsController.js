@@ -15,8 +15,9 @@ const DEFAULT_SETTINGS = {
     images:           [],  // array of { url } for slideshow
     cta_primary:      'Explore Menu',
     cta_whatsapp:     'Order via WhatsApp',
-    overlay_enabled:  true,
-    overlay_intensity: 'medium', // 'light' | 'medium' | 'strong'
+    overlay_enabled:    true,
+    overlay_intensity:  'medium', // 'light' | 'medium' | 'strong'
+    show_text_content:  true,  // toggle badge/heading/subheading/CTAs/stats
     stats: [
       { value: '500+', label: 'Happy customers' },
       { value: '50+',  label: 'Menu items'      },

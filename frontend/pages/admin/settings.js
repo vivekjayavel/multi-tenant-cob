@@ -202,6 +202,22 @@ function HeroSection({ data, onSave, saving, tenant }) {
         </div>
       )}
 
+      {/* Text content visibility toggle */}
+      <div className="bg-stone-50 border border-gray-200 rounded-2xl p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold text-gray-700">Show text content</p>
+            <p className="text-xs text-gray-400 mt-0.5">Badge, heading, subheading, CTAs and stats</p>
+          </div>
+          <button type="button"
+            onClick={() => setForm(p => ({ ...p, show_text_content: p.show_text_content === false ? true : false }))}
+            className={`relative w-12 h-6 rounded-full transition-colors flex-shrink-0 ${form.show_text_content !== false ? '' : 'bg-gray-200'}`}
+            style={form.show_text_content !== false ? { backgroundColor: 'var(--tenant-primary)' } : {}}>
+            <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all ${form.show_text_content !== false ? 'left-7' : 'left-1'}`} />
+          </button>
+        </div>
+      </div>
+
       <Field label="Badge text" placeholder="Fresh Baked Daily" {...f('badge')} />
       <Field label="Main heading" placeholder="Handcrafted with Love & Butter" {...f('heading')} />
       <Textarea label="Subheading" placeholder="From our oven to your table…" rows={3} value={form.subheading || ''} onChange={e => setForm(p => ({ ...p, subheading: e.target.value }))} />
