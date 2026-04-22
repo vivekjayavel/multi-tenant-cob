@@ -134,7 +134,7 @@ export default function CinematicHero({ hero = {} }) {
             </motion.a>
 
             {tenant?.whatsapp_number && (
-              <motion.a href={`https://wa.me/${tenant.whatsapp_number}`}
+              <motion.a href={`https://wa.me/${tenant.whatsapp_number}?text=${encodeURIComponent("Hi! I would like to place an order at " + (tenant.name || "your store") + ". Please share the menu and availability. Thank you!")}`}
                 target="_blank" rel="noopener noreferrer"
                 className={`inline-flex items-center gap-2.5 font-semibold px-8 py-4 rounded-full border-2 backdrop-blur-sm transition-colors
                   ${hasHeroImg ? 'text-white border-white/35 hover:bg-white/10' : 'text-gray-700 border-gray-300 hover:border-gray-400 hover:bg-white'}`}
