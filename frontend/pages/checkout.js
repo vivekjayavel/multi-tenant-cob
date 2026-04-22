@@ -16,7 +16,6 @@ const PAYMENT_METHODS = [
 export default function CheckoutPage({ tenant }) {
   const { items, total, dispatch, hydrated } = useCart();
   const [step,          setStep]          = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState('online');
   const [loading,       setLoading]       = useState(false);
   const [error,         setError]         = useState(null);
   const [orderId,       setOrderId]       = useState(null);
@@ -24,6 +23,8 @@ export default function CheckoutPage({ tenant }) {
   const [orderSnapshot, setOrderSnapshot] = useState(null); // captured before cart is cleared
   const seo  = noindexSeo(tenant, 'Checkout');
   const hasRazorpay = !!tenant?.razorpay_key_id;
+  // Auto-select COD if Razorpay not configured
+  const [paymentMethod, setPaymentMethod] = useState(!tenant?.razorpay_key_id ? 'cod' : 'online');
   const field = key => ({ value: form[key], onChange: e => setForm(f => ({ ...f, [key]: e.target.value })) });
 
   // Build WhatsApp message — reads from snapshot (captured before cart clear)
@@ -234,8 +235,12 @@ export default function CheckoutPage({ tenant }) {
                           </button>
                         ))}
                         {!hasRazorpay && (
-                          <div className="col-span-2 text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-xl px-4 py-2.5">
-                            ⚠️ Online payment not configured. Only Cash on Delivery is available.
+                          <div className="col-span-2 flex items-start gap-3 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3">
+                            <span className="text-xl flex-shrink-0">💵</span>
+                            <div>
+                              <p className="text-sm font-semibold text-blue-800">Cash on Delivery available</p>
+                              <p className="text-xs text-blue-600 mt-0.5">Online payment is not set up for this store yet. You can pay cash when your order is delivered.</p>
+                            </div>
                           </div>
                         )}
                       </div>
