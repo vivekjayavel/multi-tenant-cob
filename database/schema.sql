@@ -60,7 +60,7 @@ CREATE TABLE orders (
   tenant_id           INT UNSIGNED   NOT NULL,
   user_id             INT UNSIGNED   NOT NULL,
   total_price         DECIMAL(10,2)  NOT NULL,
-  status              ENUM('pending','paid','processing','shipped','delivered','cancelled','refunded') NOT NULL DEFAULT 'pending',
+  status              ENUM('pending','paid','processing','shipped','delivered','cancelled','refunded','cod_pending','cod_confirmed') NOT NULL DEFAULT 'pending',
   payment_id          VARCHAR(100)   DEFAULT NULL,
   razorpay_order_id   VARCHAR(100)   DEFAULT NULL,
   payment_signature   VARCHAR(255)   DEFAULT NULL,
