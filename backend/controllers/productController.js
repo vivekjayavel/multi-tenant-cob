@@ -22,8 +22,19 @@ exports.getBySlug = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
+// Auto-add delivery_time column if missing (self-healing migration)
+async function ensureDeliveryTimeColumn(db) {
+  try { await db.query('SELECT delivery_time FROM products LIMIT 1'); }
+  catch (e) {
+    if (e.code === 'ER_BAD_FIELD_ERROR') {
+      await db.query('ALTER TABLE products ADD COLUMN delivery_time VARCHAR(100) DEFAULT NULL AFTER description');
+    }
+  }
+}
+
 exports.create = async (req, res, next) => {
   try {
+    await ensureDeliveryTimeColumn(db);
     const { name, description, price, image_url, category, stock_qty = 0, customization_options, delivery_time } = req.body;
     const tenantId = req.tenant.id;
     const slug = req.body.slug || slugify(name, { lower: true, strict: true });
@@ -41,6 +52,7 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
+    await ensureDeliveryTimeColumn(db);
     const { id } = req.params, tenantId = req.tenant.id;
     const allowed = ['name','description','price','image_url','category','slug','is_active','stock_qty','customization_options','delivery_time'];
     const fields = [], values = [];
