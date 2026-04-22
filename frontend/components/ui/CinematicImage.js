@@ -1,37 +1,32 @@
 import { useState, useRef, useEffect } from 'react';
-import {
-  m as motion,
-  useInView, useMotionValue, useTransform, useSpring, AnimatePresence,
-} from 'framer-motion';
+import { m as motion, useInView, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
 
 export default function CinematicImage({
   src,
   alt,
-  className       = '',
+  className        = '',
   containerClassName = '',
-  tilt            = false,
-  reveal          = 'scale',
-  delay           = 0,
-  priority        = false,
-  fallback        = null,
+  tilt             = false,
+  reveal           = 'scale',
+  delay            = 0,
+  priority         = false,
+  fallback         = null,
   overlayClassName = '',
-  hoverEffect     = 'zoom',   // 'zoom' | 'pan' | 'tilt3d' | 'reveal' | 'shine' | 'none'
+  hoverEffect      = 'zoom',
 }) {
-  const [loaded,   setLoaded]   = useState(false);
-  const [error,    setError]    = useState(false);
-  const [visible,  setVisible]  = useState(priority);
-  const [hovered,  setHovered]  = useState(false);
+  const [loaded,  setLoaded]  = useState(false);
+  const [error,   setError]   = useState(false);
+  const [visible, setVisible] = useState(priority);
+  const [hovered, setHovered] = useState(false);
 
   const containerRef = useRef(null);
   const inView       = useInView(containerRef, { once: true, margin: '-10% 0px' });
 
-  // Magnetic tilt values
+  // All motion values at top level — never inside conditions or objects
   const mouseX  = useMotionValue(0.5);
   const mouseY  = useMotionValue(0.5);
-  const rotateX = useSpring(useTransform(mouseY, [0, 1], [6, -6]),  { stiffness: 200, damping: 25 });
-  const rotateY = useSpring(useTransform(mouseX, [0, 1], [-6, 6]), { stiffness: 200, damping: 25 });
-  const shineX  = useTransform(mouseX, [0, 1], ['-100%', '200%']);
-  const shineY  = useTransform(mouseY, [0, 1], ['-100%', '200%']);
+  const rotateX = useSpring(0, { stiffness: 200, damping: 25 });
+  const rotateY = useSpring(0, { stiffness: 200, damping: 25 });
 
   useEffect(() => { if (inView) setVisible(true); }, [inView]);
 
@@ -42,22 +37,27 @@ export default function CinematicImage({
     const y = (e.clientY - rect.top)  / rect.height;
     mouseX.set(x);
     mouseY.set(y);
+    // tilt3d: update springs directly
+    if (hoverEffect === 'tilt3d') {
+      rotateX.set((y - 0.5) * -10);
+      rotateY.set((x - 0.5) *  10);
+    }
   };
 
   const handleMouseLeave = () => {
-    mouseX.set(0.5);
-    mouseY.set(0.5);
+    mouseX.set(0.5); mouseY.set(0.5);
+    rotateX.set(0);  rotateY.set(0);
     setHovered(false);
   };
 
-  // Entrance reveal
+  // Entrance reveal variants
   const revealVariants = {
     hidden: {
-      scale:   reveal === 'scale' ? 1.1  : 1,
-      y:       reveal === 'slide-up'   ? 40 : 0,
-      x:       reveal === 'slide-left' ? 40 : 0,
+      scale:   reveal === 'scale'      ? 1.1  : 1,
+      y:       reveal === 'slide-up'   ? 40   : 0,
+      x:       reveal === 'slide-left' ? 40   : 0,
       opacity: 0,
-      filter:  reveal === 'blur' ? 'blur(16px)' : 'blur(0px)',
+      filter:  reveal === 'blur'       ? 'blur(16px)' : 'blur(0px)',
     },
     visible: {
       scale: 1, y: 0, x: 0, opacity: 1, filter: 'blur(0px)',
@@ -65,35 +65,30 @@ export default function CinematicImage({
     },
   };
 
-  // Per-effect image motion props (no hooks inside — Rules of Hooks)
-  const imageMotion = {
-    zoom: {
-      animate: hovered ? { scale: 1.12 } : { scale: 1 },
-      transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] },
-    },
-    tilt3d: {
-      style: { rotateX, rotateY, scale: hovered ? 1.04 : 1 },
-    },
-    reveal: {
-      animate: hovered ? { y: '-5%', scale: 1.08 } : { y: '0%', scale: 1 },
-      transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] },
-    },
-    shine: {
-      animate: hovered ? { scale: 1.06 } : { scale: 1 },
-      transition: { duration: 0.5, ease: 'easeOut' },
-    },
-    none: {},
+  // Hover animation — computed from plain values, no hooks
+  const getHoverAnimate = () => {
+    if (!hovered) return { scale: 1, y: 0 };
+    switch (hoverEffect) {
+      case 'zoom':   return { scale: 1.12 };
+      case 'reveal': return { scale: 1.08, y: '-4%' };
+      case 'shine':  return { scale: 1.06 };
+      default:       return { scale: 1 };
+    }
   };
+  const getHoverTransition = () => ({
+    duration: hoverEffect === 'zoom' ? 0.6 : 0.45,
+    ease: [0.16, 1, 0.3, 1],
+  });
 
-  const motion3dStyle = hoverEffect === 'tilt3d' && hovered
-    ? { perspective: 800, rotateX, rotateY, transformStyle: 'preserve-3d' }
+  const tilt3dStyle = hoverEffect === 'tilt3d'
+    ? { rotateX, rotateY, scale: hovered ? 1.04 : 1 }
     : {};
 
   return (
     <motion.div
       ref={containerRef}
       className={`relative overflow-hidden ${containerClassName}`}
-      style={motion3dStyle}
+      style={hoverEffect === 'tilt3d' ? { perspective: 800 } : {}}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={handleMouseLeave}
@@ -120,7 +115,7 @@ export default function CinematicImage({
         )}
       </AnimatePresence>
 
-      {/* Image with cinematic entrance + hover effect */}
+      {/* Image with entrance reveal + hover effect */}
       {visible && src && !error && (
         <motion.div
           className="w-full h-full"
@@ -134,38 +129,34 @@ export default function CinematicImage({
             className={`w-full h-full object-cover ${className}`}
             onLoad={() => setLoaded(true)}
             onError={() => setError(true)}
-            {...(hoverEffect !== 'tilt3d' && hoverEffect !== 'none' ? {
-              animate: imageMotion[hoverEffect]?.animate,
-              transition: imageMotion[hoverEffect]?.transition,
-            } : {})}
-            style={{ willChange: 'transform', ...(imageMotion[hoverEffect]?.style || {}) }}
+            animate={hoverEffect !== 'tilt3d' ? getHoverAnimate() : undefined}
+            transition={hoverEffect !== 'tilt3d' ? getHoverTransition() : undefined}
+            style={{ willChange: 'transform', ...tilt3dStyle }}
           />
 
-          {/* Shine overlay */}
+          {/* Shine overlay — CSS only, no hooks */}
           {hoverEffect === 'shine' && hovered && (
-            <motion.div
+            <div
               className="absolute inset-0 pointer-events-none z-10"
               style={{
-                background: `radial-gradient(circle at ${useTransform(mouseX, [0,1], ['0%','100%'])}px ${useTransform(mouseY, [0,1], ['0%','100%'])}px, rgba(255,255,255,0.25) 0%, transparent 60%)`,
+                background: `radial-gradient(circle at ${Math.round(mouseX.get() * 100)}% ${Math.round(mouseY.get() * 100)}%, rgba(255,255,255,0.22) 0%, transparent 55%)`,
               }}
             />
           )}
 
-          {/* Reveal: dramatic bottom-to-top gradient reveal */}
+          {/* Reveal gradient */}
           {hoverEffect === 'reveal' && (
             <motion.div
               className="absolute inset-0 pointer-events-none"
-              animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : '100%' }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              style={{
-                background: 'linear-gradient(to top, rgba(0,0,0,0.45) 0%, transparent 50%)',
-              }}
+              animate={{ opacity: hovered ? 1 : 0 }}
+              transition={{ duration: 0.35 }}
+              style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.4) 0%, transparent 50%)' }}
             />
           )}
         </motion.div>
       )}
 
-      {/* Optional overlay */}
+      {/* Overlay */}
       {overlayClassName && loaded && (
         <div className={`absolute inset-0 pointer-events-none ${overlayClassName}`} />
       )}
@@ -179,7 +170,6 @@ export default function CinematicImage({
           </svg>
         </div>
       )}
-
       {!src && fallback && fallback}
     </motion.div>
   );
