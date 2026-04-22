@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 const SwiperCarousel = dynamic(() => import('../../components/ui/SwiperCarousel'), { ssr: false });
@@ -8,14 +9,12 @@ import MetaTags from '../../components/seo/MetaTags';
 const { productListSeo }                           = require('../../lib/seo');
 const { getTenantFromRequest, getProductsForPage } = require('../../lib/prefetch');
 
-export default function ProductsPage({ tenant, products, categories }) {
+export default function ProductsPage({ tenant, products, categories, initialCategory }) {
   const router = useRouter();
-  const [active, setActive] = useState(() => {
-    // Pre-select category from URL query (?category=Cakes)
-    return typeof window !== 'undefined'
-      ? new URLSearchParams(window.location.search).get('category') || 'All'
-      : 'All';
-  });
+  const [active, setActive] = useState(initialCategory || 'All');
+
+  // Pre-select category from URL query (?category=Cakes) after hydration
+  // useEffect(() => { if (router.query.category) setActive(router.query.category); }, [router.query.category]);
   const seo      = productListSeo(tenant);
   const filtered = active === 'All' ? products : products.filter(p => p.category === active);
   return (
@@ -56,10 +55,12 @@ export default function ProductsPage({ tenant, products, categories }) {
   );
 }
 
-export async function getServerSideProps({ req }) {
+export async function getServerSideProps(ctx) {
+  const req = ctx.req;
   const tenant = await getTenantFromRequest(req);
   if (!tenant) return { notFound: true };
   const products   = await getProductsForPage(tenant.id);
   const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
-  return { props: { tenant, products: JSON.parse(JSON.stringify(products)), categories } };
+  const initialCategory = ctx.query.category || 'All';
+  return { props: { tenant, products: JSON.parse(JSON.stringify(products)), categories, initialCategory } };
 }
