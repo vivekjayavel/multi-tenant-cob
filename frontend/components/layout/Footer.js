@@ -47,7 +47,7 @@ export default function Footer({ tenant, settings }) {
             {footer.email && <p className="text-sm mb-2">✉️ <a href={`mailto:${footer.email}`} className="hover:text-white transition-colors">{footer.email}</a></p>}
             {footer.phone && <p className="text-sm mb-2">📞 {footer.phone}</p>}
             {tenant?.whatsapp_number && (
-              <a href={`https://wa.me/${tenant.whatsapp_number}`} target="_blank" rel="noopener noreferrer"
+              <a href={`https://wa.me/${tenant.whatsapp_number}?text=${encodeURIComponent("Hi! I would like to place an order at " + (tenant.name || "your store") + ". Please share the menu and availability. Thank you!")}`} target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm hover:text-green-400 transition-colors">
                 💬 Chat on WhatsApp
               </a>
