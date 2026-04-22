@@ -27,6 +27,16 @@ export default function Navbar({ tenant: tenantProp }) {
   }, []);
   useEffect(() => { setMobileOpen(false); }, [router.pathname]);
 
+  // Get shop tagline from tenant_settings.branding
+  const shopTagline = (() => {
+    try {
+      const ts = typeof tenant?.tenant_settings === 'string'
+        ? JSON.parse(tenant?.tenant_settings)
+        : tenant?.tenant_settings;
+      return ts?.branding?.shop_tagline || '';
+    } catch { return ''; }
+  })();
+
   const heroHasImage  = !!(settings?.hero?.image_url);
   const isHomePage    = router.pathname === '/';
   const isTransparent = isHomePage && !scrolled && heroHasImage;
@@ -56,12 +66,14 @@ export default function Navbar({ tenant: tenantProp }) {
               >
                 {tenant?.name || 'Bakery'}
               </motion.span>
-              <span
-                className="text-[10px] font-medium tracking-widest uppercase mt-0.5"
-                style={{ color: isTransparent ? 'rgba(255,255,255,0.6)' : 'color-mix(in srgb, var(--tenant-primary) 70%, gray)' }}
-              >
-                Bakery & Cakes
-              </span>
+              {shopTagline && (
+                <span
+                  className="text-[10px] font-medium tracking-widest uppercase mt-0.5"
+                  style={{ color: isTransparent ? 'rgba(255,255,255,0.6)' : 'color-mix(in srgb, var(--tenant-primary) 70%, gray)' }}
+                >
+                  {shopTagline}
+                </span>
+              )}
             </Link>
 
             {/* Centre: Circular logo */}

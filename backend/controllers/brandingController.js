@@ -6,7 +6,7 @@ const { logger }        = require('../config/logger');
 
 exports.updateBranding = async (req, res, next) => {
   try {
-    const { theme_color, name, whatsapp_number, logo_url } = req.body;
+    const { theme_color, name, whatsapp_number, logo_url, shop_tagline } = req.body;
     const tenantId = req.tenant.id;
     const fields   = [];
     const values   = [];
@@ -31,6 +31,18 @@ exports.updateBranding = async (req, res, next) => {
     }
 
     if (!fields.length) return fail(res, 'Nothing to update');
+
+    // Save shop_tagline into tenant_settings JSON
+    if (shop_tagline !== undefined) {
+      const [[t]] = await db.query('SELECT tenant_settings FROM tenants WHERE id = ? LIMIT 1', [req.tenant.id]);
+      const current = t?.tenant_settings
+        ? (typeof t.tenant_settings === 'string' ? JSON.parse(t.tenant_settings) : t.tenant_settings)
+        : {};
+      if (!current.branding) current.branding = {};
+      current.branding.shop_tagline = shop_tagline || '';
+      fields.push('tenant_settings = ?');
+      values.push(JSON.stringify(current));
+    }
 
     values.push(tenantId);
     await db.query(`UPDATE tenants SET ${fields.join(', ')} WHERE id = ?`, values);

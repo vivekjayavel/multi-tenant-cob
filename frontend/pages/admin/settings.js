@@ -369,6 +369,14 @@ function BrandingSection({ tenant, saving, setSaving, setError, setSaved, toast 
   const [whatsapp,      setWhatsapp]     = useState(tenant?.whatsapp_number || '');
   const [preview,       setPreview]      = useState(tenant?.theme_color     || '#D97706');
   const [logoUrl,       setLogoUrl]      = useState(tenant?.logo_url        || '');
+  const [shopTagline,   setShopTagline]   = useState(() => {
+    try {
+      const ts = typeof tenant?.tenant_settings === 'string'
+        ? JSON.parse(tenant?.tenant_settings)
+        : tenant?.tenant_settings;
+      return ts?.branding?.shop_tagline || 'Bakery & Cakes';
+    } catch { return 'Bakery & Cakes'; }
+  });
   const [logoUploading, setLogoUploading] = useState(false);
 
   const handleLogoUpload = async (e) => {
@@ -410,7 +418,7 @@ function BrandingSection({ tenant, saving, setSaving, setError, setSaved, toast 
   const handleSave = async () => {
     setSaving(true); setError(null); setSaved(false);
     try {
-      await api.put('/settings/branding', { theme_color: color, name, whatsapp_number: whatsapp, logo_url: logoUrl });
+      await api.put('/settings/branding', { theme_color: color, name, whatsapp_number: whatsapp, logo_url: logoUrl, shop_tagline: shopTagline });
       toast({ message: 'Branding saved! Refreshing…', type: 'success' });
       setTimeout(() => { window.location.reload(); }, 1200);
     } catch (err) {
@@ -509,6 +517,22 @@ function BrandingSection({ tenant, saving, setSaving, setError, setSaved, toast 
         <input value={name} onChange={e => setName(e.target.value)}
           placeholder="Sweet Cakes"
           className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 transition-all" />
+      </div>
+
+      {/* Shop tagline / subtitle */}
+      <div>
+        <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+          Shop tagline
+          <span className="ml-1 text-gray-400 font-normal normal-case">(shown under shop name in header)</span>
+        </label>
+        <input
+          value={shopTagline}
+          onChange={e => setShopTagline(e.target.value)}
+          placeholder="Bakery & Cakes"
+          maxLength={50}
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 transition-all"
+        />
+        <p className="text-xs text-gray-400 mt-1">Preview: <span className="font-medium text-gray-600">{shopTagline || 'Bakery & Cakes'}</span></p>
       </div>
 
       {/* WhatsApp */}
