@@ -97,12 +97,28 @@ function HeroSection({ data, onSave, saving, tenant }) {
   const handleImageUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Count existing images
+    const currentImgs = (form.images || []);
+    const hasMain = !!form.image_url;
+    const totalExisting = currentImgs.length + (hasMain ? 1 : 0);
+    if (totalExisting >= 5) { alert('Maximum 5 images allowed'); return; }
+
     setUploading(true);
     try {
-      const fd = new FormData(); fd.append('image', file);
-      // Do NOT set Content-Type manually — axios auto-sets multipart/form-data WITH boundary
+      const fd = new FormData();
+      fd.append('image', file);
       const { data } = await uploadApi.post('/settings/hero-image', fd);
-      setForm(p => ({ ...p, image_url: data.url }));
+      setForm(p => {
+        const newUrl = data.url;
+        // Always accumulate — store first image as image_url, rest in images[]
+        if (!p.image_url) {
+          return { ...p, image_url: newUrl };
+        }
+        const existingImages = p.images || [];
+        return { ...p, images: [...existingImages, { url: newUrl }] };
+      });
+      // Clear the file input so same file can be selected again
+      e.target.value = '';
     } catch { alert('Image upload failed'); } finally { setUploading(false); }
   };
 
@@ -128,10 +144,11 @@ function HeroSection({ data, onSave, saving, tenant }) {
                   <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                     <button onClick={() => {
                       const newImgs = imgs.filter((_, i) => i !== idx);
+                      // Rebuild: first becomes image_url, rest become images[]
                       setForm(p => ({
                         ...p,
-                        images: newImgs.slice(0, -1).map(u => ({url:u})).concat(newImgs.length ? [] : []),
-                        image_url: newImgs[newImgs.length - 1] || '',
+                        image_url: newImgs[0] || '',
+                        images: newImgs.slice(1).map(u => ({ url: u })),
                       }));
                     }} className="bg-white rounded-full w-6 h-6 flex items-center justify-center text-red-500 text-sm font-bold shadow">×</button>
                   </div>

@@ -135,7 +135,7 @@ export default function CinematicHero({ hero = {} }) {
           <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at 20% 50%, color-mix(in srgb, var(--tenant-primary) 12%, transparent), transparent 65%)' }} />
           <motion.div className="absolute -top-1/4 -right-1/4 w-[60vw] h-[60vw] rounded-full opacity-[0.08]"
             style={{ background: 'var(--tenant-primary)' }}
-            animate={{ scale:[1,1.1,1], rotate:[0,8,0] }} transition={{ duration:18, repeat:Infinity, ease:'easeInOut' }} />
+/>
         </div>
       )}
 
