@@ -53,5 +53,5 @@ export async function getServerSideProps({ req }) {
   if (!tenant) return { notFound: true };
   const products   = await getProductsForPage(tenant.id);
   const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
-  return { props: { tenant, products, categories } };
+  return { props: { tenant, products: JSON.parse(JSON.stringify(products)), categories } };
 }

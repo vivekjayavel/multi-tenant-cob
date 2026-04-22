@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { m as motion } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
@@ -20,14 +20,19 @@ export default function ProductCard({ product, index = 0 }) {
   const { dispatch }  = useCart();
   const tenant        = useTenant();
   const router        = useRouter();
-  const [showModal, setShowModal] = useState(false);
+  const [showModal,    setShowModal]    = useState(false);
+  const [needsOptions, setNeedsOptions] = useState(false); // defer to client to avoid hydration mismatch
 
   const whatsappHref = tenant?.whatsapp_number
     ? `https://wa.me/${tenant.whatsapp_number}?text=${encodeURIComponent(`Hi! I'm interested in ${product.name} (₹${product.price}). Is it available?`)}`
     : null;
 
-  const available    = product.available_qty ?? product.stock_qty ?? 0;
-  const needsOptions = hasCustomization(product);
+  const available = product.available_qty ?? product.stock_qty ?? 0;
+
+  // Run on client only — avoids SSR/client mismatch from JSON parsing differences
+  useEffect(() => {
+    setNeedsOptions(hasCustomization(product));
+  }, [product.customization_options]);
 
   const handleAdd = (e) => {
     e.stopPropagation();

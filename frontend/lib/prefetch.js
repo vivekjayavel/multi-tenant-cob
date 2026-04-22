@@ -35,7 +35,16 @@ async function getProductsForPage(tenantId, category = null) {
                ORDER BY created_at DESC`;
 
   const [products] = await db.query(sql, params);
-  const enriched   = products.map(p => ({ ...p, available_qty: Math.max(0, p.stock_qty - p.reserved_qty) }));
+  const enriched   = products.map(p => ({
+    ...p,
+    available_qty: Math.max(0, p.stock_qty - p.reserved_qty),
+    // Normalize to string so SSR and client JSON.parse produce same type
+    customization_options: p.customization_options
+      ? (typeof p.customization_options === 'string'
+          ? p.customization_options
+          : JSON.stringify(p.customization_options))
+      : null,
+  }));
   const serialized = JSON.parse(JSON.stringify(enriched));
   productCache.set(cacheKey, serialized);
   return serialized;
@@ -53,7 +62,16 @@ async function getFeaturedProducts(tenantId, limit = 8) {
     'SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options, delivery_time FROM products WHERE tenant_id = ? AND is_active = 1 ORDER BY created_at DESC LIMIT ?',
     [tenantId, limit]
   );
-  const enriched   = products.map(p => ({ ...p, available_qty: Math.max(0, p.stock_qty - p.reserved_qty) }));
+  const enriched   = products.map(p => ({
+    ...p,
+    available_qty: Math.max(0, p.stock_qty - p.reserved_qty),
+    // Normalize to string so SSR and client JSON.parse produce same type
+    customization_options: p.customization_options
+      ? (typeof p.customization_options === 'string'
+          ? p.customization_options
+          : JSON.stringify(p.customization_options))
+      : null,
+  }));
   const serialized = JSON.parse(JSON.stringify(enriched));
   productCache.set(cacheKey, serialized);
   return serialized;
