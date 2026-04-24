@@ -77,6 +77,7 @@ export default function SwiperCarousel({
           gap:               `${spaceBetween}px`,
           paddingBottom:     pagination ? '32px' : '0',
           WebkitOverflowScrolling: 'touch',
+          alignItems:        'stretch',
         }}
       >
         {items.map((child, i) => (
@@ -88,6 +89,7 @@ export default function SwiperCarousel({
               minWidth:         0,
               display:          'flex',
               flexDirection:    'column',
+              alignSelf:        'stretch',
             }}
           >
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>{child}</div>

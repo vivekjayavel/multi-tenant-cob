@@ -132,13 +132,11 @@ export default function ProductCard({ product, index = 0 }) {
         </div>
 
         {/* ── Product info ── */}
-        <div className="p-3 sm:p-5 flex flex-col flex-1">
+        <div className="p-3 sm:p-5 flex flex-col" style={{ minHeight: "120px" }}>
           <h3 className="font-display font-semibold text-gray-800 text-sm sm:text-base leading-snug line-clamp-2">
             {product.name}
           </h3>
-          {product.description && (
-            <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed">{product.description}</p>
-          )}
+          <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed" style={{ minHeight: "2.5rem" }}>{product.description || ""}</p>
 
           {/* Delivery time */}
           {product.delivery_time && (
