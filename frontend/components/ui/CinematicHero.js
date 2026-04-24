@@ -1,22 +1,33 @@
 
-// Cinematic transition variants — one per style
+// 14 Cinematic transition styles
 function getTransitionVariants(style) {
-  const EXPO = [0.16, 1, 0.3, 1];
-  const EASE = [0.4, 0, 0.2, 1];
+  const EXPO  = [0.16, 1, 0.3, 1];
+  const EASE  = [0.4, 0, 0.2, 1];
+  const SHARP = [0.25, 0.46, 0.45, 0.94];
 
   switch (style) {
 
-    // 1. Classic horizontal slide with parallax exit
+    // 1. Slide — horizontal push with parallax
     case 'slide':
       return {
         enter:  (c) => ({ x: c.direction > 0 ? '100%' : '-100%', opacity: 0 }),
         center: { x: 0, opacity: 1,
           transition: { x: { duration: 0.85, ease: EXPO }, opacity: { duration: 0.3 } } },
         exit:   (c) => ({ x: c.direction > 0 ? '-28%' : '28%', opacity: 0.2,
-          transition: { x: { duration: 0.85, ease: EXPO }, opacity: { duration: 0.3 } } }),
+          transition: { x: { duration: 0.85, ease: EXPO }, opacity: { duration: 0.35 } } }),
       };
 
-    // 2. Simple crossfade
+    // 2. Vertical slide — pushes up/down
+    case 'slide-v':
+      return {
+        enter:  (c) => ({ y: c.direction > 0 ? '100%' : '-100%', opacity: 0 }),
+        center: { y: 0, opacity: 1,
+          transition: { y: { duration: 0.85, ease: EXPO }, opacity: { duration: 0.3 } } },
+        exit:   (c) => ({ y: c.direction > 0 ? '-20%' : '20%', opacity: 0.1,
+          transition: { y: { duration: 0.8, ease: EXPO }, opacity: { duration: 0.3 } } }),
+      };
+
+    // 3. Crossfade
     case 'fade':
       return {
         enter:  { opacity: 0 },
@@ -24,7 +35,7 @@ function getTransitionVariants(style) {
         exit:   { opacity: 0, transition: { duration: 1.0, ease: 'easeInOut' } },
       };
 
-    // 3. Blur dissolve (handled inline with motion.img)
+    // 4. Blur dissolve
     case 'dissolve':
       return {
         enter:  { opacity: 0 },
@@ -32,34 +43,101 @@ function getTransitionVariants(style) {
         exit:   { opacity: 0, transition: { duration: 1.2, ease: 'easeInOut' } },
       };
 
-    // 4. Zoom push — new image zooms in, old shrinks away
+    // 5. Zoom in
     case 'zoom':
       return {
-        enter:  { opacity: 0, scale: 1.15 },
+        enter:  { opacity: 0, scale: 1.18 },
         center: { opacity: 1, scale: 1,
           transition: { opacity: { duration: 0.5 }, scale: { duration: 1.0, ease: EXPO } } },
-        exit:   { opacity: 0, scale: 0.9,
+        exit:   { opacity: 0, scale: 0.88,
           transition: { opacity: { duration: 0.4 }, scale: { duration: 0.8, ease: EASE } } },
       };
 
-    // 5. Wipe left-to-right (clip-path reveal)
+    // 6. Zoom out — starts small, expands
+    case 'zoom-out':
+      return {
+        enter:  { opacity: 0, scale: 0.82 },
+        center: { opacity: 1, scale: 1,
+          transition: { opacity: { duration: 0.5 }, scale: { duration: 1.0, ease: EXPO } } },
+        exit:   { opacity: 0, scale: 1.12,
+          transition: { opacity: { duration: 0.4 }, scale: { duration: 0.8, ease: EASE } } },
+      };
+
+    // 7. Wipe left-to-right
     case 'wipe-lr':
       return {
         enter:  (c) => ({ clipPath: c.direction > 0 ? 'inset(0 100% 0 0)' : 'inset(0 0 0 100%)', opacity: 1 }),
         center: { clipPath: 'inset(0 0% 0 0)', opacity: 1,
           transition: { clipPath: { duration: 0.9, ease: EXPO } } },
-        exit:   { opacity: 0, clipPath: 'inset(0 0% 0 0)',
-          transition: { opacity: { duration: 0.3 } } },
+        exit:   { opacity: 0, transition: { duration: 0.3 } },
       };
 
-    // 6. Flash cut — brief white flash, instant cut
+    // 8. Iris reveal — circle opens from centre
+    case 'iris':
+      return {
+        enter:  { clipPath: 'circle(0% at 50% 50%)', opacity: 1 },
+        center: { clipPath: 'circle(120% at 50% 50%)', opacity: 1,
+          transition: { clipPath: { duration: 1.0, ease: EXPO } } },
+        exit:   { opacity: 0, transition: { duration: 0.4 } },
+      };
+
+    // 9. Corner wipe — diagonal reveal from top-left
+    case 'corner-wipe':
+      return {
+        enter:  { clipPath: 'inset(0 100% 100% 0)', opacity: 1 },
+        center: { clipPath: 'inset(0 0% 0% 0)', opacity: 1,
+          transition: { clipPath: { duration: 1.0, ease: EXPO } } },
+        exit:   { opacity: 0, transition: { duration: 0.35 } },
+      };
+
+    // 10. Flash cut — bright flash on entry
     case 'flash':
       return {
         enter:  { opacity: 0, filter: 'brightness(3)' },
         center: { opacity: 1, filter: 'brightness(1)',
-          transition: { opacity: { duration: 0.15 }, filter: { duration: 0.6, ease: 'easeOut' } } },
-        exit:   { opacity: 0, filter: 'brightness(2)',
+          transition: { opacity: { duration: 0.15 }, filter: { duration: 0.65, ease: 'easeOut' } } },
+        exit:   { opacity: 0, filter: 'brightness(2.5)',
           transition: { opacity: { duration: 0.15 }, filter: { duration: 0.15 } } },
+      };
+
+    // 11. Dark dip — image dips to black between slides
+    case 'dip-black':
+      return {
+        enter:  { opacity: 0, filter: 'brightness(0)' },
+        center: { opacity: 1, filter: 'brightness(1)',
+          transition: { opacity: { duration: 0.6, ease: 'easeIn' }, filter: { duration: 0.7, ease: 'easeOut' } } },
+        exit:   { opacity: 0, filter: 'brightness(0)',
+          transition: { opacity: { duration: 0.5 }, filter: { duration: 0.5 } } },
+      };
+
+    // 12. Split — image splits horizontally (top half up, bottom down)
+    case 'split':
+      return {
+        enter:  (c) => ({ x: c.direction > 0 ? '100%' : '-100%', opacity: 0 }),
+        center: { x: 0, opacity: 1,
+          transition: { x: { duration: 0.7, ease: SHARP }, opacity: { duration: 0.2 } } },
+        exit:   (c) => ({ x: c.direction > 0 ? '-50%' : '50%', opacity: 0, rotate: c.direction * 2,
+          transition: { duration: 0.7, ease: SHARP } } ),
+      };
+
+    // 13. Rotate & slide
+    case 'rotate-slide':
+      return {
+        enter:  (c) => ({ x: c.direction > 0 ? '100%' : '-100%', rotate: c.direction * -8, opacity: 0 }),
+        center: { x: 0, rotate: 0, opacity: 1,
+          transition: { duration: 0.9, ease: EXPO } },
+        exit:   (c) => ({ x: c.direction > 0 ? '-25%' : '25%', rotate: c.direction * 4, opacity: 0,
+          transition: { duration: 0.7, ease: EASE } }),
+      };
+
+    // 14. Morph blur — blur transforms between images
+    case 'morph':
+      return {
+        enter:  { opacity: 0, filter: 'blur(40px) saturate(0)', scale: 1.1 },
+        center: { opacity: 1, filter: 'blur(0px) saturate(1)', scale: 1,
+          transition: { duration: 1.2, ease: EXPO } },
+        exit:   { opacity: 0, filter: 'blur(30px) saturate(0)', scale: 0.95,
+          transition: { duration: 0.8, ease: EASE } },
       };
 
     default:
@@ -104,15 +182,17 @@ export default function CinematicHero({ hero = {} }) {
   const [direction,  setDirection]  = useState(1); // 1 = forward, -1 = backward
 
   // Cycle through transition styles for each slide change
-  const TRANSITION_STYLES = ['slide', 'fade', 'dissolve', 'zoom', 'wipe-lr', 'flash'];
+  const TRANSITION_STYLES = [
+    'slide', 'slide-v', 'fade', 'dissolve', 'zoom', 'zoom-out',
+    'wipe-lr', 'iris', 'corner-wipe', 'flash', 'dip-black', 'split', 'rotate-slide', 'morph'
+  ];
   const [transitionStyle, setTransitionStyle] = useState('slide');
-  const transitionIdxRef = useRef(0);
 
   // Auto-advance slideshow
   const advance = useCallback(() => {
     if (allImages.length < 2) return;
-    transitionIdxRef.current = (transitionIdxRef.current + 1) % TRANSITION_STYLES.length;
-    setTransitionStyle(TRANSITION_STYLES[transitionIdxRef.current]);
+    const nextStyle = pickRandom(TRANSITION_STYLES, transitionStyle);
+    setTransitionStyle(nextStyle);
     setDirection(1);
     setActiveIdx(i => (i + 1) % allImages.length);
   }, [allImages.length]);
@@ -126,8 +206,8 @@ export default function CinematicHero({ hero = {} }) {
 
   const goTo = (idx) => {
     if (idx === activeIdx) return;
-    transitionIdxRef.current = (transitionIdxRef.current + 1) % TRANSITION_STYLES.length;
-    setTransitionStyle(TRANSITION_STYLES[transitionIdxRef.current]);
+    const nextStyle2 = pickRandom(TRANSITION_STYLES, transitionStyle);
+    setTransitionStyle(nextStyle2);
     setDirection(idx > activeIdx ? 1 : -1);
     setActiveIdx(idx);
   };
