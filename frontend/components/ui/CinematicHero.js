@@ -265,28 +265,36 @@ export default function CinematicHero({ hero = {} }) {
       {hasImages && (
         <motion.div className="absolute inset-0 cursor-pointer" style={{ y }}
           onClick={() => { window.location.href = '/products'; }}>
-          <AnimatePresence initial={false} custom={direction}>
+          <AnimatePresence initial={false} custom={{ direction, transitionStyle }}>
             <motion.div
               key={activeIdx}
-              custom={direction}
+              custom={{ direction, transitionStyle }}
               className="absolute inset-0"
-              variants={{
-                enter:  (d) => ({ x: d > 0 ? '100%' : '-100%', opacity: 0, filter: 'brightness(0.6)' }),
-                center: { x: 0, opacity: 1, filter: 'brightness(1)',
-                  transition: { x: { duration: 0.9, ease: [0.16, 1, 0.3, 1] }, opacity: { duration: 0.4 }, filter: { duration: 0.9 } } },
-                exit:   (d) => ({ x: d > 0 ? '-30%' : '30%', opacity: 0.3, filter: 'brightness(0.5)',
-                  transition: { x: { duration: 0.9, ease: [0.16, 1, 0.3, 1] }, opacity: { duration: 0.4 } } }),
-              }}
+              variants={getTransitionVariants(transitionStyle)}
               initial="enter"
               animate="center"
               exit="exit"
             >
-              <img
-                src={allImages[activeIdx]}
-                alt={tenant?.name}
-                className="w-full h-full object-cover"
-                draggable={false}
-              />
+              {(transitionStyle === 'dissolve' || transitionStyle === 'morph') ? (
+                <motion.img
+                  src={allImages[activeIdx]}
+                  alt={tenant?.name}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                  initial={transitionStyle === 'morph'
+                    ? { filter: 'blur(40px) saturate(0)', scale: 1.1, opacity: 0 }
+                    : { filter: 'blur(20px)', opacity: 0, scale: 1.05 }}
+                  animate={{ filter: 'blur(0px) saturate(1)', opacity: 1, scale: 1 }}
+                  transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                />
+              ) : (
+                <img
+                  src={allImages[activeIdx]}
+                  alt={tenant?.name}
+                  className="w-full h-full object-cover"
+                  draggable={false}
+                />
+              )}
             </motion.div>
           </AnimatePresence>
 
