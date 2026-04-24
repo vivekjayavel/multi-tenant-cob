@@ -65,8 +65,7 @@ export default function ProductCard({ product, index = 0 }) {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="group relative bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm sm:shadow-md border border-gray-100 cursor-pointer flex flex-col h-full"
-        style={{ boxShadow: isHovered ? '0 20px 60px -10px rgba(0,0,0,0.18)' : '' }}
-        whileHover={{ y: -4 }}
+        whileHover={{ y: -4, boxShadow: '0 20px 60px -10px rgba(0,0,0,0.18)' }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       >
         {/* ── Cinematic image ── */}
@@ -156,8 +155,7 @@ export default function ProductCard({ product, index = 0 }) {
             <motion.p
               className="font-bold text-base sm:text-lg"
               style={{ color: 'var(--tenant-primary)' }}
-              animate={{ scale: isHovered ? 1.05 : 1 }}
-              transition={{ duration: 0.2 }}
+  
             >
               ₹{parseFloat(product.price).toLocaleString('en-IN')}
             </motion.p>
