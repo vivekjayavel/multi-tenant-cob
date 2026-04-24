@@ -1,3 +1,76 @@
+
+// Cinematic transition variants — one per style
+function getTransitionVariants(style) {
+  const EXPO = [0.16, 1, 0.3, 1];
+  const EASE = [0.4, 0, 0.2, 1];
+
+  switch (style) {
+
+    // 1. Classic horizontal slide with parallax exit
+    case 'slide':
+      return {
+        enter:  (c) => ({ x: c.direction > 0 ? '100%' : '-100%', opacity: 0 }),
+        center: { x: 0, opacity: 1,
+          transition: { x: { duration: 0.85, ease: EXPO }, opacity: { duration: 0.3 } } },
+        exit:   (c) => ({ x: c.direction > 0 ? '-28%' : '28%', opacity: 0.2,
+          transition: { x: { duration: 0.85, ease: EXPO }, opacity: { duration: 0.3 } } }),
+      };
+
+    // 2. Simple crossfade
+    case 'fade':
+      return {
+        enter:  { opacity: 0 },
+        center: { opacity: 1, transition: { duration: 1.0, ease: 'easeInOut' } },
+        exit:   { opacity: 0, transition: { duration: 1.0, ease: 'easeInOut' } },
+      };
+
+    // 3. Blur dissolve (handled inline with motion.img)
+    case 'dissolve':
+      return {
+        enter:  { opacity: 0 },
+        center: { opacity: 1, transition: { duration: 0.01 } },
+        exit:   { opacity: 0, transition: { duration: 1.2, ease: 'easeInOut' } },
+      };
+
+    // 4. Zoom push — new image zooms in, old shrinks away
+    case 'zoom':
+      return {
+        enter:  { opacity: 0, scale: 1.15 },
+        center: { opacity: 1, scale: 1,
+          transition: { opacity: { duration: 0.5 }, scale: { duration: 1.0, ease: EXPO } } },
+        exit:   { opacity: 0, scale: 0.9,
+          transition: { opacity: { duration: 0.4 }, scale: { duration: 0.8, ease: EASE } } },
+      };
+
+    // 5. Wipe left-to-right (clip-path reveal)
+    case 'wipe-lr':
+      return {
+        enter:  (c) => ({ clipPath: c.direction > 0 ? 'inset(0 100% 0 0)' : 'inset(0 0 0 100%)', opacity: 1 }),
+        center: { clipPath: 'inset(0 0% 0 0)', opacity: 1,
+          transition: { clipPath: { duration: 0.9, ease: EXPO } } },
+        exit:   { opacity: 0, clipPath: 'inset(0 0% 0 0)',
+          transition: { opacity: { duration: 0.3 } } },
+      };
+
+    // 6. Flash cut — brief white flash, instant cut
+    case 'flash':
+      return {
+        enter:  { opacity: 0, filter: 'brightness(3)' },
+        center: { opacity: 1, filter: 'brightness(1)',
+          transition: { opacity: { duration: 0.15 }, filter: { duration: 0.6, ease: 'easeOut' } } },
+        exit:   { opacity: 0, filter: 'brightness(2)',
+          transition: { opacity: { duration: 0.15 }, filter: { duration: 0.15 } } },
+      };
+
+    default:
+      return {
+        enter:  { opacity: 0 },
+        center: { opacity: 1, transition: { duration: 0.8 } },
+        exit:   { opacity: 0, transition: { duration: 0.8 } },
+      };
+  }
+}
+
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { m as motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
 import { useTenant } from '../../context/TenantContext';
@@ -30,9 +103,16 @@ export default function CinematicHero({ hero = {} }) {
   const [activeIdx,  setActiveIdx]  = useState(0);
   const [direction,  setDirection]  = useState(1); // 1 = forward, -1 = backward
 
+  // Cycle through transition styles for each slide change
+  const TRANSITION_STYLES = ['slide', 'fade', 'dissolve', 'zoom', 'wipe-lr', 'flash'];
+  const [transitionStyle, setTransitionStyle] = useState('slide');
+  const transitionIdxRef = useRef(0);
+
   // Auto-advance slideshow
   const advance = useCallback(() => {
     if (allImages.length < 2) return;
+    transitionIdxRef.current = (transitionIdxRef.current + 1) % TRANSITION_STYLES.length;
+    setTransitionStyle(TRANSITION_STYLES[transitionIdxRef.current]);
     setDirection(1);
     setActiveIdx(i => (i + 1) % allImages.length);
   }, [allImages.length]);
@@ -46,6 +126,8 @@ export default function CinematicHero({ hero = {} }) {
 
   const goTo = (idx) => {
     if (idx === activeIdx) return;
+    transitionIdxRef.current = (transitionIdxRef.current + 1) % TRANSITION_STYLES.length;
+    setTransitionStyle(TRANSITION_STYLES[transitionIdxRef.current]);
     setDirection(idx > activeIdx ? 1 : -1);
     setActiveIdx(idx);
   };
