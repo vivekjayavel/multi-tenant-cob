@@ -16,7 +16,7 @@ exports.list = async (req, res, next) => {
 
 exports.getBySlug = async (req, res, next) => {
   try {
-    const [rows] = await db.query('SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options, delivery_time, sort_order, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1', [req.tenant.id, req.params.slug]);
+    const [rows] = await db.query('SELECT id, name, description, price, image_url, images, category, slug, stock_qty, reserved_qty, customization_options, delivery_time, sort_order, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1', [req.tenant.id, req.params.slug]);
     if (!rows.length) return fail(res, 'Product not found', 404);
     ok(res, { product: { ...rows[0], available_qty: Math.max(0, rows[0].stock_qty - rows[0].reserved_qty) } });
   } catch (err) { next(err); }
@@ -35,7 +35,7 @@ async function ensureDeliveryTimeColumn(db) {
 exports.create = async (req, res, next) => {
   try {
     await ensureDeliveryTimeColumn(db);
-    const { name, description, price, image_url, category, stock_qty = 0, customization_options, delivery_time, sort_order = 0 } = req.body;
+    const { name, description, price, image_url, images, category, stock_qty = 0, customization_options, delivery_time, sort_order = 0 } = req.body;
     const tenantId = req.tenant.id;
     const slug = req.body.slug || slugify(name, { lower: true, strict: true });
     let custOpts = null;
@@ -44,7 +44,8 @@ exports.create = async (req, res, next) => {
         ? customization_options
         : JSON.stringify(customization_options);
     }
-    const [result] = await db.query('INSERT INTO products (tenant_id, name, description, price, image_url, category, slug, stock_qty, customization_options, delivery_time, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [tenantId, name, description, price, image_url, category, slug, stock_qty, custOpts, delivery_time || null, parseInt(sort_order) || 0]);
+    const imagesJson = images ? (typeof images === 'string' ? images : JSON.stringify(images)) : null;
+    const [result] = await db.query('INSERT INTO products (tenant_id, name, description, price, image_url, images, category, slug, stock_qty, customization_options, delivery_time, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [tenantId, name, description, price, image_url, imagesJson, category, slug, stock_qty, custOpts, delivery_time || null, parseInt(sort_order) || 0]);
     invalidateProductCache(tenantId);
     ok(res, { id: result.insertId, slug }, 'Product created', 201);
   } catch (err) { next(err); }
@@ -54,7 +55,7 @@ exports.update = async (req, res, next) => {
   try {
     await ensureDeliveryTimeColumn(db);
     const { id } = req.params, tenantId = req.tenant.id;
-    const allowed = ['name','description','price','image_url','category','slug','is_active','stock_qty','customization_options','delivery_time','sort_order'];
+    const allowed = ['name','description','price','image_url','images','category','slug','is_active','stock_qty','customization_options','delivery_time','sort_order'];
     const fields = [], values = [];
 
     // If stock_qty is being reduced, cap reserved_qty to not exceed new stock_qty
@@ -71,11 +72,11 @@ exports.update = async (req, res, next) => {
       if (req.body[key] !== undefined) {
         let val = req.body[key];
         // JSON column: mysql2 needs a string, not an object
-        if (key === 'customization_options' && val !== null && typeof val === 'object') {
+        if ((key === 'customization_options' || key === 'images') && val !== null && typeof val === 'object') {
           val = JSON.stringify(val);
         }
-        // Treat empty string as NULL for JSON column
-        if (key === 'customization_options' && val === '') val = null;
+        // Treat empty string as NULL for JSON columns
+        if ((key === 'customization_options' || key === 'images') && val === '') val = null;
         fields.push(`${key} = ?`);
         values.push(val);
       }

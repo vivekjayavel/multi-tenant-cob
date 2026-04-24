@@ -2,13 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import Head from 'next/head';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import AdminLayout from '../../components/admin/AdminLayout';
+import uploadApi from '../../lib/uploadApi';
 import ImageUploader from '../../components/admin/ImageUploader';
 import { useToast } from '../../components/ui/Toast';
 import ProductCustomizationEditor from '../../components/admin/ProductCustomizationEditor';
 import api from '../../lib/api';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
 
-const EMPTY  = { name: '', description: '', price: '', category: '', slug: '', stock_qty: '', image_url: '', customization_options: null, delivery_time: '', sort_order: '0' };
+const EMPTY  = { name: '', description: '', price: '', category: '', slug: '', stock_qty: '', image_url: '', images: [], customization_options: null, delivery_time: '', sort_order: '0' };
 const slugify = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 export default function AdminProducts({ tenant, adminUser }) {
@@ -17,6 +18,7 @@ export default function AdminProducts({ tenant, adminUser }) {
   const [form,     setForm]     = useState(EMPTY);
   const [editId,   setEditId]   = useState(null);
   const [saving,   setSaving]   = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error,    setError]    = useState(null);
   const [panel,    setPanel]    = useState(false);
 
@@ -40,7 +42,7 @@ export default function AdminProducts({ tenant, adminUser }) {
   useEffect(() => { load(); }, [load]);
 
   const openNew  = () => { setEditId(null); setForm(EMPTY); setError(null); setPanel(true); };
-  const openEdit = p  => { setEditId(p.id); setForm({ name: p.name, description: p.description || '', price: p.price, category: p.category || '', slug: p.slug, stock_qty: p.stock_qty, image_url: p.image_url || '', customization_options: p.customization_options || null, delivery_time: p.delivery_time || '', sort_order: String(p.sort_order ?? 0) }); setError(null); setPanel(true); };
+  const openEdit = p  => { setEditId(p.id); setForm({ name: p.name, description: p.description || '', price: p.price, category: p.category || '', slug: p.slug, stock_qty: p.stock_qty, image_url: p.image_url || '', images: (typeof p.images === 'string' ? JSON.parse(p.images || '[]') : p.images) || [], customization_options: p.customization_options || null, delivery_time: p.delivery_time || '', sort_order: String(p.sort_order ?? 0) }); setError(null); setPanel(true); };
 
   const handleSave = async (e) => {
     e.preventDefault(); setSaving(true); setError(null);
@@ -146,7 +148,22 @@ export default function AdminProducts({ tenant, adminUser }) {
                   {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">{error}</p>}
                   <div>
                     <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">Product image</label>
-                    <ImageUploader productId={editId} currentImage={form.image_url} onUpload={data => setForm(f => ({ ...f, image_url: data.url }))} />
+                    <ProductImageUploader
+                      images={form.image_url ? [form.image_url, ...(form.images||[]).map(i=>i.url||i)] : (form.images||[]).map(i=>i.url||i)}
+                      onAdd={(url) => setForm(f => {
+                        if (!f.image_url) return { ...f, image_url: url };
+                        const imgs = [...(f.images||[])];
+                        if (imgs.length < 3) imgs.push({ url });
+                        return { ...f, images: imgs };
+                      })}
+                      onRemove={(idx) => setForm(f => {
+                        const all = [f.image_url, ...(f.images||[]).map(i=>i.url||i)].filter(Boolean);
+                        all.splice(idx, 1);
+                        return { ...f, image_url: all[0]||'', images: all.slice(1).map(u=>({url:u})) };
+                      })}
+                      uploading={uploading}
+                      setUploading={setUploading}
+                    />
                   </div>
                   {[
                     { key: 'name',      label: 'Product name', required: true,  type: 'text'   },
@@ -202,3 +219,77 @@ export default function AdminProducts({ tenant, adminUser }) {
 }
 
 export const getServerSideProps = withAdminAuth(async ({ tenant }) => ({ props: { tenant } }));
+
+/* ─── Multi-image uploader for products ──────────────────────────── */
+function ProductImageUploader({ images, onAdd, onRemove, uploading, setUploading }) {
+  const MAX = 4;
+
+  const handleUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || images.length >= MAX) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('image', file);
+      const { data } = await uploadApi.post('/upload/product-image', fd);
+      onAdd(data.url);
+      e.target.value = '';
+    } catch { alert('Upload failed'); } finally { setUploading(false); }
+  };
+
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
+        Product Images
+        <span className="ml-1 text-gray-400 font-normal normal-case">(up to {MAX} · first = main)</span>
+      </label>
+
+      <div className="grid grid-cols-4 gap-2">
+        {/* Existing images */}
+        {images.map((url, idx) => url && (
+          <div key={idx} className="relative group aspect-square rounded-xl overflow-hidden bg-stone-100 border border-gray-200">
+            <img src={url} alt={`Product ${idx+1}`} className="w-full h-full object-cover" />
+            {/* Main badge */}
+            {idx === 0 && (
+              <span className="absolute top-1 left-1 bg-black/60 text-white text-[9px] px-1.5 py-0.5 rounded-full font-semibold">
+                Main
+              </span>
+            )}
+            {/* Remove button */}
+            <button
+              type="button"
+              onClick={() => onRemove(idx)}
+              className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity font-bold"
+            >×</button>
+          </div>
+        ))}
+
+        {/* Add button */}
+        {images.length < MAX && (
+          <label className={`aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-colors ${
+            uploading ? 'border-gray-200 bg-gray-50' : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
+          }`}>
+            {uploading ? (
+              <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--tenant-primary)' }} />
+            ) : (
+              <>
+                <svg className="w-5 h-5 text-gray-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4"/>
+                </svg>
+                <span className="text-[10px] text-gray-400">Add photo</span>
+              </>
+            )}
+            <input type="file" accept=".jpg,.jpeg,.png,.webp" className="hidden"
+              onChange={handleUpload} disabled={uploading || images.length >= MAX} />
+          </label>
+        )}
+
+        {/* Empty placeholders */}
+        {Array.from({ length: Math.max(0, MAX - images.length - 1) }).map((_, i) => (
+          <div key={`empty-${i}`} className="aspect-square rounded-xl border border-dashed border-gray-100 bg-gray-50/50" />
+        ))}
+      </div>
+      <p className="text-xs text-gray-400 mt-1.5">{images.length}/{MAX} images · JPG, PNG, WebP</p>
+    </div>
+  );
+}
