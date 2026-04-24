@@ -164,6 +164,12 @@ const textReveal = {
   visible: { opacity: 1, y: 0,  filter: 'blur(0px)', transition: { duration: 0.8, ease: EASE_EXPO } },
 };
 
+// Pick a random transition style (never repeats current)
+function pickRandom(styles, current) {
+  const pool = styles.filter(s => s !== current);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 export default function CinematicHero({ hero = {} }) {
   const tenant    = useTenant();
   const heroRef   = useRef(null);
