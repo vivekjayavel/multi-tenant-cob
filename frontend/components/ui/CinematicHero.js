@@ -84,7 +84,8 @@ export default function CinematicHero({ hero = {} }) {
 
   return (
     <section ref={heroRef}
-      className={`relative min-h-screen flex items-center overflow-hidden ${hasImages ? 'bg-stone-950' : 'bg-stone-50'}`}>
+      className={`relative flex items-center overflow-hidden ${hasImages ? 'bg-stone-950' : 'bg-stone-50'}`}
+      style={{ marginTop: '136px', minHeight: 'calc(100vh - 136px)' }}>
 
       {/* ── Slideshow images — cinematic transitions, clickable ── */}
       {hasImages && (
@@ -147,7 +148,7 @@ export default function CinematicHero({ hero = {} }) {
       {hero.show_text_content !== false && (
       <motion.div
         className="relative z-10 max-w-6xl mx-auto px-6 sm:px-8 w-full"
-        style={{ opacity, paddingTop: 'clamp(140px, 18vh, 200px)', paddingBottom: 'clamp(80px, 12vh, 140px)' }}
+        style={{ opacity, paddingTop: 'clamp(48px, 6vh, 80px)', paddingBottom: 'clamp(48px, 6vh, 80px)' }}
       >
         <motion.div variants={container} initial="hidden" animate="visible" className="max-w-xl space-y-5 sm:space-y-6">
 
