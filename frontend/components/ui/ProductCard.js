@@ -61,13 +61,13 @@ export default function ProductCard({ product, index = 0 }) {
         onClick={() => router.push(`/products/${product.slug}`)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="group relative bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer flex flex-col h-full"
+        className="group relative bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm sm:shadow-md border border-gray-100 cursor-pointer flex flex-col h-full"
         style={{ boxShadow: isHovered ? '0 20px 60px -10px rgba(0,0,0,0.18)' : '' }}
         whileHover={{ y: -4 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       >
         {/* ── Cinematic image ── */}
-        <div className="relative aspect-square overflow-hidden bg-stone-100 flex-shrink-0">
+        <div className="relative aspect-[4/3] sm:aspect-square overflow-hidden bg-stone-100 flex-shrink-0">
           <CinematicImage
             src={product.image_url}
             alt={product.name}
@@ -82,7 +82,7 @@ export default function ProductCard({ product, index = 0 }) {
             <motion.span
               initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4 + (index % 4) * 0.06 }}
-              className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-600 px-2.5 py-1 rounded-full shadow-sm z-10"
+              className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-white/90 backdrop-blur-sm text-[10px] sm:text-xs font-semibold text-gray-600 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full shadow-sm z-10"
             >
               {product.category}
             </motion.span>
@@ -132,8 +132,8 @@ export default function ProductCard({ product, index = 0 }) {
         </div>
 
         {/* ── Product info ── */}
-        <div className="p-4 flex flex-col flex-1">
-          <h3 className="font-display font-semibold text-gray-800 text-base leading-snug line-clamp-2">
+        <div className="p-3 sm:p-5 flex flex-col flex-1">
+          <h3 className="font-display font-semibold text-gray-800 text-sm sm:text-base leading-snug line-clamp-2">
             {product.name}
           </h3>
           {product.description && (
@@ -142,7 +142,7 @@ export default function ProductCard({ product, index = 0 }) {
 
           {/* Delivery time */}
           {product.delivery_time && (
-            <div className="flex items-center gap-1.5 mt-2">
+            <div className="hidden sm:flex items-center gap-1.5 mt-2">
               <svg className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -153,7 +153,7 @@ export default function ProductCard({ product, index = 0 }) {
           {/* Price + CTA */}
           <div className="flex items-center justify-between mt-auto pt-3">
             <motion.p
-              className="font-bold text-lg"
+              className="font-bold text-base sm:text-lg"
               style={{ color: 'var(--tenant-primary)' }}
               animate={{ scale: isHovered ? 1.05 : 1 }}
               transition={{ duration: 0.2 }}
@@ -164,7 +164,7 @@ export default function ProductCard({ product, index = 0 }) {
             <motion.button
               onClick={handleAdd}
               disabled={available === 0}
-              className="text-white text-xs font-semibold px-4 py-2 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 overflow-hidden relative"
+              className="text-white text-xs font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg sm:rounded-xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 sm:gap-1.5 overflow-hidden relative"
               style={{ backgroundColor: 'var(--tenant-primary)' }}
               whileHover={{ scale: 1.08, boxShadow: '0 6px 20px -4px color-mix(in srgb, var(--tenant-primary) 50%, transparent)' }}
               whileTap={{ scale: 0.94 }}

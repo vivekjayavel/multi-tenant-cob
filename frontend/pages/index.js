@@ -64,14 +64,15 @@ export default function HomePage({ tenant, categoryGroups, settings }) {
 
                   {/* Products carousel for this category */}
                   <SwiperCarousel
-                    slidesPerView={1.2}
-                    spaceBetween={16}
+                    slidesPerView={1.5}
+                    spaceBetween={12}
                     navigation={products.length > 4}
                     pagination={products.length > 2}
                     breakpoints={{
-                      480:  { slidesPerView: 2,   spaceBetween: 16 },
-                      768:  { slidesPerView: 3,   spaceBetween: 20 },
-                      1024: { slidesPerView: 4,   spaceBetween: 24 },
+                      480:  { slidesPerView: 2,   spaceBetween: 12 },
+                      768:  { slidesPerView: 2,   spaceBetween: 20 },
+                      1024: { slidesPerView: 3,   spaceBetween: 28 },
+                      1280: { slidesPerView: 3,   spaceBetween: 32 },
                     }}
                   >
                     {products.map((p, i) => (
