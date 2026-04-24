@@ -188,10 +188,7 @@ export default function CinematicHero({ hero = {} }) {
   const [direction,  setDirection]  = useState(1); // 1 = forward, -1 = backward
 
   // Transition styles — ref-backed so advance() always reads latest (no stale closure)
-  const TRANSITION_STYLES = [
-    'slide', 'slide-v', 'fade', 'dissolve', 'zoom', 'zoom-out',
-    'wipe-lr', 'iris', 'corner-wipe', 'flash', 'dip-black', 'split', 'rotate-slide', 'morph'
-  ];
+  const TRANSITION_STYLES = ['slide', 'slide-v', 'zoom', 'zoom-out', 'rotate-slide', 'fade'];
   const [transitionStyle, setTransitionStyle] = useState('slide');
   const transitionStyleRef = useRef('slide');
 
