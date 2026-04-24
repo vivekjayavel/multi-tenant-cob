@@ -130,4 +130,21 @@ async function getProductsByCategory(tenantId) {
     }));
 }
 
-module.exports = { getTenantFromRequest, getProductsForPage, getFeaturedProducts, getProductsByCategory, notFoundOrProps };
+async function getCategories(tenantId) {
+  const db = require('../../backend/config/db');
+  const [rows] = await db.query(
+    `SELECT DISTINCT category FROM products
+     WHERE tenant_id = ? AND is_active = 1 AND category IS NOT NULL AND category != ''
+     ORDER BY category ASC`,
+    [tenantId]
+  );
+  const cats = rows.map(r => r.category).filter(Boolean);
+  // Cakes first
+  return cats.sort((a, b) => {
+    if (a.toLowerCase().includes('cake') && !b.toLowerCase().includes('cake')) return -1;
+    if (!a.toLowerCase().includes('cake') && b.toLowerCase().includes('cake')) return 1;
+    return a.localeCompare(b);
+  });
+}
+
+module.exports = { getTenantFromRequest, getProductsForPage, getFeaturedProducts, getProductsByCategory, getCategories, notFoundOrProps };

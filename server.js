@@ -23,6 +23,7 @@ const orderRoutes      = require('./backend/routes/orderRoutes');
 const uploadRoutes     = require('./backend/routes/uploadRoutes');
 const paymentRoutes    = require('./backend/routes/paymentRoutes');
 const settingsRoutes   = require('./backend/routes/settingsRoutes');
+const categoryRoutes   = require('./backend/routes/categoryRoutes');
 const seoRoutes        = require('./backend/routes/seoRoutes');
 const superadminRoutes = require('./backend/routes/superadminRoutes');
 
@@ -115,6 +116,7 @@ app.prepare().then(() => {
   server.use('/api/upload',   uploadRoutes);
   server.use('/api/payment',  paymentRoutes);
   server.use('/api/settings', settingsRoutes);
+  server.use('/api/categories', categoryRoutes);
   server.use(errorHandler);
   // In dev API-only mode, redirect page requests to Next.js dev server
   if (process.env.API_ONLY === 'true') {
