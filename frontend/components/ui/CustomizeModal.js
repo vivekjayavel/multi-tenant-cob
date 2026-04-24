@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
+import { useToast } from './Toast';
 
 export default function CustomizeModal({ product, onClose }) {
   const { dispatch } = useCart();
+  const toast = useToast();
   const opts = parseOptions(product.customization_options);
 
   const [selections, setSelections] = useState({
@@ -34,6 +36,7 @@ export default function CustomizeModal({ product, onClose }) {
     if (selections.message)      customization.message      = selections.message;
     if (selections.instructions) customization.instructions = selections.instructions;
 
+    const itemName = product.name;
     dispatch({
       type: 'ADD',
       item: {
@@ -46,6 +49,7 @@ export default function CustomizeModal({ product, onClose }) {
         customization: Object.keys(customization).length ? customization : undefined,
       },
     });
+    toast({ message: `${itemName} added to cart 🛒`, type: 'success', duration: 2000 });
     onClose();
   };
 

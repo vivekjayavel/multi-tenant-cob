@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useTenant } from '../../context/TenantContext';
+import { useToast } from './Toast';
 import CinematicImage from './CinematicImage';
 import CustomizeModal from './CustomizeModal';
 
@@ -21,6 +22,7 @@ const HOVER_EFFECTS = ['zoom', 'shine', 'reveal', 'zoom', 'shine', 'reveal'];
 
 export default function ProductCard({ product, index = 0 }) {
   const { dispatch }   = useCart();
+  const toast = useToast();
   const tenant         = useTenant();
   const router         = useRouter();
   const [showModal,    setShowModal]    = useState(false);
@@ -49,6 +51,7 @@ export default function ProductCard({ product, index = 0 }) {
       price: parseFloat(product.price),
       image_url: product.image_url, slug: product.slug,
     }});
+    toast({ message: `${product.name} added to cart 🛒`, type: 'success', duration: 2000 });
   };
 
   return (

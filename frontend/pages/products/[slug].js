@@ -5,6 +5,7 @@ import MetaTags from '../../components/seo/MetaTags';
 import CinematicImage from '../../components/ui/CinematicImage';
 import CustomizeModal from '../../components/ui/CustomizeModal';
 import { useCart } from '../../context/CartContext';
+import { useToast } from '../../components/ui/Toast';
 const { productDetailSeo }    = require('../../lib/seo');
 const { getTenantFromRequest } = require('../../lib/prefetch');
 
@@ -22,6 +23,7 @@ export default function ProductDetailPage({ tenant, product }) {
   const [qty,       setQty]       = useState(1);
   const [showModal, setShowModal] = useState(false);
   const { dispatch } = useCart();
+  const toast = useToast();
   const seo          = productDetailSeo(tenant, product);
   const available    = product.available_qty ?? product.stock_qty ?? 0;
   const needsOptions = hasCustomization(product);
@@ -38,6 +40,7 @@ export default function ProductDetailPage({ tenant, product }) {
       image_url: product.image_url, slug: product.slug,
       quantity: qty,
     }});
+    toast({ message: `${product.name} added to cart 🛒`, type: 'success', duration: 2000 });
   };
 
   return (
