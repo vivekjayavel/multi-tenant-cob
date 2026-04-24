@@ -187,18 +187,24 @@ export default function CinematicHero({ hero = {} }) {
   const [activeIdx,  setActiveIdx]  = useState(0);
   const [direction,  setDirection]  = useState(1); // 1 = forward, -1 = backward
 
-  // Cycle through transition styles for each slide change
+  // Transition styles — ref-backed so advance() always reads latest (no stale closure)
   const TRANSITION_STYLES = [
     'slide', 'slide-v', 'fade', 'dissolve', 'zoom', 'zoom-out',
     'wipe-lr', 'iris', 'corner-wipe', 'flash', 'dip-black', 'split', 'rotate-slide', 'morph'
   ];
   const [transitionStyle, setTransitionStyle] = useState('slide');
+  const transitionStyleRef = useRef('slide');
+
+  const updateStyle = (next) => {
+    transitionStyleRef.current = next;
+    setTransitionStyle(next);
+  };
 
   // Auto-advance slideshow
   const advance = useCallback(() => {
     if (allImages.length < 2) return;
-    const nextStyle = pickRandom(TRANSITION_STYLES, transitionStyle);
-    setTransitionStyle(nextStyle);
+    const nextStyle = pickRandom(TRANSITION_STYLES, transitionStyleRef.current);
+    updateStyle(nextStyle);
     setDirection(1);
     setActiveIdx(i => (i + 1) % allImages.length);
   }, [allImages.length]);
@@ -212,8 +218,8 @@ export default function CinematicHero({ hero = {} }) {
 
   const goTo = (idx) => {
     if (idx === activeIdx) return;
-    const nextStyle2 = pickRandom(TRANSITION_STYLES, transitionStyle);
-    setTransitionStyle(nextStyle2);
+    const nextStyle2 = pickRandom(TRANSITION_STYLES, transitionStyleRef.current);
+    updateStyle(nextStyle2);
     setDirection(idx > activeIdx ? 1 : -1);
     setActiveIdx(idx);
   };
