@@ -8,7 +8,8 @@
   },
   "scripts": {
     "dev": "next dev frontend -p 3000",
-    "build": "next build frontend",
+    "build": "echo Build skipped - using pre-built .next",
+    "build:local": "next build frontend",
     "start": "node -e \"process.env.NODE_ENV='production'; require('./server.js')\"",
     "backup": "node scripts/backup.js",
     "backup:weekly": "node scripts/backup.js --weekly",
