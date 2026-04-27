@@ -11,7 +11,9 @@ async function getTenantFromRequest(req) {
   // the DB hit is negligible.
   const db     = require('../../backend/config/db');
   const rawDomain = req.headers['x-forwarded-host'] || req.headers.host || '';
-  const domain = (rawDomain || process.env.DEFAULT_DOMAIN || process.env.NEXT_PUBLIC_DOMAIN || '').split(':')[0].toLowerCase();
+  // On Hostinger, LiteSpeed passes 127.0.0.1 as host — fall back to production domain
+  const isProxy = !rawDomain || rawDomain.startsWith('127.') || rawDomain.startsWith('localhost') || rawDomain === '::1';
+  const domain = (isProxy ? 'rainbowbakes.in' : rawDomain).split(':')[0].toLowerCase();
 
   const [rows] = await db.query(
     'SELECT id, name, domain, logo_url, theme_color, whatsapp_number, tenant_settings FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1',
