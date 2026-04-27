@@ -1,0 +1,1 @@
+self.__REACT_LOADABLE_MANIFEST='{"components\\\\admin\\\\AdminLayout.js -> ./NotificationBell":{"id":3279,"files":["static/chunks/279.aca8912d677e38fb.js"]},"pages\\\\index.js -> ../components/ui/SwiperCarousel":{"id":408,"files":["static/chunks/408.09f7ed497d6cd739.js"]}}';
