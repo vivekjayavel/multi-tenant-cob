@@ -90,11 +90,11 @@ CREATE TABLE order_items (
 
 -- Seed: first tenant for local development
 INSERT INTO tenants (name, domain, theme_color, whatsapp_number)
-VALUES ('Sweet Cakes', 'localhost', '#D97706', '919876543210');
+VALUES ('Rainbow Bakes', 'rainbowbakes.in', '#D97706', '919876543210');
 
 -- Seed: admin user (password: Admin@123)
 INSERT INTO users (tenant_id, name, email, password, role)
-VALUES (1, 'Admin User', 'admin@sweetcakes.com',
+VALUES (1, 'Admin User', 'admin@rainbowbakes.in',
   '$2a$12$5zV0I0/hNDj2i1NxRGVJaurtGR3OgJ.n6DApm.t5c6AWptoiXB0aO', 'admin');
 
 -- Seed: sample products

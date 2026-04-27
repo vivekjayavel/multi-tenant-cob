@@ -1,15 +1,3 @@
-<FilesMatch "(^\.env|^\.env\.|package(-lock)?\.json|^yarn\.lock|^\.gitignore)">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
-RedirectMatch 403 ^/backend(/.*)?$
-RedirectMatch 403 ^/scripts(/.*)?$
-RedirectMatch 403 ^/database(/.*)?$
-RedirectMatch 403 ^/node_modules(/.*)?$
-RedirectMatch 403 ^/logs(/.*)?$
-RedirectMatch 403 ^/backups(/.*)?$
-RedirectMatch 403 ^/\.
-<FilesMatch "\.(sql|sql\.gz|bak|backup|log|tmp|swp|orig)$">
-    Order allow,deny
-    Deny from all
-</FilesMatch>
+# Redirect all traffic to Node.js app running on internal port
+RewriteEngine On
+RewriteRule ^(.*)$ http://localhost:3000/$1 [P,L]
