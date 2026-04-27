@@ -148,8 +148,17 @@ function FeatureCard({ f }) {
 }
 
 export async function getServerSideProps({ req, query }) {
-  const tenant = await getTenantFromRequest(req);
-  if (!tenant) return { notFound: true };
+  let tenant;
+  try {
+    tenant = await getTenantFromRequest(req);
+  } catch (e) {
+    console.error('[SSR] getTenantFromRequest error:', e.message);
+    return { props: { tenant: null, categoryGroups: [], settings: null } };
+  }
+  if (!tenant) {
+    console.error('[SSR] No tenant found for host:', req.headers.host, '| x-forwarded-host:', req.headers['x-forwarded-host']);
+    return { props: { tenant: { name: process.env.DEFAULT_TENANT_NAME || 'Rainbow Bakes', id: 1 }, categoryGroups: [], settings: null } };
+  }
 
   const categoryGroups = await getProductsByCategory(tenant.id);
 
