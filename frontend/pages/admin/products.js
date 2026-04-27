@@ -42,7 +42,7 @@ export default function AdminProducts({ tenant, adminUser }) {
   useEffect(() => { load(); }, [load]);
 
   const openNew  = () => { setEditId(null); setForm(EMPTY); setError(null); setPanel(true); };
-  const openEdit = p  => { setEditId(p.id); setForm({ name: p.name, description: p.description || '', price: p.price, category: p.category || '', slug: p.slug, stock_qty: p.stock_qty, image_url: p.image_url || '', images: (typeof p.images === 'string' ? JSON.parse(p.images || '[]') : p.images) || [], customization_options: p.customization_options || null, delivery_time: p.delivery_time || '', sort_order: String(p.sort_order ?? 0) }); setError(null); setPanel(true); };
+  const openEdit = p  => { setEditId(p.id); setForm({ name: p.name, description: p.description || '', price: p.price, category: p.category || '', slug: p.slug, stock_qty: p.stock_qty, image_url: p.image_url || '', images: (() => { try { if (!p.images) return []; if (typeof p.images === 'string') return JSON.parse(p.images); return Array.isArray(p.images) ? p.images : []; } catch { return []; } })(), customization_options: p.customization_options || null, delivery_time: p.delivery_time || '', sort_order: String(p.sort_order ?? 0) }); setError(null); setPanel(true); };
 
   const handleSave = async (e) => {
     e.preventDefault(); setSaving(true); setError(null);
