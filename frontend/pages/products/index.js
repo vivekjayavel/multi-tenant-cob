@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { useRouter } from 'next/router';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 const SwiperCarousel = dynamic(() => import('../../components/ui/SwiperCarousel'), { ssr: false });
