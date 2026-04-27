@@ -2,10 +2,11 @@
 const path = require('path');
 const os   = require('os');
 
-const envPath = process.env.NODE_ENV === 'production'
-  ? path.join(os.homedir(), 'app-config', '.env')
-  : path.join(__dirname, '.env');
+// Load env: try app-config first (production), then local .env
+const envPath = path.join(os.homedir(), 'app-config', '.env');
+const localEnvPath = path.join(__dirname, '.env');
 require('dotenv').config({ path: envPath });
+require('dotenv').config({ path: localEnvPath }); // fills any missing vars
 
 const { validateEnv } = require('./backend/config/validateEnv');
 validateEnv();
