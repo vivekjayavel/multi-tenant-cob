@@ -70,11 +70,11 @@ app.prepare().then(() => {
   server.use(express.urlencoded({ extended: true, limit: '50kb' }));
   server.use(cookieParser());
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' && process.env.FORCE_HTTPS === 'true') {
     server.use((req, res, next) => {
       const host  = req.headers.host || '';
-      const proto = req.headers['x-forwarded-proto'] || 'http';
-      if (proto === 'http') return res.redirect(301, `https://${host}${req.originalUrl}`);
+      const proto = req.headers['x-forwarded-proto'] || req.headers['x-forwarded-ssl'] === 'on' ? 'https' : 'http';
+      if (proto === 'http' && !req.headers['x-forwarded-for']) return res.redirect(301, `https://${host}${req.originalUrl}`);
       if (host.startsWith('www.')) return res.redirect(301, `https://${host.slice(4)}${req.originalUrl}`);
       next();
     });
