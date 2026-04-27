@@ -3,6 +3,7 @@ import Head from 'next/head';
 import AdminLayout from '../../components/admin/AdminLayout';
 import OrderTable from '../../components/admin/OrderTable';
 import api from '../../lib/api';
+import Pagination from '../../components/admin/Pagination';
 import { useToast } from '../../components/ui/Toast';
 const { withAdminAuth } = require('../../lib/withAdminAuth');
 
@@ -48,7 +49,7 @@ export default function AdminOrders({ tenant, adminUser }) {
       <Head><title>{`Orders — ${tenant.name}`}</title></Head>
       <AdminLayout tenant={tenant} active="orders" adminUser={adminUser}>
         <div className="flex items-center justify-between mb-6">
-          <div><h1 className="font-display text-2xl text-gray-900">Orders</h1><p className="text-sm text-gray-500 mt-0.5">{orders.length} results</p></div>
+          <div><h1 className="font-display text-2xl text-gray-900">Orders</h1><p className="text-sm text-gray-500 mt-0.5">{total} results</p></div>
         </div>
         <div className="flex gap-1.5 overflow-x-auto scrollbar-hide pb-1 mb-6">
           {FILTERS.map(f => (

@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { m as motion, AnimatePresence } from 'framer-motion';
 import AdminLayout from '../../components/admin/AdminLayout';
 import uploadApi from '../../lib/uploadApi';
+import Pagination from '../../components/admin/Pagination';
 import ImageUploader from '../../components/admin/ImageUploader';
 import { useToast } from '../../components/ui/Toast';
 import ProductCustomizationEditor from '../../components/admin/ProductCustomizationEditor';
@@ -23,11 +24,16 @@ export default function AdminProducts({ tenant, adminUser }) {
   const [panel,    setPanel]    = useState(false);
 
   const [activeCategory, setActiveCategory] = useState('All');
+  const handleCategoryChange = (cat) => { setActiveCategory(cat); setPage(1); };
 
   const load = useCallback(async () => {
     setLoading(true);
-    try { const { data } = await api.get('/products'); setProducts(data.products || []); } finally { setLoading(false); }
-  }, []);
+    try {
+      const { data } = await api.get(`/products?page=${page}&limit=${LIMIT}`);
+      setProducts(data.products || []);
+      setTotal(data.total || 0);
+    } finally { setLoading(false); }
+  }, [page]);
 
   // Derive sorted categories from products (Cakes first)
   const categories = ['All', ...[...new Set(products.map(p => p.category).filter(Boolean))].sort((a, b) => {
@@ -66,7 +72,7 @@ export default function AdminProducts({ tenant, adminUser }) {
       <Head><title>{`Products — ${tenant.name}`}</title></Head>
       <AdminLayout tenant={tenant} active="products" adminUser={adminUser}>
         <div className="flex items-center justify-between mb-6">
-          <div><h1 className="font-display text-2xl text-gray-900">Products</h1><p className="text-sm text-gray-500 mt-0.5">{filteredProducts.length} of {products.length} items</p></div>
+          <div><h1 className="font-display text-2xl text-gray-900">Products</h1><p className="text-sm text-gray-500 mt-0.5">{filteredProducts.length} shown · {total} total</p></div>
           <button onClick={openNew} className="text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all hover:-translate-y-0.5" style={{ backgroundColor: 'var(--tenant-primary)' }}>+ Add product</button>
         </div>
         {/* Category filter tabs */}
@@ -75,7 +81,7 @@ export default function AdminProducts({ tenant, adminUser }) {
             {categories.map(cat => (
               <button
                 key={cat}
-                onClick={() => setActiveCategory(cat)}
+                onClick={() => handleCategoryChange(cat)}
                 className={`flex-shrink-0 text-xs font-semibold px-4 py-2 rounded-full transition-all whitespace-nowrap ${
                   activeCategory === cat ? 'text-white shadow-sm' : 'bg-white text-gray-500 hover:text-gray-800 border border-gray-200'
                 }`}

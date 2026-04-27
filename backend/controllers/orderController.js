@@ -171,7 +171,15 @@ exports.listAll = async (req, res, next) => {
         : [],
     }));
 
-    ok(res, { orders: parsed });
+    // Get total count for pagination
+    const countParams = [req.tenant.id];
+    let countWhere = 'WHERE o.tenant_id = ?';
+    if (status) { countWhere += ' AND o.status = ?'; countParams.push(status); }
+    const [[{ total }]] = await db.query(
+      `SELECT COUNT(DISTINCT o.id) AS total FROM orders o ${countWhere}`, countParams
+    );
+
+    ok(res, { orders: parsed, total: parseInt(total), page: parseInt(page), limit: parseInt(limit) });
   } catch (err) { next(err); }
 };
 
