@@ -128,12 +128,15 @@ export default function ProductDetailPage({ tenant, product }) {
                 <p className="text-gray-500 leading-relaxed">{product.description}</p>
               )}
 
-              <div className="flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-full ${available > 0 ? 'bg-green-400' : 'bg-red-400'}`} />
-                <span className={`text-sm font-medium ${available > 0 ? 'text-green-700' : 'text-red-600'}`}>
-                  {available > 0 ? `In stock (${available} available)` : 'Currently out of stock'}
-                </span>
-              </div>
+              {/* Stock badge — hidden for customisable products */}
+              {!needsOptions && (
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${available > 0 ? 'bg-green-400' : 'bg-red-400'}`} />
+                  <span className={`text-sm font-medium ${available > 0 ? 'text-green-700' : 'text-red-600'}`}>
+                    {available > 0 ? `In stock (${available} available)` : 'Currently out of stock'}
+                  </span>
+                </div>
+              )}
 
               {product.delivery_time && (
                 <div className="flex items-center gap-2.5 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3">
