@@ -6,6 +6,7 @@ import { useTenant } from '../../context/TenantContext';
 import { useToast } from './Toast';
 import CinematicImage from './CinematicImage';
 import CustomizeModal from './CustomizeModal';
+import ImageGallery from './ImageGallery';
 
 function hasCustomization(product) {
   if (!product.customization_options) return false;
@@ -26,6 +27,7 @@ export default function ProductCard({ product, index = 0 }) {
   const tenant         = useTenant();
   const router         = useRouter();
   const [showModal,    setShowModal]    = useState(false);
+  const [showGallery,  setShowGallery]  = useState(false);
   const [needsOptions, setNeedsOptions] = useState(false);
   const [isHovered,    setIsHovered]    = useState(false);
 
@@ -38,6 +40,19 @@ export default function ProductCard({ product, index = 0 }) {
     : null;
 
   const available = product.available_qty ?? product.stock_qty ?? 0;
+
+  // Build full images list for gallery
+  const allImages = (() => {
+    const imgs = [];
+    if (product.image_url) imgs.push(product.image_url);
+    if (product.images) {
+      const extra = typeof product.images === 'string'
+        ? JSON.parse(product.images || '[]')
+        : product.images;
+      extra.forEach(i => { const u = i?.url || i; if (u && !imgs.includes(u)) imgs.push(u); });
+    }
+    return imgs;
+  })();
 
   useEffect(() => {
     setNeedsOptions(hasCustomization(product));
@@ -69,7 +84,8 @@ export default function ProductCard({ product, index = 0 }) {
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       >
         {/* ── Cinematic image ── */}
-        <div className="relative aspect-[4/3] sm:aspect-square overflow-hidden bg-stone-100 flex-shrink-0">
+        <div className="relative aspect-[4/3] sm:aspect-square overflow-hidden bg-stone-100 flex-shrink-0"
+             onClick={e => { if (allImages.length > 0) { e.stopPropagation(); setShowGallery(true); } }}>
           <CinematicImage
             src={product.image_url}
             alt={product.name}
@@ -80,6 +96,14 @@ export default function ProductCard({ product, index = 0 }) {
           />
 
           {/* Category badge */}
+          {allImages.length > 1 && (
+            <div className="absolute bottom-2 right-2 z-10 bg-black/50 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm flex items-center gap-1">
+              <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              {allImages.length}
+            </div>
+          )}
           {product.category && (
             <motion.span
               initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
@@ -185,6 +209,11 @@ export default function ProductCard({ product, index = 0 }) {
       {showModal && (
         <CustomizeModal product={product} onClose={() => setShowModal(false)} />
       )}
+      <AnimatePresence>
+        {showGallery && (
+          <ImageGallery images={allImages} alt={product.name} onClose={() => setShowGallery(false)} />
+        )}
+      </AnimatePresence>
     </>
   );
 }

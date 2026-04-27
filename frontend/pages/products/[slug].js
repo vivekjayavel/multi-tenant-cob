@@ -4,6 +4,7 @@ import Layout from '../../components/layout/Layout';
 import MetaTags from '../../components/seo/MetaTags';
 import CinematicImage from '../../components/ui/CinematicImage';
 import CustomizeModal from '../../components/ui/CustomizeModal';
+import ImageGallery from '../../components/ui/ImageGallery';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../components/ui/Toast';
 const { productDetailSeo }    = require('../../lib/seo');
@@ -22,10 +23,21 @@ function hasCustomization(product) {
 export default function ProductDetailPage({ tenant, product }) {
   const [qty,       setQty]       = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [showGallery, setShowGallery] = useState(false);
   const { dispatch } = useCart();
   const toast = useToast();
   const seo          = productDetailSeo(tenant, product);
   const available    = product.available_qty ?? product.stock_qty ?? 0;
+  const allImages = (() => {
+    const imgs = [];
+    if (product.image_url) imgs.push(product.image_url);
+    if (product.images) {
+      const extra = typeof product.images === 'string'
+        ? JSON.parse(product.images || '[]') : product.images;
+      extra.forEach(i => { const u = i?.url || i; if (u && !imgs.includes(u)) imgs.push(u); });
+    }
+    return imgs;
+  })();
   const needsOptions = hasCustomization(product);
 
   const whatsappHref = tenant?.whatsapp_number
@@ -52,7 +64,8 @@ export default function ProductDetailPage({ tenant, product }) {
 
             {/* Image */}
             <motion.div initial={{ opacity:0, x:-30 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.7, ease:[0.16,1,0.3,1] }}
-              className="relative aspect-square rounded-3xl overflow-hidden bg-stone-100 shadow-2xl">
+              className="relative aspect-square rounded-3xl overflow-hidden bg-stone-100 shadow-2xl cursor-pointer"
+              onClick={() => allImages.length > 0 && setShowGallery(true)}>
               <CinematicImage
                 src={product.image_url}
                 alt={product.name}
@@ -61,6 +74,14 @@ export default function ProductDetailPage({ tenant, product }) {
                 containerClassName="w-full h-full"
                 fallback={<div className="w-full h-full flex items-center justify-center text-8xl opacity-20">🎂</div>}
               />
+              {allImages.length > 1 && (
+                <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs font-semibold px-2.5 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5">
+                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                  {allImages.length} photos
+                </div>
+              )}
               {product.category && (
                 <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-600 px-3 py-1.5 rounded-full shadow-sm">
                   {product.category}
@@ -73,6 +94,17 @@ export default function ProductDetailPage({ tenant, product }) {
                 </span>
               )}
             </motion.div>
+            {/* Thumbnail strip */}
+            {allImages.length > 1 && (
+              <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide">
+                {allImages.map((img, i) => (
+                  <button key={i} onClick={() => setShowGallery(true)}
+                    className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border-2 border-transparent hover:border-gray-300 transition-all">
+                    <img src={img} alt={`${product.name} ${i+1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Details */}
             <motion.div initial={{ opacity:0, x:30 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.7, delay:0.1, ease:[0.16,1,0.3,1] }}
@@ -175,7 +207,7 @@ export async function getServerSideProps({ req, params, res }) {
   if (!productRow) return { notFound: true };
   if (!productRow.is_active) { res.statusCode = 410; return { props: { tenant, product: null, deleted: true } }; }
   const [[product]] = await db.query(
-    'SELECT id, name, description, price, image_url, category, slug, stock_qty, reserved_qty, customization_options, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1',
+    'SELECT id, name, description, price, image_url, images, category, slug, stock_qty, reserved_qty, customization_options, delivery_time, sort_order, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1',
     [tenant.id, params.slug]
   );
   if (!product) return { notFound: true };
