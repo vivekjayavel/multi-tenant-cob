@@ -131,10 +131,22 @@ app.prepare().then(() => {
     server.all('*', (req, res) => handle(req, res));
   }
 
-  const PORT = parseInt(process.env.PORT) || 3000;
-  const httpServer = server.listen(PORT, () =>
-    logger.info('Server started', { port: PORT, env: process.env.NODE_ENV, pid: process.pid })
-  );
+  const SOCKET = process.env.LSNODE_SOCKET;
+  const PORT   = parseInt(process.env.PORT) || 3000;
+
+  if (SOCKET) {
+    // Hostinger LiteSpeed uses Unix socket
+    const fs = require('fs');
+    if (fs.existsSync(SOCKET)) fs.unlinkSync(SOCKET);
+    const httpServer = server.listen(SOCKET, () => {
+      fs.chmodSync(SOCKET, '777');
+      logger.info('Server started', { socket: SOCKET, env: process.env.NODE_ENV, pid: process.pid });
+    });
+  } else {
+    const httpServer = server.listen(PORT, () =>
+      logger.info('Server started', { port: PORT, env: process.env.NODE_ENV, pid: process.pid })
+    );
+  }
 
   // ── Forward WebSocket upgrades to Next.js HMR ──────────────
   // Express handles HTTP only. Without this, /_next/webpack-hmr
