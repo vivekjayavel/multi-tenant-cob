@@ -38,11 +38,13 @@ async function getProductsForPage(tenantId, category = null) {
   const enriched   = products.map(p => ({
     ...p,
     available_qty: Math.max(0, p.stock_qty - p.reserved_qty),
-    // Normalize to string so SSR and client JSON.parse produce same type
     customization_options: p.customization_options
       ? (typeof p.customization_options === 'string'
           ? p.customization_options
           : JSON.stringify(p.customization_options))
+      : null,
+    images: p.images
+      ? (typeof p.images === 'string' ? p.images : JSON.stringify(p.images))
       : null,
   }));
   const serialized = JSON.parse(JSON.stringify(enriched));
@@ -65,11 +67,13 @@ async function getFeaturedProducts(tenantId, limit = 8) {
   const enriched   = products.map(p => ({
     ...p,
     available_qty: Math.max(0, p.stock_qty - p.reserved_qty),
-    // Normalize to string so SSR and client JSON.parse produce same type
     customization_options: p.customization_options
       ? (typeof p.customization_options === 'string'
           ? p.customization_options
           : JSON.stringify(p.customization_options))
+      : null,
+    images: p.images
+      ? (typeof p.images === 'string' ? p.images : JSON.stringify(p.images))
       : null,
   }));
   const serialized = JSON.parse(JSON.stringify(enriched));
@@ -126,6 +130,12 @@ async function getProductsByCategory(tenantId) {
       // Sort within category by sort_order ASC then created_at DESC
       products: JSON.parse(JSON.stringify(
         [...prods].sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0))
+          .map(p => ({
+            ...p,
+            images: p.images
+              ? (typeof p.images === 'string' ? p.images : JSON.stringify(p.images))
+              : null,
+          }))
       )),
     }));
 }

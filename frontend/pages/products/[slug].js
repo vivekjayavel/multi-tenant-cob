@@ -219,5 +219,11 @@ export async function getServerSideProps({ req, params, res }) {
           ? product.customization_options
           : JSON.stringify(product.customization_options))
       : null,
+    // Normalize images to JSON string for consistent SSR/client handling
+    images: product.images
+      ? (typeof product.images === 'string'
+          ? product.images
+          : JSON.stringify(product.images))
+      : null,
   })) } };
 }
