@@ -148,6 +148,7 @@ function FeatureCard({ f }) {
 }
 
 export async function getServerSideProps({ req, query }) {
+  console.log('[SSR] host:', req.headers.host, 'x-forwarded-host:', req.headers['x-forwarded-host']);
   let tenant;
   try {
     tenant = await getTenantFromRequest(req);
@@ -157,7 +158,7 @@ export async function getServerSideProps({ req, query }) {
   }
   if (!tenant) {
     console.error('[SSR] No tenant found for host:', req.headers.host, '| x-forwarded-host:', req.headers['x-forwarded-host']);
-    return { props: { tenant: { name: process.env.DEFAULT_TENANT_NAME || 'Rainbow Bakes', id: 1 }, categoryGroups: [], settings: null } };
+    return { props: { tenant: { id: 1, name: 'Rainbow Bakes', domain: 'rainbowbakes.in', theme_color: '#D97706', logo_url: null, whatsapp_number: null, tenant_settings: null }, categoryGroups: [], settings: null } };
   }
 
   const categoryGroups = await getProductsByCategory(tenant.id);
