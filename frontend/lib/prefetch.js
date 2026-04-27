@@ -10,7 +10,7 @@ async function getTenantFromRequest(req) {
   // after admin changes. Tenant queries are tiny (1 row, indexed) so
   // the DB hit is negligible.
   const db     = require('../../backend/config/db');
-  const domain = (req.headers.host || '').split(':')[0].toLowerCase();
+  const domain = (req.headers['x-forwarded-host'] || req.headers.host || process.env.DEFAULT_DOMAIN || '').split(':')[0].toLowerCase();
 
   const [rows] = await db.query(
     'SELECT id, name, domain, logo_url, theme_color, whatsapp_number, tenant_settings FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1',

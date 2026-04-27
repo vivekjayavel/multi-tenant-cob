@@ -5,7 +5,8 @@ const { logger }      = require('../config/logger');
 
 async function tenantMiddleware(req, res, next) {
   try {
-    const domain   = (req.headers.host || '').split(':')[0].toLowerCase();
+    const rawHost  = (req.headers['x-forwarded-host'] || req.headers.host || '').split(':')[0].toLowerCase();
+    const domain   = rawHost || process.env.DEFAULT_DOMAIN || '';
     if (!domain) return res.status(400).json({ success: false, message: 'Missing host header' });
     const cacheKey = `domain:${domain}`;
     const cached   = tenantCache.get(cacheKey);
