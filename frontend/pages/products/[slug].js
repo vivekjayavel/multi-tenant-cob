@@ -24,6 +24,7 @@ export default function ProductDetailPage({ tenant, product }) {
   const [qty,       setQty]       = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
+  const [activeImageIdx, setActiveImageIdx] = useState(0);
   const { dispatch } = useCart();
   const toast = useToast();
   const seo          = productDetailSeo(tenant, product);
@@ -62,49 +63,56 @@ export default function ProductDetailPage({ tenant, product }) {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-36 pb-20">
           <div className="grid md:grid-cols-2 gap-12 items-start">
 
-            {/* Image */}
+            {/* Image gallery */}
             <motion.div initial={{ opacity:0, x:-30 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.7, ease:[0.16,1,0.3,1] }}
-              className="relative aspect-square rounded-3xl overflow-hidden bg-stone-100 shadow-2xl cursor-pointer"
-              onClick={() => allImages.length > 0 && setShowGallery(true)}>
-              <CinematicImage
-                src={product.image_url}
-                alt={product.name}
-                reveal="blur"
-                tilt={true}
-                containerClassName="w-full h-full"
-                fallback={<div className="w-full h-full flex items-center justify-center text-8xl opacity-20">🎂</div>}
-              />
+              className="flex flex-col gap-3">
+
+              {/* Main selected image */}
+              <div className="relative aspect-square rounded-3xl overflow-hidden bg-stone-100 shadow-2xl cursor-pointer"
+                onClick={() => allImages.length > 0 && setShowGallery(true)}>
+                <img
+                  src={allImages[activeImageIdx] || product.image_url}
+                  alt={product.name}
+                  className="w-full h-full object-cover transition-opacity duration-300"
+                />
+                {product.category && (
+                  <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-600 px-3 py-1.5 rounded-full shadow-sm">
+                    {product.category}
+                  </span>
+                )}
+                {needsOptions && (
+                  <span className="absolute top-4 right-4 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm"
+                    style={{ backgroundColor: 'var(--tenant-primary)' }}>
+                    ✦ Customisable
+                  </span>
+                )}
+                {allImages.length > 1 && (
+                  <div className="absolute bottom-3 right-3 bg-black/50 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm">
+                    {activeImageIdx + 1} / {allImages.length}
+                  </div>
+                )}
+              </div>
+
+              {/* Scrollable thumbnail strip */}
               {allImages.length > 1 && (
-                <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs font-semibold px-2.5 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                  </svg>
-                  {allImages.length} photos
+                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                  {allImages.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setActiveImageIdx(i)}
+                      className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl overflow-hidden border-2 transition-all duration-200 ${
+                        activeImageIdx === i
+                          ? 'border-current scale-105 shadow-md'
+                          : 'border-transparent opacity-60 hover:opacity-90'
+                      }`}
+                      style={activeImageIdx === i ? { borderColor: 'var(--tenant-primary)' } : {}}
+                    >
+                      <img src={img} alt={`${product.name} ${i+1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
                 </div>
               )}
-              {product.category && (
-                <span className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm text-xs font-semibold text-gray-600 px-3 py-1.5 rounded-full shadow-sm">
-                  {product.category}
-                </span>
-              )}
-              {needsOptions && (
-                <span className="absolute top-4 right-4 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm"
-                  style={{ backgroundColor: 'var(--tenant-primary)' }}>
-                  ✦ Customisable
-                </span>
-              )}
             </motion.div>
-            {/* Thumbnail strip */}
-            {allImages.length > 1 && (
-              <div className="flex gap-2 mt-3 overflow-x-auto scrollbar-hide">
-                {allImages.map((img, i) => (
-                  <button key={i} onClick={() => setShowGallery(true)}
-                    className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 border-2 border-transparent hover:border-gray-300 transition-all">
-                    <img src={img} alt={`${product.name} ${i+1}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
 
             {/* Details */}
             <motion.div initial={{ opacity:0, x:30 }} animate={{ opacity:1, x:0 }} transition={{ duration:0.7, delay:0.1, ease:[0.16,1,0.3,1] }}
