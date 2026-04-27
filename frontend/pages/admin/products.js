@@ -23,6 +23,9 @@ export default function AdminProducts({ tenant, adminUser }) {
   const [error,    setError]    = useState(null);
   const [panel,    setPanel]    = useState(false);
 
+  const [page,    setPage]    = useState(1);
+  const [total,   setTotal]   = useState(0);
+  const LIMIT = 12;
   const [activeCategory, setActiveCategory] = useState('All');
   const handleCategoryChange = (cat) => { setActiveCategory(cat); setPage(1); };
 

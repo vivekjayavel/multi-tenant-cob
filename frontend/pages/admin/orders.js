@@ -25,6 +25,9 @@ export default function AdminOrders({ tenant, adminUser }) {
   const [updating, setUpdating] = useState(null);
   const toast = useToast();
   const [error,    setError]    = useState(null);
+  const [page,    setPage]    = useState(1);
+  const [total,   setTotal]   = useState(0);
+  const LIMIT = 15;
 
   const load = async (status) => {
     setLoading(true);
