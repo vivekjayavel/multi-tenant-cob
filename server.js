@@ -137,10 +137,7 @@ app.prepare().then(() => {
 
   if (SOCKET) {
     // Hostinger LiteSpeed uses Unix socket
-    const fs = require('fs');
-    if (fs.existsSync(SOCKET)) fs.unlinkSync(SOCKET);
     const httpServer = server.listen(SOCKET, () => {
-      fs.chmodSync(SOCKET, '777');
       logger.info('Server started', { socket: SOCKET, env: process.env.NODE_ENV, pid: process.pid });
     });
   } else {
