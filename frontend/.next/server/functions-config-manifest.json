@@ -1,1 +1,1 @@
-{"version":1,"functions":{"/admin":{},"/cart":{},"/admin/orders":{},"/admin/products":{},"/":{},"/checkout":{},"/products/[slug]":{},"/admin/settings":{},"/products":{},"/login":{}}}
+{"version":1,"functions":{"/admin":{},"/admin/orders":{},"/":{},"/admin/products":{},"/admin/settings":{},"/cart":{},"/login":{},"/checkout":{},"/products/[slug]":{},"/products":{}}}
