@@ -3,7 +3,7 @@ import { m as motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 
 export default function CartDrawer({ open, onClose }) {
-  const { items, total, dispatch, hydrated } = useCart();
+  const { items, total, originalTotal, totalSavings, dispatch, hydrated } = useCart();
   return (
     <AnimatePresence>
       {open && (
@@ -53,9 +53,27 @@ export default function CartDrawer({ open, onClose }) {
               </AnimatePresence>
             </div>
             {items.length > 0 && (
-              <div className="px-6 py-5 border-t border-gray-100 space-y-3">
-                <div className="flex justify-between text-sm"><span className="text-gray-500">Subtotal</span><span className="font-semibold text-gray-900">₹{total.toFixed(2)}</span></div>
-                <Link href="/checkout" onClick={onClose} className="block w-full text-white text-sm font-semibold py-3.5 rounded-xl text-center transition-colors duration-200" style={{ backgroundColor: 'var(--tenant-primary)' }}>Proceed to Checkout</Link>
+              <div className="px-6 py-5 border-t border-gray-100 space-y-2">
+                {totalSavings > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-400 line-through">MRP</span>
+                    <span className="text-gray-400 line-through">₹{originalTotal.toFixed(2)}</span>
+                  </div>
+                )}
+                {totalSavings > 0 && (
+                  <div className="flex justify-between text-xs">
+                    <span className="text-green-600 font-medium">🎉 Discount</span>
+                    <span className="text-green-600 font-semibold">-₹{totalSavings.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm border-t border-gray-50 pt-2">
+                  <span className="text-gray-700 font-semibold">Total</span>
+                  <span className="font-bold text-gray-900">₹{total.toFixed(2)}</span>
+                </div>
+                {totalSavings > 0 && (
+                  <p className="text-[10px] text-green-600 text-center font-semibold bg-green-50 rounded-lg py-1.5">You save ₹{totalSavings.toFixed(2)} 🎂</p>
+                )}
+                <Link href="/checkout" onClick={onClose} className="block w-full text-white text-sm font-semibold py-3.5 rounded-xl text-center transition-colors duration-200 mt-1" style={{ backgroundColor: 'var(--tenant-primary)' }}>Proceed to Checkout</Link>
                 <button onClick={() => dispatch({ type: 'CLEAR' })} className="block w-full text-sm text-gray-400 hover:text-gray-600 transition-colors py-1">Clear cart</button>
               </div>
             )}

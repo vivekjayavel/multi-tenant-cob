@@ -40,13 +40,14 @@ export default function CustomizeModal({ product, onClose }) {
     dispatch({
       type: 'ADD',
       item: {
-        id:            product.id,
-        name:          product.name,
-        price:         unitPrice,
-        image_url:     product.image_url,
-        slug:          product.slug,
-        quantity:      qty,
-        customization: Object.keys(customization).length ? customization : undefined,
+        id:             product.id,
+        name:           product.name,
+        price:          unitPrice,
+        original_price: getWeightPrice(selections.weight, originalPrice, 1),
+        image_url:      product.image_url,
+        slug:           product.slug,
+        quantity:       qty,
+        customization:  Object.keys(customization).length ? customization : undefined,
       },
     });
     toast({ message: `${itemName} added to cart 🛒`, type: 'success', duration: 2000 });

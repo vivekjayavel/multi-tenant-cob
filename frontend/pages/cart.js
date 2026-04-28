@@ -7,7 +7,7 @@ const { noindexSeo }           = require('../lib/seo');
 const { getTenantFromRequest } = require('../lib/prefetch');
 
 export default function CartPage({ tenant }) {
-  const { items, total, dispatch, hydrated } = useCart();
+  const { items, total, originalTotal, totalSavings, dispatch, hydrated } = useCart();
   const seo = noindexSeo(tenant, 'Cart');
 
   return (
@@ -71,12 +71,29 @@ export default function CartPage({ tenant }) {
                   </motion.div>
                 ))}
               </AnimatePresence>
-              <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mt-6">
-                <div className="flex justify-between text-sm mb-4">
-                  <span className="text-gray-500">Subtotal</span>
-                  <span className="font-semibold text-gray-900">₹{total.toFixed(2)}</span>
+              <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm mt-6 space-y-3">
+                {totalSavings > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-400 line-through">MRP</span>
+                    <span className="text-gray-400 line-through">₹{originalTotal.toFixed(2)}</span>
+                  </div>
+                )}
+                {totalSavings > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-600 font-medium">🎉 Discount</span>
+                    <span className="text-green-600 font-semibold">-₹{totalSavings.toFixed(2)}</span>
+                  </div>
+                )}
+                <div className="flex justify-between text-sm border-t border-gray-100 pt-3">
+                  <span className="text-gray-700 font-semibold">Total</span>
+                  <span className="font-bold text-gray-900 text-base">₹{total.toFixed(2)}</span>
                 </div>
-                <Link href="/checkout" className="block w-full text-white text-sm font-semibold py-4 rounded-xl text-center transition-all hover:-translate-y-0.5"
+                {totalSavings > 0 && (
+                  <div className="bg-green-50 rounded-xl px-4 py-2 text-center">
+                    <p className="text-xs text-green-700 font-semibold">You save ₹{totalSavings.toFixed(2)} on this order! 🎂</p>
+                  </div>
+                )}
+                <Link href="/checkout" className="block w-full text-white text-sm font-semibold py-4 rounded-xl text-center transition-all hover:-translate-y-0.5 mt-2"
                   style={{ backgroundColor: 'var(--tenant-primary)' }}>Proceed to Checkout</Link>
               </div>
             </div>

@@ -56,11 +56,13 @@ export function CartProvider({ children }) {
     if (hydrated) localStorage.setItem('cart', JSON.stringify(state.items));
   }, [state.items, hydrated]);
 
-  const total     = state.items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const total          = state.items.reduce((s, i) => s + i.price * i.quantity, 0);
+  const originalTotal  = state.items.reduce((s, i) => s + (i.original_price || i.price) * i.quantity, 0);
+  const totalSavings   = originalTotal - total;
   const itemCount = state.items.reduce((s, i) => s + i.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ ...state, total, itemCount, hydrated, dispatch }}>
+    <CartContext.Provider value={{ ...state, total, originalTotal, totalSavings, itemCount, hydrated, dispatch }}>
       {children}
     </CartContext.Provider>
   );
