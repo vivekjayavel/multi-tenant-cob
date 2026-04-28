@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { m as motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useToast } from './Toast';
 
@@ -42,7 +42,7 @@ export default function CustomizeModal({ product, onClose }) {
       item: {
         id:            product.id,
         name:          product.name,
-        price:         parseFloat(product.price),
+        price:         unitPrice,
         image_url:     product.image_url,
         slug:          product.slug,
         quantity:      qty,
@@ -54,6 +54,8 @@ export default function CustomizeModal({ product, onClose }) {
   };
 
   const available = product.available_qty ?? product.stock_qty ?? 0;
+  const basePrice = parseFloat(product.price);
+  const unitPrice = getWeightPrice(selections.weight, basePrice);
 
   return (
     <AnimatePresence>
@@ -83,7 +85,7 @@ export default function CustomizeModal({ product, onClose }) {
             <div className="flex-1 min-w-0">
               <h2 className="font-display font-bold text-gray-900 text-lg leading-tight">{product.name}</h2>
               <p className="font-bold text-base mt-0.5" style={{ color: 'var(--tenant-primary)' }}>
-                ₹{parseFloat(product.price).toLocaleString('en-IN')}
+                ₹{unitPrice.toLocaleString('en-IN')}
               </p>
               {product.delivery_time && (
                 <div className="flex items-center gap-1.5 mt-1.5">
@@ -113,7 +115,7 @@ export default function CustomizeModal({ product, onClose }) {
 
             {/* Weight */}
             {opts.weight?.enabled && opts.weight.options.length > 0 && (
-              <DropdownField
+              <WeightField
                 label={opts.weight.label || 'Weight'}
                 value={selections.weight}
                 options={opts.weight.options}
@@ -200,7 +202,7 @@ export default function CustomizeModal({ product, onClose }) {
             <div className="flex items-center justify-between text-sm mb-3">
               <span className="text-gray-500">Total</span>
               <span className="font-bold text-lg" style={{ color: 'var(--tenant-primary)' }}>
-                ₹{(parseFloat(product.price) * qty).toLocaleString('en-IN')}
+                ₹{(unitPrice * qty).toLocaleString('en-IN')}
               </span>
             </div>
             <motion.button
@@ -215,6 +217,39 @@ export default function CustomizeModal({ product, onClose }) {
         </motion.div>
       </motion.div>
     </AnimatePresence>
+  );
+}
+
+function WeightField({ label, value, options, onChange, required }) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
+        {label}
+        {required && <span className="ml-1 text-red-400">*</span>}
+      </label>
+      <div className="flex flex-wrap gap-2">
+        {options.map(opt => {
+          const { label: optLabel, price } = parseWeightOption(opt);
+          const isSelected = value === opt;
+          return (
+            <button key={opt} onClick={() => onChange(opt)}
+              className={`px-4 py-2 rounded-full text-sm font-medium border-2 transition-all ${
+                isSelected
+                  ? 'text-white border-transparent shadow-sm'
+                  : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'
+              }`}
+              style={isSelected ? { backgroundColor: 'var(--tenant-primary)', borderColor: 'var(--tenant-primary)' } : {}}>
+              <span>{optLabel}</span>
+              {price !== null && (
+                <span className={`ml-1 text-xs ${isSelected ? 'text-white/80' : 'text-gray-400'}`}>
+                  ₹{price.toLocaleString('en-IN')}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -248,4 +283,20 @@ function parseOptions(raw) {
   try {
     return typeof raw === 'string' ? JSON.parse(raw) : raw;
   } catch { return {}; }
+}
+
+// Parse weight option: "1kg|1499" → { label: "1kg", price: 1499 }
+// Plain "1kg" → { label: "1kg", price: null }
+function parseWeightOption(opt) {
+  const parts = String(opt).split('|');
+  return {
+    label: parts[0].trim(),
+    price: parts[1] ? parseFloat(parts[1]) : null,
+  };
+}
+
+function getWeightPrice(weightValue, basePrice) {
+  if (!weightValue) return basePrice;
+  const parsed = parseWeightOption(weightValue);
+  return parsed.price !== null ? parsed.price : basePrice;
 }
