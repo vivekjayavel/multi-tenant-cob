@@ -31,7 +31,7 @@ async function getProductsForPage(tenantId, category = null) {
   if (cached) return cached;
 
   const params = category ? [tenantId, category] : [tenantId];
-  const sql = `SELECT id, name, description, price, image_url, images, category, slug, stock_qty, reserved_qty, customization_options, delivery_time, sort_order
+  const sql = `SELECT id, name, description, price, sale_price, image_url, images, category, slug, stock_qty, reserved_qty, customization_options, delivery_time, sort_order
                FROM products
                WHERE tenant_id = ? AND is_active = 1
                ${category ? 'AND category = ?' : ''}
@@ -64,7 +64,7 @@ async function getFeaturedProducts(tenantId, limit = 8) {
   if (cached) return cached;
 
   const [products] = await db.query(
-    'SELECT id, name, description, price, image_url, images, category, slug, stock_qty, reserved_qty, customization_options, delivery_time, sort_order FROM products WHERE tenant_id = ? AND is_active = 1 ORDER BY sort_order ASC, created_at DESC LIMIT ?',
+    'SELECT id, name, description, price, sale_price, image_url, images, category, slug, stock_qty, reserved_qty, customization_options, delivery_time, sort_order FROM products WHERE tenant_id = ? AND is_active = 1 ORDER BY sort_order ASC, created_at DESC LIMIT ?',
     [tenantId, limit]
   );
   const enriched   = products.map(p => ({
@@ -94,7 +94,7 @@ function notFoundOrProps(data) {
 async function getProductsByCategory(tenantId) {
   const db = require('../../backend/config/db');
   const [products] = await db.query(
-    `SELECT id, name, description, price, image_url, images, category, slug,
+    `SELECT id, name, description, price, sale_price, image_url, images, category, slug,
             stock_qty, reserved_qty, customization_options, delivery_time, sort_order
      FROM products
      WHERE tenant_id = ? AND is_active = 1
