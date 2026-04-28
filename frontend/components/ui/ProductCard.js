@@ -115,7 +115,7 @@ export default function ProductCard({ product, index = 0 }) {
           )}
 
           {/* Customisable badge */}
-          {needsOptions && (
+          {needsOptions && !product.sale_price && (
             <motion.span
               initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
               className="absolute top-3 right-3 text-white text-[10px] font-bold px-2 py-1 rounded-full z-10"
@@ -123,6 +123,29 @@ export default function ProductCard({ product, index = 0 }) {
             >
               ✦ Customisable
             </motion.span>
+          )}
+          {needsOptions && product.sale_price && parseFloat(product.sale_price) < parseFloat(product.price) && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+              className="absolute bottom-10 right-2 text-white text-[10px] font-bold px-2 py-1 rounded-full z-10"
+              style={{ backgroundColor: 'var(--tenant-primary)' }}
+            >
+              ✦ Customisable
+            </motion.span>
+          )}
+
+          {/* Sale badge */}
+          {product.sale_price && parseFloat(product.sale_price) < parseFloat(product.price) && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8, rotate: -12 }}
+              animate={{ opacity: 1, scale: 1, rotate: -12 }}
+              transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+              className="absolute top-3 right-3 z-10"
+            >
+              <div className="bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full shadow-lg tracking-wide">
+                🔥 {Math.round((1 - parseFloat(product.sale_price) / parseFloat(product.price)) * 100)}% OFF
+              </div>
+            </motion.div>
           )}
 
           {/* Sold out */}
