@@ -77,6 +77,8 @@ exports.update = async (req, res, next) => {
         }
         // Treat empty string as NULL for JSON columns
         if ((key === 'customization_options' || key === 'images') && val === '') val = null;
+        // Treat empty string as NULL for numeric fields
+        if ((key === 'sale_price' || key === 'delivery_time') && val === '') val = null;
         fields.push(`${key} = ?`);
         values.push(val);
       }
