@@ -176,13 +176,19 @@ export default function ProductCard({ product, index = 0 }) {
 
           {/* Price + CTA */}
           <div className="flex items-center justify-between mt-auto pt-3">
-            <motion.p
-              className="font-bold text-base sm:text-lg"
-              style={{ color: 'var(--tenant-primary)' }}
-  
-            >
-              ₹{parseFloat(product.price).toLocaleString('en-IN')}
-            </motion.p>
+            <div className="flex flex-col">
+              <motion.p
+                className="font-bold text-base sm:text-lg"
+                style={{ color: 'var(--tenant-primary)' }}
+              >
+                ₹{parseFloat(product.sale_price || product.price).toLocaleString('en-IN')}
+              </motion.p>
+              {product.sale_price && parseFloat(product.sale_price) < parseFloat(product.price) && (
+                <p className="text-xs text-gray-400 line-through">
+                  ₹{parseFloat(product.price).toLocaleString('en-IN')}
+                </p>
+              )}
+            </div>
 
             <motion.button
               onClick={handleAdd}

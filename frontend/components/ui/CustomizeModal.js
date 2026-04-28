@@ -54,7 +54,7 @@ export default function CustomizeModal({ product, onClose }) {
   };
 
   const available = product.available_qty ?? product.stock_qty ?? 0;
-  const basePrice = parseFloat(product.price);
+  const basePrice = parseFloat(product.sale_price || product.price);
   const unitPrice = getWeightPrice(selections.weight, basePrice);
 
   return (
