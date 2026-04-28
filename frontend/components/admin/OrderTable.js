@@ -167,6 +167,30 @@ function OrderRow({ o, onStatusChange, updating }) {
                     );
                   })}
                 </div>
+                {/* Order total summary */}
+                {(() => {
+                  const itemsTotal = (o.items || []).reduce((s, i) => s + parseFloat(i.price) * i.quantity, 0);
+                  const orderTotal = parseFloat(o.total_price);
+                  const savings = itemsTotal - orderTotal;
+                  return itemsTotal > 0 ? (
+                    <div className="mt-3 bg-white rounded-xl p-3 border border-gray-100 space-y-1.5">
+                      <div className="flex justify-between text-xs text-gray-500">
+                        <span>Items subtotal</span>
+                        <span>₹{itemsTotal.toLocaleString('en-IN')}</span>
+                      </div>
+                      {savings > 0.01 && (
+                        <div className="flex justify-between text-xs text-green-600 font-medium">
+                          <span>🎉 Discount applied</span>
+                          <span>-₹{savings.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between text-sm font-bold border-t border-gray-100 pt-1.5">
+                        <span>Order Total</span>
+                        <span style={{ color: 'var(--tenant-primary)' }}>₹{orderTotal.toLocaleString('en-IN')}</span>
+                      </div>
+                    </div>
+                  ) : null;
+                })()}
               </div>
 
               {/* Delivery + notes */}
