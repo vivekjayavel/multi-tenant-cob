@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { m as motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import useOrderNotifications from '../../hooks/useOrderNotifications';
 
 export default function NotificationBell() {
@@ -22,9 +22,11 @@ export default function NotificationBell() {
   const handleOpen = () => {
     if (!open && bellRef.current) {
       const rect = bellRef.current.getBoundingClientRect();
-      // Always open to the right of the sidebar (224px wide), aligned with bell top
-      const sidebarWidth = 224;
-      setDropPos({ top: rect.bottom + 6, left: sidebarWidth + 8 });
+      const isMobile = window.innerWidth < 768;
+      const left = isMobile
+        ? Math.max(8, Math.min(rect.left - 240, window.innerWidth - 328))
+        : 224 + 8;
+      setDropPos({ top: rect.bottom + 6, left });
     }
     setOpen(o => !o);
     if (!open) clearNotifications();

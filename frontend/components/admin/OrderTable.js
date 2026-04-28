@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { m as motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const STATUS_COLORS = {
   pending:       'bg-yellow-100 text-yellow-800',

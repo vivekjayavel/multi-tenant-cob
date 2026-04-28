@@ -2,7 +2,8 @@
   "components\\admin\\AdminLayout.js -> ./NotificationBell": {
     "id": 3279,
     "files": [
-      "static/chunks/279.aca8912d677e38fb.js"
+      "static/chunks/172-16a0c4e3939626bd.js",
+      "static/chunks/279.5ffa50f0749b8422.js"
     ]
   },
   "pages\\index.js -> ../components/ui/SwiperCarousel": {
