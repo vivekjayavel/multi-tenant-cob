@@ -32,7 +32,7 @@ export default function CartDrawer({ open, onClose }) {
                         <div className="mt-1 space-y-0.5">
                           {Object.entries(item.customization).map(([k, v]) => v && (
                             <p key={k} className="text-[10px] text-gray-400 leading-tight">
-                              <span className="capitalize font-medium text-gray-500">{k}:</span> {v}
+                              <span className="capitalize font-medium text-gray-500">{k}:</span> {k === 'weight' ? String(v).split('|')[0] : v}
                             </p>
                           ))}
                         </div>

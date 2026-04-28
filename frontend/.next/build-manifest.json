@@ -5,8 +5,8 @@
   "devFiles": [],
   "ampDevFiles": [],
   "lowPriorityFiles": [
-    "static/EEq6K-U6jBcB0sAeeWGQp/_buildManifest.js",
-    "static/EEq6K-U6jBcB0sAeeWGQp/_ssgManifest.js"
+    "static/RSMIMVs_6bMyhW22XSgHD/_buildManifest.js",
+    "static/RSMIMVs_6bMyhW22XSgHD/_ssgManifest.js"
   ],
   "rootMainFiles": [],
   "pages": {
@@ -18,7 +18,7 @@
       "static/chunks/894-64a2891aa8d730aa.js",
       "static/chunks/172-16a0c4e3939626bd.js",
       "static/chunks/103-31380da9bd7fe554.js",
-      "static/chunks/768-d9db2b5d2f0213b5.js",
+      "static/chunks/768-1b48841d0abe7935.js",
       "static/chunks/512-a8b2f690b3d95552.js",
       "static/chunks/631-44c935b863088df2.js",
       "static/chunks/pages/index-50f828c0192002cd.js"
@@ -79,7 +79,7 @@
       "static/chunks/main-e5a5d8a4bf1bc178.js",
       "static/chunks/850-c4af69173f6c9b6a.js",
       "static/chunks/894-64a2891aa8d730aa.js",
-      "static/chunks/768-d9db2b5d2f0213b5.js",
+      "static/chunks/768-1b48841d0abe7935.js",
       "static/chunks/pages/cart-2d94ac23374f9721.js"
     ],
     "/checkout": [
@@ -88,7 +88,7 @@
       "static/chunks/main-e5a5d8a4bf1bc178.js",
       "static/chunks/850-c4af69173f6c9b6a.js",
       "static/chunks/894-64a2891aa8d730aa.js",
-      "static/chunks/768-d9db2b5d2f0213b5.js",
+      "static/chunks/768-1b48841d0abe7935.js",
       "static/chunks/pages/checkout-b0a0a354169fdb6b.js"
     ],
     "/login": [
@@ -105,7 +105,7 @@
       "static/chunks/850-c4af69173f6c9b6a.js",
       "static/chunks/894-64a2891aa8d730aa.js",
       "static/chunks/172-16a0c4e3939626bd.js",
-      "static/chunks/768-d9db2b5d2f0213b5.js",
+      "static/chunks/768-1b48841d0abe7935.js",
       "static/chunks/512-a8b2f690b3d95552.js",
       "static/chunks/631-44c935b863088df2.js",
       "static/chunks/pages/products-50f8590b39f52695.js"
@@ -117,7 +117,7 @@
       "static/chunks/850-c4af69173f6c9b6a.js",
       "static/chunks/894-64a2891aa8d730aa.js",
       "static/chunks/172-16a0c4e3939626bd.js",
-      "static/chunks/768-d9db2b5d2f0213b5.js",
+      "static/chunks/768-1b48841d0abe7935.js",
       "static/chunks/512-a8b2f690b3d95552.js",
       "static/chunks/pages/products/[slug]-ceb038042eccc7c2.js"
     ]
