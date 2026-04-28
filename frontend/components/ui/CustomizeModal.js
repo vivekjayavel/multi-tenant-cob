@@ -54,8 +54,11 @@ export default function CustomizeModal({ product, onClose }) {
   };
 
   const available = product.available_qty ?? product.stock_qty ?? 0;
-  const basePrice = parseFloat(product.sale_price || product.price);
-  const unitPrice = getWeightPrice(selections.weight, basePrice);
+  const originalPrice = parseFloat(product.price);
+  const salePrice = product.sale_price ? parseFloat(product.sale_price) : null;
+  const discountRatio = salePrice ? salePrice / originalPrice : 1;
+  const basePrice = salePrice || originalPrice;
+  const unitPrice = getWeightPrice(selections.weight, basePrice, discountRatio);
 
   return (
     <AnimatePresence>
@@ -120,6 +123,7 @@ export default function CustomizeModal({ product, onClose }) {
                 value={selections.weight}
                 options={opts.weight.options}
                 onChange={v => { set('weight', v); setError(''); }}
+                discountRatio={discountRatio}
                 required
               />
             )}
@@ -220,7 +224,7 @@ export default function CustomizeModal({ product, onClose }) {
   );
 }
 
-function WeightField({ label, value, options, onChange, required }) {
+function WeightField({ label, value, options, onChange, required, discountRatio = 1 }) {
   return (
     <div>
       <label className="block text-xs font-semibold text-gray-600 mb-1.5 uppercase tracking-wide">
@@ -230,7 +234,9 @@ function WeightField({ label, value, options, onChange, required }) {
       <div className="flex flex-wrap gap-2">
         {options.map(opt => {
           const { label: optLabel, price } = parseWeightOption(opt);
+          const saleWeightPrice = price !== null ? Math.round(price * discountRatio) : null;
           const isSelected = value === opt;
+          const hasSale = discountRatio < 1 && price !== null;
           return (
             <button key={opt} onClick={() => onChange(opt)}
               className={`px-4 py-2 rounded-full text-sm font-medium border-2 transition-all ${
@@ -240,9 +246,10 @@ function WeightField({ label, value, options, onChange, required }) {
               }`}
               style={isSelected ? { backgroundColor: 'var(--tenant-primary)', borderColor: 'var(--tenant-primary)' } : {}}>
               <span>{optLabel}</span>
-              {price !== null && (
+              {saleWeightPrice !== null && (
                 <span className={`ml-1 text-xs ${isSelected ? 'text-white/80' : 'text-gray-400'}`}>
-                  ₹{price.toLocaleString('en-IN')}
+                  ₹{saleWeightPrice.toLocaleString('en-IN')}
+                  {hasSale && <span className={`ml-1 line-through text-[10px] ${isSelected ? 'text-white/50' : 'text-gray-300'}`}>₹{price.toLocaleString('en-IN')}</span>}
                 </span>
               )}
             </button>
@@ -295,8 +302,9 @@ function parseWeightOption(opt) {
   };
 }
 
-function getWeightPrice(weightValue, basePrice) {
+function getWeightPrice(weightValue, basePrice, discountRatio = 1) {
   if (!weightValue) return basePrice;
   const parsed = parseWeightOption(weightValue);
-  return parsed.price !== null ? parsed.price : basePrice;
+  if (parsed.price !== null) return Math.round(parsed.price * discountRatio);
+  return basePrice;
 }
