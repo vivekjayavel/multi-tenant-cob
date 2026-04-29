@@ -22,7 +22,7 @@ exports.create = async (req, res, next) => {
     const productIds   = items.map(i => i.product_id);
     const placeholders = productIds.map(() => '?').join(',');
     const [products]   = await conn.execute(
-      `SELECT id, name, price, stock_qty, reserved_qty FROM products
+      `SELECT id, name, price, sale_price, stock_qty, reserved_qty FROM products
        WHERE id IN (${placeholders}) AND tenant_id = ? AND is_active = 1 FOR UPDATE`,
       [...productIds, tenantId]
     );
