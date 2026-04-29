@@ -59,7 +59,7 @@ export default function ProductDetailPage({ tenant, product }) {
   return (
     <>
       <MetaTags seo={seo} tenant={tenant} />
-      <Layout tenant={tenant}>
+      <Layout tenant={tenant} settings={settings}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-36 pb-20">
           <div className="grid md:grid-cols-2 gap-12 items-start">
 
@@ -222,7 +222,16 @@ export async function getServerSideProps({ req, params, res }) {
     [tenant.id, params.slug]
   );
   if (!product) return { notFound: true };
-  return { props: { tenant, product: JSON.parse(JSON.stringify({
+  let settings = null;
+  if (tenant.tenant_settings) {
+    try {
+      settings = typeof tenant.tenant_settings === 'string'
+        ? JSON.parse(tenant.tenant_settings)
+        : tenant.tenant_settings;
+    } catch {}
+  }
+
+  return { props: { tenant, settings, product: JSON.parse(JSON.stringify({
     ...product,
     available_qty: Math.max(0, product.stock_qty - product.reserved_qty),
     customization_options: product.customization_options

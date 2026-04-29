@@ -8,7 +8,7 @@ import MetaTags from '../../components/seo/MetaTags';
 const { productListSeo }                           = require('../../lib/seo');
 const { getTenantFromRequest, getProductsForPage } = require('../../lib/prefetch');
 
-export default function ProductsPage({ tenant, products, categories, initialCategory }) {
+export default function ProductsPage({ tenant, products, categories, initialCategory, settings }) {
   const router = useRouter();
   const [active, setActive] = useState(initialCategory || 'All');
 
@@ -26,7 +26,7 @@ export default function ProductsPage({ tenant, products, categories, initialCate
   return (
     <>
       <MetaTags seo={seo} tenant={tenant} />
-      <Layout tenant={tenant}>
+      <Layout tenant={tenant} settings={settings}>
 
         {/* Header */}
         <div className="bg-stone-50 pt-36 pb-16">
@@ -119,6 +119,15 @@ export async function getServerSideProps(ctx) {
     return a.localeCompare(b);
   });
 
+  let settings = null;
+  if (tenant.tenant_settings) {
+    try {
+      settings = typeof tenant.tenant_settings === 'string'
+        ? JSON.parse(tenant.tenant_settings)
+        : tenant.tenant_settings;
+    } catch {}
+  }
+
   const initialCategory = ctx.query.category || 'All';
-  return { props: { tenant, products: JSON.parse(JSON.stringify(products)), categories, initialCategory } };
+  return { props: { tenant, products: JSON.parse(JSON.stringify(products)), categories, initialCategory, settings } };
 }
