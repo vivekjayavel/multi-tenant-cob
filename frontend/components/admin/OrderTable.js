@@ -169,11 +169,18 @@ function OrderRow({ o, onStatusChange, updating }) {
                 </div>
                 {/* Order total summary */}
                 {(() => {
-                  const itemsTotal = (o.items || []).reduce((s, i) => s + parseFloat(i.price) * i.quantity, 0);
-                  const orderTotal = parseFloat(o.total_price);
-                  const savings = itemsTotal - orderTotal;
+                  const itemsTotal    = (o.items || []).reduce((s, i) => s + parseFloat(i.price) * i.quantity, 0);
+                  const originalTotal = (o.items || []).reduce((s, i) => s + parseFloat(i.original_price || i.price) * i.quantity, 0);
+                  const orderTotal    = parseFloat(o.total_price);
+                  const savings       = originalTotal - itemsTotal;
                   return itemsTotal > 0 ? (
                     <div className="mt-3 bg-white rounded-xl p-3 border border-gray-100 space-y-1.5">
+                      {savings > 0.01 && (
+                        <div className="flex justify-between text-xs text-gray-400">
+                          <span className="line-through">MRP</span>
+                          <span className="line-through">₹{originalTotal.toLocaleString('en-IN')}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between text-xs text-gray-500">
                         <span>Items subtotal</span>
                         <span>₹{itemsTotal.toLocaleString('en-IN')}</span>
@@ -188,6 +195,11 @@ function OrderRow({ o, onStatusChange, updating }) {
                         <span>Order Total</span>
                         <span style={{ color: 'var(--tenant-primary)' }}>₹{orderTotal.toLocaleString('en-IN')}</span>
                       </div>
+                      {savings > 0.01 && (
+                        <div className="bg-green-50 rounded-lg px-3 py-1 text-center">
+                          <p className="text-[10px] text-green-700 font-semibold">Customer saved ₹{savings.toFixed(2)} 🎉</p>
+                        </div>
+                      )}
                     </div>
                   ) : null;
                 })()}

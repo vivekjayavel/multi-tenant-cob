@@ -143,6 +143,7 @@ exports.listAll = async (req, res, next) => {
                 'product_name',         oi.product_name,
                 'quantity',             oi.quantity,
                 'price',                oi.price,
+                'original_price',       oi.original_price,
                 'customization_details', oi.customization_details
               )) AS items
        FROM orders o
