@@ -20,7 +20,7 @@ function hasCustomization(product) {
   } catch { return false; }
 }
 
-export default function ProductDetailPage({ tenant, product }) {
+export default function ProductDetailPage({ tenant, product, settings }) {
   const [qty,       setQty]       = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
