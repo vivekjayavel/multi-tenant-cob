@@ -8,6 +8,13 @@ import '../styles/globals.css';
 export default function App({ Component, pageProps }) {
   const { tenant } = pageProps;
 
+  // Set theme immediately (blocking) to prevent flash
+  if (typeof window !== 'undefined' && tenant?.theme_color) {
+    const root = document.documentElement;
+    root.style.setProperty('--tenant-primary',      tenant.theme_color);
+    root.style.setProperty('--tenant-primary-dark', _darken(tenant.theme_color, 15));
+  }
+
   useEffect(() => {
     if (!tenant?.theme_color) return;
     const root = document.documentElement;
