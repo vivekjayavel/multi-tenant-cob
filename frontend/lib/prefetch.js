@@ -16,7 +16,7 @@ async function getTenantFromRequest(req) {
   const domain = (isProxy ? 'rainbowbakes.in' : rawDomain).split(':')[0].toLowerCase();
 
   const [rows] = await db.query(
-    'SELECT id, name, domain, logo_url, theme_color, whatsapp_number, tenant_settings FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1',
+    'SELECT id, name, domain, logo_url, theme_color, whatsapp_number, tenant_settings, razorpay_key_id FROM tenants WHERE domain = ? AND is_active = 1 LIMIT 1',
     [domain]
   );
   return rows[0] || null;
