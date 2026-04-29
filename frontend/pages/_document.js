@@ -42,12 +42,7 @@ export default function MyDocument({ themeColor }) {
 
 MyDocument.getInitialProps = async (ctx) => {
   const initialProps = await Document.getInitialProps(ctx);
-  let themeColor = null;
-  try {
-    // Get theme from cookie (set by _app.js on first load)
-    const cookies = ctx.req?.headers?.cookie || '';
-    const match = cookies.match(/tenant_theme=([^;]+)/);
-    if (match) themeColor = decodeURIComponent(match[1]);
-  } catch {}
+  // Read theme from response header set by tenantMiddleware
+  const themeColor = ctx.res?.getHeader('X-Tenant-Theme') || null;
   return { ...initialProps, themeColor };
 };
