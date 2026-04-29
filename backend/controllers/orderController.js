@@ -43,7 +43,7 @@ exports.create = async (req, res, next) => {
         await conn.rollback();
         return fail(res, `Only ${avail} unit(s) available for "${product.name}"`, 400);
       }
-      totalPrice += parseFloat(product.price) * item.quantity;
+      totalPrice += parseFloat(product.sale_price || product.price) * item.quantity;
     }
 
     // Insert order — COD starts as 'cod_pending', online as 'pending'
@@ -63,9 +63,9 @@ exports.create = async (req, res, next) => {
         : null;
 
       await conn.execute(
-        `INSERT INTO order_items (order_id, product_id, quantity, price, product_name, customization_details)
-         VALUES (?, ?, ?, ?, ?, ?)`,
-        [orderId, item.product_id, item.quantity, product.price, product.name, custDetails]
+        `INSERT INTO order_items (order_id, product_id, quantity, price, original_price, product_name, customization_details)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+        [orderId, item.product_id, item.quantity, product.sale_price || product.price, product.price, product.name, custDetails]
       );
 
       // Use LEAST() to ensure reserved_qty never exceeds stock_qty (satisfies chk_reserved_lte_stock)
