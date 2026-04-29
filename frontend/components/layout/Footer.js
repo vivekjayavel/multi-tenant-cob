@@ -54,7 +54,48 @@ export default function Footer({ tenant, settings }) {
             )}
           </div>
         </div>
-        <p className="text-xs text-center text-gray-600 pt-8">© {year} <span style={{ color: 'var(--tenant-primary)', fontWeight: 600 }}>{tenant?.name}</span>. All rights reserved.</p>
+        {/* Social Media Icons */}
+        {(footer.instagram || footer.facebook || footer.twitter || footer.youtube || footer.tiktok || footer.pinterest) && (
+          <div className="flex justify-center gap-4 py-6 border-b border-gray-800">
+            {footer.instagram && (
+              <a href={footer.instagram} target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-gray-800 hover:bg-pink-600 flex items-center justify-center transition-all duration-200 hover:scale-110 text-lg">
+                📸
+              </a>
+            )}
+            {footer.facebook && (
+              <a href={footer.facebook} target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-gray-800 hover:bg-blue-600 flex items-center justify-center transition-all duration-200 hover:scale-110 text-lg">
+                📘
+              </a>
+            )}
+            {footer.twitter && (
+              <a href={footer.twitter} target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-gray-800 hover:bg-sky-500 flex items-center justify-center transition-all duration-200 hover:scale-110 text-lg">
+                🐦
+              </a>
+            )}
+            {footer.youtube && (
+              <a href={footer.youtube} target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-gray-800 hover:bg-red-600 flex items-center justify-center transition-all duration-200 hover:scale-110 text-lg">
+                ▶️
+              </a>
+            )}
+            {footer.tiktok && (
+              <a href={footer.tiktok} target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-600 flex items-center justify-center transition-all duration-200 hover:scale-110 text-lg">
+                🎵
+              </a>
+            )}
+            {footer.pinterest && (
+              <a href={footer.pinterest} target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-gray-800 hover:bg-red-500 flex items-center justify-center transition-all duration-200 hover:scale-110 text-lg">
+                📌
+              </a>
+            )}
+          </div>
+        )}
+        <p className="text-xs text-center text-gray-600 pt-6">© {year} <span style={{ color: 'var(--tenant-primary)', fontWeight: 600 }}>{tenant?.name}</span>. All rights reserved.</p>
       </div>
     </footer>
   );

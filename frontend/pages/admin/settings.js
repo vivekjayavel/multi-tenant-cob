@@ -349,6 +349,37 @@ function FooterSection({ data, onSave, saving }) {
           )}
         </div>
       </div>
+      {/* Social Media */}
+      <div>
+        <label className="block text-xs font-semibold text-gray-600 mb-3 uppercase tracking-wide">Social Media Links</label>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-xl">📸</span>
+            <input value={form.instagram||''} onChange={e=>setForm(p=>({...p,instagram:e.target.value}))} placeholder="https://instagram.com/yourbakery" className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">📘</span>
+            <input value={form.facebook||''} onChange={e=>setForm(p=>({...p,facebook:e.target.value}))} placeholder="https://facebook.com/yourbakery" className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🐦</span>
+            <input value={form.twitter||''} onChange={e=>setForm(p=>({...p,twitter:e.target.value}))} placeholder="https://twitter.com/yourbakery" className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">▶️</span>
+            <input value={form.youtube||''} onChange={e=>setForm(p=>({...p,youtube:e.target.value}))} placeholder="https://youtube.com/@yourbakery" className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">🎵</span>
+            <input value={form.tiktok||''} onChange={e=>setForm(p=>({...p,tiktok:e.target.value}))} placeholder="https://tiktok.com/@yourbakery" className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2" />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xl">📌</span>
+            <input value={form.pinterest||''} onChange={e=>setForm(p=>({...p,pinterest:e.target.value}))} placeholder="https://pinterest.com/yourbakery" className="flex-1 px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2" />
+          </div>
+        </div>
+      </div>
+
       <SaveBtn saving={saving} onClick={() => onSave({ ...form, links })} />
     </div>
   );
