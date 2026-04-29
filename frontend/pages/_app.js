@@ -20,10 +20,15 @@ export default function App({ Component, pageProps }) {
     const root = document.documentElement;
     root.style.setProperty('--tenant-primary',      tenant.theme_color);
     root.style.setProperty('--tenant-primary-dark', _darken(tenant.theme_color, 15));
+    // Store theme in cookie so _document.js can apply it on next SSR render
+    document.cookie = 'tenant_theme=' + encodeURIComponent(tenant.theme_color) + '; path=/; max-age=86400';
   }, [tenant?.theme_color]);
 
+  const themeStyle = tenant?.theme_color ? {
+    '--tenant-primary': tenant.theme_color,
+  } : {};
+
   return (
-    // LazyMotion loads animation features only on client, preventing SSR mismatch
     <LazyMotion features={domAnimation}>
       <ToastProvider>
       <TenantContext.Provider value={tenant || {}}>
