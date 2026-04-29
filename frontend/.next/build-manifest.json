@@ -5,8 +5,8 @@
   "devFiles": [],
   "ampDevFiles": [],
   "lowPriorityFiles": [
-    "static/gK7EUe5fEvfcut06eon0f/_buildManifest.js",
-    "static/gK7EUe5fEvfcut06eon0f/_ssgManifest.js"
+    "static/EL57xDpTG9Dpc08TnKzay/_buildManifest.js",
+    "static/EL57xDpTG9Dpc08TnKzay/_ssgManifest.js"
   ],
   "rootMainFiles": [],
   "pages": {
@@ -18,7 +18,7 @@
       "static/chunks/894-64a2891aa8d730aa.js",
       "static/chunks/172-16a0c4e3939626bd.js",
       "static/chunks/103-31380da9bd7fe554.js",
-      "static/chunks/768-3ec040577b266967.js",
+      "static/chunks/768-3641b4354b040870.js",
       "static/chunks/512-6b09e5d3638785ec.js",
       "static/chunks/631-d050974557419c52.js",
       "static/chunks/pages/index-50f828c0192002cd.js"
@@ -27,7 +27,7 @@
       "static/chunks/webpack-20dbef1385cb3289.js",
       "static/chunks/framework-14efab3c3d1ed63b.js",
       "static/chunks/main-e5a5d8a4bf1bc178.js",
-      "static/css/99e91860ab2686be.css",
+      "static/css/6717d83fd4b12420.css",
       "static/chunks/pages/_app-92a5310a74af323b.js"
     ],
     "/_error": [
@@ -79,7 +79,7 @@
       "static/chunks/main-e5a5d8a4bf1bc178.js",
       "static/chunks/850-c4af69173f6c9b6a.js",
       "static/chunks/894-64a2891aa8d730aa.js",
-      "static/chunks/768-3ec040577b266967.js",
+      "static/chunks/768-3641b4354b040870.js",
       "static/chunks/pages/cart-7c5b1c70f84797d1.js"
     ],
     "/checkout": [
@@ -88,7 +88,7 @@
       "static/chunks/main-e5a5d8a4bf1bc178.js",
       "static/chunks/850-c4af69173f6c9b6a.js",
       "static/chunks/894-64a2891aa8d730aa.js",
-      "static/chunks/768-3ec040577b266967.js",
+      "static/chunks/768-3641b4354b040870.js",
       "static/chunks/pages/checkout-382caaa698823be6.js"
     ],
     "/login": [
@@ -105,7 +105,7 @@
       "static/chunks/850-c4af69173f6c9b6a.js",
       "static/chunks/894-64a2891aa8d730aa.js",
       "static/chunks/172-16a0c4e3939626bd.js",
-      "static/chunks/768-3ec040577b266967.js",
+      "static/chunks/768-3641b4354b040870.js",
       "static/chunks/512-6b09e5d3638785ec.js",
       "static/chunks/631-d050974557419c52.js",
       "static/chunks/pages/products-702ede67f66e0d68.js"
@@ -117,7 +117,7 @@
       "static/chunks/850-c4af69173f6c9b6a.js",
       "static/chunks/894-64a2891aa8d730aa.js",
       "static/chunks/172-16a0c4e3939626bd.js",
-      "static/chunks/768-3ec040577b266967.js",
+      "static/chunks/768-3641b4354b040870.js",
       "static/chunks/512-6b09e5d3638785ec.js",
       "static/chunks/pages/products/[slug]-0719d90faaf949f6.js"
     ]
