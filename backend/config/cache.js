@@ -3,7 +3,7 @@ const { LRUCache } = require('lru-cache');
 const { logger }   = require('./logger');
 
 const tenantCache   = new LRUCache({ max: 100, ttl: 10 * 60 * 1000, allowStale: false, updateAgeOnGet: false });
-const productCache  = new LRUCache({ max: 500, ttl: 5 * 60 * 1000,  allowStale: false, updateAgeOnGet: true  });
+const productCache  = new LRUCache({ max: 500, ttl: 10 * 1000,  allowStale: false, updateAgeOnGet: false });
 const responseCache = new LRUCache({ max: 200, ttl: 2 * 60 * 1000,  allowStale: false, updateAgeOnGet: false });
 
 function buildKey(tenantId, ...parts) { return `${tenantId}:${parts.filter(Boolean).join(':')}`; }
