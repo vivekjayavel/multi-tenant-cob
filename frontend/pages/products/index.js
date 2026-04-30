@@ -29,7 +29,7 @@ export default function ProductsPage({ tenant, products, categories, initialCate
       <Layout tenant={tenant} settings={settings}>
 
         {/* Header */}
-        <div className="bg-stone-50 pt-36 pb-16">
+        <div className="bg-stone-50 pt-24 sm:pt-36 pb-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               className="text-sm font-semibold tracking-widest uppercase mb-3"

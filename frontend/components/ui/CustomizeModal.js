@@ -69,7 +69,7 @@ export default function CustomizeModal({ product, onClose }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ paddingBottom: 0 }}
       >
         <motion.div
           key="modal"
@@ -78,7 +78,7 @@ export default function CustomizeModal({ product, onClose }) {
           exit={{ opacity: 0, y: 60 }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           onClick={e => e.stopPropagation()}
-          className="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden"
+          className="w-full sm:max-w-md bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col" style={{ maxHeight: "92dvh" }}
         >
           {/* Header */}
           <div className="flex items-start gap-4 p-5 border-b border-gray-100">
@@ -109,7 +109,7 @@ export default function CustomizeModal({ product, onClose }) {
           </div>
 
           {/* Options */}
-          <div className="p-5 space-y-4 max-h-[60vh] overflow-y-auto">
+          <div className="p-5 space-y-4 overflow-y-auto flex-1">
             {error && (
               <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
                 className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-2.5">
