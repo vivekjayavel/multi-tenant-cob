@@ -44,9 +44,9 @@ export default function CustomizeModal({ product, onClose }) {
       item: {
         id:             product.id,
         name:           product.name,
-        price:          finalPrice,
-        eggless_surcharge: egglessSurcharge,
-        original_price: getWeightPrice(selections.weight, originalPrice, 1) + egglessSurcharge,
+        price:          unitPrice,
+        eggless_surcharge: eggSurcharge,
+        original_price: getWeightPrice(selections.weight, originalPrice, 1) + eggSurcharge,
         image_url:      product.image_url,
         slug:           product.slug,
         quantity:       qty,
@@ -128,7 +128,7 @@ export default function CustomizeModal({ product, onClose }) {
             <div className="flex-1 min-w-0">
               <h2 className="font-display font-bold text-gray-900 text-lg leading-tight">{product.name}</h2>
               <p className="font-bold text-base mt-0.5" style={{ color: 'var(--tenant-primary)' }}>
-                ₹{finalPrice.toLocaleString('en-IN')}
+                ₹{unitPrice.toLocaleString('en-IN')}
               </p>
               {product.delivery_time && (
                 <div className="flex items-center gap-1.5 mt-1.5">
@@ -246,7 +246,7 @@ export default function CustomizeModal({ product, onClose }) {
             <div className="flex items-center justify-between text-sm mb-3">
               <span className="text-gray-500 text-sm sm:text-base">Total</span>
               <span className="font-bold text-base sm:text-lg" style={{ color: 'var(--tenant-primary)' }}>
-                ₹{(finalPrice * qty).toLocaleString('en-IN')}
+                ₹{(unitPrice * qty).toLocaleString('en-IN')}
               </span>
             </div>
             <motion.button
