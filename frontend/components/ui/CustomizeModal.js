@@ -63,12 +63,14 @@ export default function CustomizeModal({ product, onClose }) {
     document.body.style.position = 'fixed';
     document.body.style.top = `-${scrollY}px`;
     document.body.style.width = '100%';
+    document.body.style.webkitOverflowScrolling = 'touch';
     return () => {
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.width = '';
-      window.scrollTo(0, scrollY);
+      document.body.style.webkitOverflowScrolling = '';
+      window.scrollTo(0, parseInt(scrollY || '0') * 1);
     };
   }, []);
 
@@ -90,8 +92,8 @@ export default function CustomizeModal({ product, onClose }) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-0 sm:px-4"
-        style={{ paddingTop: '88px', paddingBottom: '8px' }}
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center px-4"
+        style={{ paddingTop: '88px', paddingBottom: '20px', WebkitOverflowScrolling: 'touch' }}
         onTouchMove={e => e.preventDefault()}
       >
         <motion.div
@@ -101,7 +103,7 @@ export default function CustomizeModal({ product, onClose }) {
           exit={{ opacity: 0, y: 60 }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           onClick={e => e.stopPropagation()}
-          className="w-full sm:max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col mx-4 sm:mx-0" style={{ height: 'calc(100dvh - 100px)', maxHeight: '680px' }}
+          className="w-full sm:max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col mx-4 sm:mx-0" style={{ height: 'calc(100svh - 108px)', maxHeight: '680px', WebkitOverflowScrolling: 'touch' }}
         >
           {/* Header */}
           <div className="flex items-start gap-4 p-5 border-b border-gray-100 flex-shrink-0">

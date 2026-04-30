@@ -26,3 +26,10 @@
   .text-balance { text-wrap: balance; }
 }
 
+
+/* iOS Safari modal body lock */
+body.modal-open {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+}
