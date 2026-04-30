@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useToast } from './Toast';
@@ -77,7 +78,11 @@ export default function CustomizeModal({ product, onClose }) {
   const basePrice = salePrice || originalPrice;
   const unitPrice = getWeightPrice(selections.weight, basePrice, discountRatio);
 
-  return (
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); return () => setMounted(false); }, []);
+  if (!mounted) return null;
+
+  return createPortal(
     <AnimatePresence>
       <motion.div
         key="backdrop"
@@ -240,7 +245,7 @@ export default function CustomizeModal({ product, onClose }) {
         </motion.div>
       </motion.div>
     </AnimatePresence>
-  );
+  , document.body);
 }
 
 function WeightField({ label, value, options, onChange, required, discountRatio = 1 }) {
