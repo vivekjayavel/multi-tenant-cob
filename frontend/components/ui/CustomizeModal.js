@@ -70,6 +70,7 @@ export default function CustomizeModal({ product, onClose }) {
         exit={{ opacity: 0 }}
         onClick={onClose}
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" style={{ paddingBottom: 0 }}
+        onTouchMove={e => e.preventDefault()}
       >
         <motion.div
           key="modal"
