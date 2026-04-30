@@ -86,7 +86,7 @@ export default function CustomizeModal({ product, onClose }) {
         exit={{ opacity: 0 }}
         onClick={onClose}
         className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-0 sm:px-4"
-        style={{ paddingTop: '80px', paddingBottom: '16px' }}
+        style={{ paddingTop: '90px', paddingBottom: 'max(16px, env(safe-area-inset-bottom, 16px))' }}
         onTouchMove={e => e.preventDefault()}
       >
         <motion.div
@@ -96,7 +96,7 @@ export default function CustomizeModal({ product, onClose }) {
           exit={{ opacity: 0, y: 60 }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
           onClick={e => e.stopPropagation()}
-          className="w-full sm:max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col mx-4 sm:mx-0" style={{ maxHeight: 'calc(100dvh - 100px)' }}
+          className="w-full sm:max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col mx-4 sm:mx-0" style={{ maxHeight: 'calc(100dvh - 120px)', marginBottom: 'env(safe-area-inset-bottom, 0px)' }}
         >
           {/* Header */}
           <div className="flex items-start gap-4 p-5 border-b border-gray-100">
