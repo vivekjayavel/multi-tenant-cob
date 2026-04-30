@@ -168,6 +168,18 @@ export default function CustomizeModal({ product, onClose }) {
               />
             )}
 
+            {/* Egg / Eggless */}
+            {opts.egg?.enabled && (
+              <OptionField
+                label={opts.egg.label || 'Egg Preference'}
+                value={selections.egg}
+                options={opts.egg.options?.length ? opts.egg.options : ['Egg', 'Eggless']}
+                onChange={v => { set('egg', v); setError(''); }}
+                required
+                note={selections.egg === 'Eggless' && eggSurcharge > 0 ? `+₹${eggSurcharge} for eggless` : null}
+              />
+            )}
+
             {/* Flavour */}
             {opts.flavour?.enabled && opts.flavour.options.length > 0 && (
               <DropdownField
