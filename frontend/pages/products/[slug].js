@@ -42,14 +42,15 @@ export default function ProductDetailPage({ tenant, product, settings }) {
   const needsOptions = hasCustomization(product);
 
   const whatsappHref = tenant?.whatsapp_number
-    ? `https://wa.me/${tenant.whatsapp_number}?text=${encodeURIComponent(`Hi! I'd like to order ${qty}x ${product.name} (₹${product.price} each). Is it available?`)}`
+    ? `https://wa.me/${tenant.whatsapp_number}?text=${encodeURIComponent(`Hi! I'd like to order ${qty}x ${product.name} (₹${product.sale_price || product.price} each). Is it available?`)}`
     : null;
 
   const handleAddToCart = () => {
     if (needsOptions) { setShowModal(true); return; }
     dispatch({ type: 'ADD', item: {
       id: product.id, name: product.name,
-      price: parseFloat(product.price),
+      price: parseFloat(product.sale_price || product.price),
+      original_price: parseFloat(product.price),
       image_url: product.image_url, slug: product.slug,
       quantity: qty,
     }});
@@ -119,9 +120,21 @@ export default function ProductDetailPage({ tenant, product, settings }) {
               className="space-y-6 pt-4">
               <div>
                 <h1 className="font-display text-4xl text-gray-900 leading-tight">{product.name}</h1>
-                <p className="text-3xl font-bold mt-3" style={{ color:'var(--tenant-primary)' }}>
-                  ₹{parseFloat(product.price).toLocaleString('en-IN')}
-                </p>
+                <div className="flex items-baseline gap-3 mt-3">
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-bold" style={{ color:'var(--tenant-primary)' }}>
+                    ₹{parseFloat(product.sale_price || product.price).toLocaleString('en-IN')}
+                  </p>
+                  {product.sale_price && parseFloat(product.sale_price) < parseFloat(product.price) && (
+                    <p className="text-lg text-gray-400 line-through">
+                      ₹{parseFloat(product.price).toLocaleString('en-IN')}
+                    </p>
+                  )}
+                  {product.sale_price && parseFloat(product.sale_price) < parseFloat(product.price) && (
+                    <span className="bg-red-500 text-white text-xs font-black px-2 py-0.5 rounded-full">
+                      🔥 {Math.round((1 - parseFloat(product.sale_price) / parseFloat(product.price)) * 100)}% OFF
+                    </span>
+                  )}
+                </div>
               </div>
 
               {product.description && (
@@ -160,7 +173,7 @@ export default function ProductDetailPage({ tenant, product, settings }) {
                         <span className="px-5 py-3 text-sm font-semibold border-x border-gray-200 min-w-[52px] text-center">{qty}</span>
                         <button onClick={() => setQty(q => Math.min(available, q + 1))} className="px-4 py-3 text-gray-600 hover:bg-gray-50 transition-colors font-medium">+</button>
                       </div>
-                      <p className="text-sm text-gray-400">Total: <strong className="text-gray-700">₹{(parseFloat(product.price) * qty).toLocaleString('en-IN')}</strong></p>
+                      <p className="text-sm text-gray-400">Total: <strong className="text-gray-700">₹{(parseFloat(product.sale_price || product.price) * qty).toLocaleString('en-IN')}</strong></p>
                     </div>
                   )}
 
@@ -218,7 +231,7 @@ export async function getServerSideProps({ req, params, res }) {
   if (!productRow) return { notFound: true };
   if (!productRow.is_active) { res.statusCode = 410; return { props: { tenant, product: null, deleted: true } }; }
   const [[product]] = await db.query(
-    'SELECT id, name, description, price, image_url, images, category, slug, stock_qty, reserved_qty, customization_options, delivery_time, sort_order, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1',
+    'SELECT id, name, description, price, sale_price, image_url, images, category, slug, stock_qty, reserved_qty, customization_options, delivery_time, sort_order, created_at, updated_at FROM products WHERE tenant_id = ? AND slug = ? AND is_active = 1 LIMIT 1',
     [tenant.id, params.slug]
   );
   if (!product) return { notFound: true };
