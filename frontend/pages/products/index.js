@@ -83,7 +83,7 @@ export default function ProductsPage({ tenant, products, categories, initialCate
               transition={{ duration: 0.25 }}
             >
               {filtered.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                   {filtered.map((p, i) => (
                     <ProductCard key={p.id} product={p} index={i} />
                   ))}
