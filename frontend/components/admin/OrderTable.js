@@ -47,7 +47,7 @@ function CustomizationChips({ data }) {
       {entries.map(([k, v]) => (
         <span key={k} className="inline-flex items-center gap-1 text-[10px] bg-amber-50 text-amber-700 border border-amber-100 px-2 py-0.5 rounded-full">
           <span className="font-semibold capitalize">{k}:</span>
-          <span className="max-w-[100px] truncate">{k === 'weight' ? String(v).split('|')[0] : String(v)}</span>
+          <span className="max-w-[120px] truncate">{k === 'weight' ? String(v).split('|')[0] : String(v)}</span>
         </span>
       ))}
     </div>

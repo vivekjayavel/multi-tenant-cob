@@ -40,8 +40,14 @@ export default function CheckoutPage({ tenant }) {
       if (i.customization) {
         const cust = Object.entries(i.customization).filter(([,v]) => v);
         if (cust.length) {
-          line += '\n' + cust.map(([k,v]) => `   \u203a ${k}: ${v}`).join('\n');
+          line += '\n' + cust.map(([k,v]) => {
+            const label = k === 'weight' ? String(v).split('|')[0] : v;
+            return `   \u203a ${k}: ${label}`;
+          }).join('\n');
         }
+      }
+      if (i.eggless_surcharge > 0) {
+        line += `\n   \u203a Eggless charge: +₹${i.eggless_surcharge}`;
       }
       return line;
     }).join('\n');

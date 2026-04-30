@@ -25,6 +25,7 @@ export default function CustomizeModal({ product, onClose }) {
     // Validate required dropdowns
     const missing = [];
     if (opts.weight?.enabled   && opts.weight.options.length   && !selections.weight)   missing.push(opts.weight.label   || 'Weight');
+    if (opts.egg?.enabled      && opts.egg.options.length      && !selections.egg)       missing.push(opts.egg.label      || 'Egg / Eggless');
     if (opts.flavour?.enabled  && opts.flavour.options.length  && !selections.flavour)  missing.push(opts.flavour.label  || 'Flavour');
     if (opts.occasion?.enabled && opts.occasion.options.length && !selections.occasion) missing.push(opts.occasion.label || 'Occasion');
     if (missing.length) { setError(`Please select: ${missing.join(', ')}`); return; }
@@ -43,8 +44,9 @@ export default function CustomizeModal({ product, onClose }) {
       item: {
         id:             product.id,
         name:           product.name,
-        price:          unitPrice,
-        original_price: getWeightPrice(selections.weight, originalPrice, 1),
+        price:          finalPrice,
+        eggless_surcharge: egglessSurcharge,
+        original_price: getWeightPrice(selections.weight, originalPrice, 1) + egglessSurcharge,
         image_url:      product.image_url,
         slug:           product.slug,
         quantity:       qty,
@@ -78,7 +80,19 @@ export default function CustomizeModal({ product, onClose }) {
   const salePrice = product.sale_price ? parseFloat(product.sale_price) : null;
   const discountRatio = salePrice ? salePrice / originalPrice : 1;
   const basePrice = salePrice || originalPrice;
-  const unitPrice = getWeightPrice(selections.weight, basePrice, discountRatio);
+  const weightPrice = getWeightPrice(selections.weight, basePrice, discountRatio);
+  // Egg surcharge: ₹50 per 500g, multiplied by weight selected
+  const eggSurcharge = (() => {
+    if (!selections.egg || selections.egg !== 'Egg') return 0;
+    const weightLabel = selections.weight ? selections.weight.split('|')[0] : '500g';
+    const match = weightLabel.match(/([\d.]+)\s*(kg|g)/i);
+    if (!match) return 50;
+    const val = parseFloat(match[1]);
+    const unit = match[2].toLowerCase();
+    const grams = unit === 'kg' ? val * 1000 : val;
+    return Math.round((grams / 500) * 50);
+  })();
+  const unitPrice = weightPrice + eggSurcharge;
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); return () => setMounted(false); }, []);
@@ -114,7 +128,7 @@ export default function CustomizeModal({ product, onClose }) {
             <div className="flex-1 min-w-0">
               <h2 className="font-display font-bold text-gray-900 text-lg leading-tight">{product.name}</h2>
               <p className="font-bold text-base mt-0.5" style={{ color: 'var(--tenant-primary)' }}>
-                ₹{unitPrice.toLocaleString('en-IN')}
+                ₹{finalPrice.toLocaleString('en-IN')}
               </p>
               {product.delivery_time && (
                 <div className="flex items-center gap-1.5 mt-1.5">
@@ -232,7 +246,7 @@ export default function CustomizeModal({ product, onClose }) {
             <div className="flex items-center justify-between text-sm mb-3">
               <span className="text-gray-500 text-sm sm:text-base">Total</span>
               <span className="font-bold text-base sm:text-lg" style={{ color: 'var(--tenant-primary)' }}>
-                ₹{(unitPrice * qty).toLocaleString('en-IN')}
+                ₹{(finalPrice * qty).toLocaleString('en-IN')}
               </span>
             </div>
             <motion.button
@@ -248,6 +262,30 @@ export default function CustomizeModal({ product, onClose }) {
       </motion.div>
     </AnimatePresence>
   , document.body);
+}
+
+function OptionField({ label, value, options, onChange, required, note }) {
+  return (
+    <div>
+      <p className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">
+        {label} {required && <span className="text-red-400">*</span>}
+        {note && <span className="ml-2 text-green-600 font-normal normal-case">{note}</span>}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {options.map(opt => (
+          <button key={opt} onClick={() => onChange(opt)}
+            className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium border-2 transition-all ${
+              value === opt
+                ? 'text-white border-transparent shadow-sm'
+                : 'border-gray-200 text-gray-600 hover:border-gray-300 bg-white'
+            }`}
+            style={value === opt ? { backgroundColor: 'var(--tenant-primary)', borderColor: 'var(--tenant-primary)' } : {}}>
+            {opt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function WeightField({ label, value, options, onChange, required, discountRatio = 1 }) {

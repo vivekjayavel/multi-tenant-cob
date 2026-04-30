@@ -33,6 +33,9 @@ export default function CartDrawer({ open, onClose }) {
                           {Object.entries(item.customization).map(([k, v]) => v && (
                             <p key={k} className="text-[10px] text-gray-400 leading-tight">
                               <span className="capitalize font-medium text-gray-500">{k}:</span> {k === 'weight' ? String(v).split('|')[0] : v}
+                              {k === 'eggless' && v === 'Eggless' && item.eggless_surcharge > 0 && (
+                                <span className="ml-1 text-green-600">(+₹{item.eggless_surcharge})</span>
+                              )}
                             </p>
                           ))}
                         </div>
