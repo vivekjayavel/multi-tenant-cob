@@ -45,7 +45,7 @@ export default function HomePage({ tenant, categoryGroups, settings }) {
                     <div className="flex items-center gap-3">
                       {/* Accent line */}
                       <div className="w-1 h-7 rounded-full" style={{ backgroundColor: 'var(--tenant-primary)' }} />
-                      <h2 className="font-display text-2xl text-gray-900">{category}</h2>
+                      <h2 className="font-display text-lg sm:text-xl lg:text-2xl text-gray-900">{category}</h2>
                       <span className="text-xs font-semibold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-full">
                         {products.length} item{products.length !== 1 ? 's' : ''}
                       </span>
@@ -103,7 +103,7 @@ export default function HomePage({ tenant, categoryGroups, settings }) {
                 initial={{ opacity: 0, y: 16 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="font-display text-3xl text-center text-gray-900 mb-10"
+                className="font-display text-base sm:text-xl sm:text-2xl lg:text-3xl text-center text-gray-900 mb-10"
               >
                 Why Choose {tenant.name}
               </motion.h2>
@@ -140,7 +140,7 @@ export default function HomePage({ tenant, categoryGroups, settings }) {
 function FeatureCard({ f }) {
   return (
     <div className="bg-white rounded-2xl p-7 text-center shadow-sm hover:shadow-xl transition-shadow duration-300 h-full">
-      <span className="text-4xl block">{f.icon}</span>
+      <span className="text-lg sm:text-xl lg:text-2xl sm:text-3xl lg:text-4xl block">{f.icon}</span>
       <h3 className="font-display font-semibold text-gray-800 mt-4 mb-2">{f.title}</h3>
       <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
     </div>

@@ -185,7 +185,7 @@ export default function ProductCard({ product, index = 0 }) {
           <h3 className="font-display font-semibold text-gray-800 text-sm sm:text-base leading-snug line-clamp-2">
             {product.name}
           </h3>
-          <p className="text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed" style={{ minHeight: "2.5rem" }}>{product.description || ""}</p>
+          <p className="text-[10px] sm:text-xs text-gray-400 mt-1 line-clamp-2 leading-relaxed" style={{ minHeight: "2.5rem" }}>{product.description || ""}</p>
 
           {/* Delivery time */}
           {product.delivery_time && (
@@ -201,7 +201,7 @@ export default function ProductCard({ product, index = 0 }) {
           <div className="flex items-center justify-between mt-auto pt-3">
             <div className="flex flex-col">
               <motion.p
-                className="font-bold text-base sm:text-lg"
+                className="font-bold text-sm sm:text-base md:text-lg"
                 style={{ color: 'var(--tenant-primary)' }}
               >
                 ₹{parseFloat(product.sale_price || product.price).toLocaleString('en-IN')}

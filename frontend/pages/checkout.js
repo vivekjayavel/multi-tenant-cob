@@ -187,7 +187,7 @@ export default function CheckoutPage({ tenant }) {
               <motion.div key="step1" initial={{ opacity:0, x:30 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-30 }}
                 className="grid lg:grid-cols-[1fr_380px] gap-10">
                 <div>
-                  <h1 className="font-display text-2xl text-gray-900 mb-6">Delivery details</h1>
+                  <h1 className="font-display text-lg sm:text-xl lg:text-2xl text-gray-900 mb-6">Delivery details</h1>
                   <form onSubmit={handlePlaceOrder} className="space-y-4">
                     {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">{error}</p>}
 
@@ -219,7 +219,7 @@ export default function CheckoutPage({ tenant }) {
                             style={paymentMethod === m.id
                               ? { borderColor:'var(--tenant-primary)', backgroundColor:'color-mix(in srgb, var(--tenant-primary) 5%, white)' }
                               : {}}>
-                            <span className="text-2xl flex-shrink-0 mt-0.5">{m.icon}</span>
+                            <span className="text-lg sm:text-xl lg:text-2xl flex-shrink-0 mt-0.5">{m.icon}</span>
                             <div>
                               <p className="text-sm font-semibold text-gray-800">{m.label}</p>
                               <p className="text-xs text-gray-400 mt-0.5">{m.sub}</p>
@@ -275,7 +275,7 @@ export default function CheckoutPage({ tenant }) {
               <motion.div key="step2" initial={{ opacity:0, x:30 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:-30 }}
                 className="grid lg:grid-cols-[1fr_380px] gap-10">
                 <div>
-                  <h1 className="font-display text-2xl text-gray-900 mb-2">Payment</h1>
+                  <h1 className="font-display text-lg sm:text-xl lg:text-2xl text-gray-900 mb-2">Payment</h1>
                   <p className="text-sm text-gray-500 mb-8">Order <span className="font-semibold text-gray-700">#{orderId}</span> confirmed.</p>
                   {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3 mb-6">{error}</p>}
                   <motion.button onClick={handleOnlinePayment} disabled={loading}
@@ -306,8 +306,8 @@ export default function CheckoutPage({ tenant }) {
                 className="text-center py-16 max-w-md mx-auto">
                 <motion.div initial={{ scale:0 }} animate={{ scale:1 }}
                   transition={{ type:'spring', stiffness:260, damping:20, delay:0.2 }}
-                  className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">🎉</motion.div>
-                <h1 className="font-display text-3xl text-gray-900 mb-2">Order confirmed!</h1>
+                  className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-lg sm:text-xl lg:text-2xl sm:text-3xl lg:text-4xl mx-auto mb-6">🎉</motion.div>
+                <h1 className="font-display text-base sm:text-xl sm:text-2xl lg:text-3xl text-gray-900 mb-2">Order confirmed!</h1>
                 <p className="text-gray-500 mb-1">Order <strong>#{orderId}</strong> placed with {tenant?.name}.</p>
                 <p className="text-sm text-gray-400 mb-6">
                   {paymentMethod === 'cod'

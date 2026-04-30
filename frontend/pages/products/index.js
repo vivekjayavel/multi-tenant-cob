@@ -37,7 +37,7 @@ export default function ProductsPage({ tenant, products, categories, initialCate
               Our Menu
             </motion.p>
             <motion.h1 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }} className="font-display text-5xl text-gray-900">
+              transition={{ delay: 0.1 }} className="font-display text-base sm:text-xl sm:text-2xl lg:text-3xl sm:text-4xl lg:text-5xl text-gray-900">
               Fresh Baked Goods
             </motion.h1>
           </div>
@@ -90,7 +90,7 @@ export default function ProductsPage({ tenant, products, categories, initialCate
                 </div>
               ) : (
                 <div className="py-24 text-center">
-                  <p className="text-4xl mb-4">🥐</p>
+                  <p className="text-lg sm:text-xl lg:text-2xl sm:text-3xl lg:text-4xl mb-4">🥐</p>
                   <p className="text-gray-400 text-sm">
                     {active === 'All' ? 'No products yet.' : `No products in "${active}" yet.`}
                   </p>

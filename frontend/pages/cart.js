@@ -15,7 +15,7 @@ export default function CartPage({ tenant }) {
       <MetaTags seo={seo} tenant={tenant} />
       <Layout tenant={tenant}>
         <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-36 pb-20">
-          <h1 className="font-display text-3xl text-gray-900 mb-8">Your Cart</h1>
+          <h1 className="font-display text-base sm:text-xl sm:text-2xl lg:text-3xl text-gray-900 mb-8">Your Cart</h1>
 
           {/* Show skeleton until cart is hydrated from localStorage */}
           {!hydrated ? (
@@ -26,7 +26,7 @@ export default function CartPage({ tenant }) {
             </div>
           ) : items.length === 0 ? (
             <div className="text-center py-24">
-              <p className="text-5xl mb-4">🛒</p>
+              <p className="text-xl sm:text-2xl lg:text-3xl sm:text-4xl lg:text-5xl mb-4">🛒</p>
               <p className="text-gray-400 mb-6">Your cart is empty.</p>
               <Link href="/products" className="text-white font-semibold px-6 py-3 rounded-xl transition-colors"
                 style={{ backgroundColor: 'var(--tenant-primary)' }}>Browse Menu</Link>
