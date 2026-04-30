@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../context/CartContext';
 import { useToast } from './Toast';
@@ -55,6 +55,22 @@ export default function CustomizeModal({ product, onClose }) {
   };
 
   const available = product.available_qty ?? product.stock_qty ?? 0;
+  // Lock body scroll when modal opens
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.width = '100%';
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.width = '';
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
   const originalPrice = parseFloat(product.price);
   const salePrice = product.sale_price ? parseFloat(product.sale_price) : null;
   const discountRatio = salePrice ? salePrice / originalPrice : 1;
