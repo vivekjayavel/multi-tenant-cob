@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 const DEFAULT_OPTIONS = {
   weight:       { enabled: false, label: 'Weight',              options: ['500g', '1kg', '2kg', '3kg'], placeholder: '' },
+  egg:          { enabled: false, label: 'Egg / Eggless',       options: ['Egg', 'Eggless'], placeholder: '', surcharge: 50 },
   flavour:      { enabled: false, label: 'Flavour',             options: ['Chocolate', 'Vanilla', 'Strawberry', 'Butterscotch'], placeholder: '' },
   occasion:     { enabled: false, label: 'Occasion',            options: ['Birthday', 'Anniversary', 'Wedding', 'Baby Shower', 'Farewell'], placeholder: '' },
   message:      { enabled: false, label: 'Message on Cake',     options: [], placeholder: 'e.g. Happy Birthday John!' },
