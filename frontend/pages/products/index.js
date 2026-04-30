@@ -29,7 +29,7 @@ export default function ProductsPage({ tenant, products, categories, initialCate
       <Layout tenant={tenant} settings={settings}>
 
         {/* Header */}
-        <div className="bg-stone-50 pt-24 sm:pt-36 pb-16">
+        <div className="bg-stone-50 pt-20 sm:pt-32 pb-8 sm:pb-16">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               className="text-sm font-semibold tracking-widest uppercase mb-3"
@@ -45,7 +45,7 @@ export default function ProductsPage({ tenant, products, categories, initialCate
 
         {/* Sticky category tabs */}
         <div className="sticky z-30 bg-white/95 backdrop-blur-md border-b border-gray-100"
-          style={{ top: '136px' }}>
+          style={{ top: '80px' }}>
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide py-3">
               {['All', ...categories].map(cat => (
