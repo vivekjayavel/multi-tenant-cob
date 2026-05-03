@@ -83,6 +83,7 @@ export default function CheckoutPage({ tenant }) {
         items: items.map(i => ({
           product_id:    i.id,
           quantity:      i.quantity,
+          price:         i.price,
           customization: i.customization || undefined,
         })),
         delivery_address: address,
