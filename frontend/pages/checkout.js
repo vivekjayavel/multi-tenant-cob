@@ -14,7 +14,7 @@ const PAYMENT_METHODS = [
 ];
 
 export default function CheckoutPage({ tenant }) {
-  const { items, total, dispatch, hydrated } = useCart();
+  const { items, total, originalTotal, totalSavings, dispatch, hydrated } = useCart();
   const [step,          setStep]          = useState(1);
   const [loading,       setLoading]       = useState(false);
   const [error,         setError]         = useState(null);
