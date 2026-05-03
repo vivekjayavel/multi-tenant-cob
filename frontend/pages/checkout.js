@@ -144,7 +144,7 @@ export default function CheckoutPage({ tenant }) {
   };
 
   if (!hydrated) return (
-    <Layout tenant={tenant}>
+    <Layout tenant={tenant} hideFooter>
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--tenant-primary)' }} />
       </div>
@@ -152,7 +152,7 @@ export default function CheckoutPage({ tenant }) {
   );
 
   if (items.length === 0 && step !== 3) return (
-    <Layout tenant={tenant}>
+    <Layout tenant={tenant} hideFooter>
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 pt-20">
         <span className="text-6xl">🛒</span>
         <p className="text-gray-500 text-lg">Your cart is empty.</p>
@@ -166,7 +166,7 @@ export default function CheckoutPage({ tenant }) {
     <>
       <MetaTags seo={seo} tenant={tenant} />
       {paymentMethod === 'online' && <Head><script src="https://checkout.razorpay.com/v1/checkout.js" /></Head>}
-      <Layout tenant={tenant}>
+      <Layout tenant={tenant} hideFooter>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-36 pb-20">
 
           {/* Step indicators */}
