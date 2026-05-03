@@ -37,6 +37,7 @@ exports.create = async (req, res, next) => {
 
     // Check stock and compute total
     let totalPrice = 0;
+    const itemPriceMap = {};
     for (const item of items) {
       const product = productMap[item.product_id];
       const avail   = product.stock_qty - product.reserved_qty;
@@ -45,10 +46,10 @@ exports.create = async (req, res, next) => {
         return fail(res, `Only ${avail} unit(s) available for "${product.name}"`, 400);
       }
       // Use client-sent price (includes weight pricing, eggless surcharge, etc.)
-      // Validate it's not less than sale_price (anti-tampering)
       const clientPrice = item.price ? parseFloat(item.price) : null;
       const minPrice = parseFloat(product.sale_price || product.price);
       const itemPrice = clientPrice && clientPrice >= minPrice ? clientPrice : minPrice;
+      itemPriceMap[item.product_id] = itemPrice;
       totalPrice += itemPrice * item.quantity;
     }
 
@@ -71,7 +72,7 @@ exports.create = async (req, res, next) => {
       await conn.execute(
         `INSERT INTO order_items (order_id, product_id, quantity, price, original_price, product_name, customization_details)
          VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [orderId, item.product_id, item.quantity, itemPrice, product.price, product.name, custDetails]
+        [orderId, item.product_id, item.quantity, itemPriceMap[item.product_id], product.price, product.name, custDetails]
       );
 
       // Use LEAST() to ensure reserved_qty never exceeds stock_qty (satisfies chk_reserved_lte_stock)
