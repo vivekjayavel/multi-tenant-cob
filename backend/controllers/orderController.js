@@ -12,7 +12,8 @@ exports.create = async (req, res, next) => {
 
     const { items, delivery_address, notes, payment_method = 'online' } = req.body;
     const tenantId = req.tenant.id;
-    const userId   = req.user.userId;
+    // Support guest orders - use null for user_id if not logged in
+    const userId = req.user?.userId || null;
 
     // Validate payment method
     if (!['online', 'cod'].includes(payment_method))

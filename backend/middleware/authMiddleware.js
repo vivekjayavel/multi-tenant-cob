@@ -38,3 +38,10 @@ function adminOnly(req, res, next) {
 }
 
 module.exports = { authMiddleware, adminOnly };
+
+function optionalAuth(req, res, next) {
+  const auth = req.headers.authorization;
+  if (!auth) { req.user = null; return next(); }
+  authMiddleware(req, res, next);
+}
+module.exports.optionalAuth = optionalAuth;

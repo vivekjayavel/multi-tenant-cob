@@ -14,9 +14,13 @@ api.interceptors.response.use(
       const status = err.response?.status, code = err.response?.data?.code;
       if (status === 401) {
         localStorage.removeItem('token');
-        if (code === 'TOKEN_REVOKED')  window.location.href = '/login?reason=revoked';
-        else if (code === 'TOKEN_EXPIRED') window.location.href = '/login?reason=expired';
-        else window.location.href = '/login';
+        const currentPath = window.location.pathname;
+        // Don't redirect to login from public pages
+        if (!currentPath.startsWith('/checkout') && !currentPath.startsWith('/cart')) {
+          if (code === 'TOKEN_REVOKED')  window.location.href = '/login?reason=revoked';
+          else if (code === 'TOKEN_EXPIRED') window.location.href = '/login?reason=expired';
+          else if (currentPath.startsWith('/admin')) window.location.href = '/login';
+        }
       }
     }
     return Promise.reject(err);
