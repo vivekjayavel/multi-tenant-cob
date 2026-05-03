@@ -83,7 +83,7 @@ export default function CustomizeModal({ product, onClose }) {
   const weightPrice = getWeightPrice(selections.weight, basePrice, discountRatio);
   // Egg surcharge: ₹50 per 500g, multiplied by weight selected
   const eggSurcharge = (() => {
-    if (!selections.egg || selections.egg !== 'Egg') return 0;
+    if (!selections.egg || selections.egg !== 'Eggless') return 0;
     const weightLabel = selections.weight ? selections.weight.split('|')[0] : '500g';
     const match = weightLabel.match(/([\d.]+)\s*(kg|g)/i);
     if (!match) return 50;
