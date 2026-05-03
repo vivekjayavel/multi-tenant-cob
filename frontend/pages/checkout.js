@@ -42,7 +42,8 @@ export default function CheckoutPage({ tenant }) {
         if (cust.length) {
           line += '\n' + cust.map(([k,v]) => {
             const label = k === 'weight' ? String(v).split('|')[0] : v;
-            return `   \u203a ${k}: ${label}`;
+            const keyLabel = k === 'eggless_charge' ? 'Eggless charge' : k === 'egg' ? 'Egg preference' : k;
+            return `   \u203a ${keyLabel}: ${label}`;
           }).join('\n');
         }
       }

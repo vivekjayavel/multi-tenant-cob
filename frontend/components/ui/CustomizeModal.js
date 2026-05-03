@@ -33,10 +33,12 @@ export default function CustomizeModal({ product, onClose }) {
     // Build clean customization object (only non-empty values)
     const customization = {};
     if (selections.weight)       customization.weight       = selections.weight;
+    if (selections.egg)          customization.egg          = selections.egg;
     if (selections.flavour)      customization.flavour      = selections.flavour;
     if (selections.occasion)     customization.occasion     = selections.occasion;
     if (selections.message)      customization.message      = selections.message;
     if (selections.instructions) customization.instructions = selections.instructions;
+    if (eggSurcharge > 0)        customization.eggless_charge = `+₹${eggSurcharge}`;
 
     const itemName = product.name;
     dispatch({
