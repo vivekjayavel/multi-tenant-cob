@@ -45,7 +45,13 @@ exports.createRazorpayOrder = async (req, res, next) => {
   try {
     await conn.beginTransaction();
     const { orderId } = req.body;
-    const [rows] = await conn.execute('SELECT id, total_price, status, razorpay_order_id FROM orders WHERE id = ? AND tenant_id = ? AND user_id = ? LIMIT 1 FOR UPDATE', [orderId, req.tenant.id, req.user.userId]);
+    const userId = req.user?.userId || null;
+    const [rows] = await conn.execute(
+      userId
+        ? 'SELECT id, total_price, status, razorpay_order_id FROM orders WHERE id = ? AND tenant_id = ? AND user_id = ? LIMIT 1 FOR UPDATE'
+        : 'SELECT id, total_price, status, razorpay_order_id FROM orders WHERE id = ? AND tenant_id = ? LIMIT 1 FOR UPDATE',
+      userId ? [orderId, req.tenant.id, userId] : [orderId, req.tenant.id]
+    );
     if (!rows.length) { await conn.rollback(); return fail(res, 'Order not found', 404); }
     const order = rows[0];
     if (['paid','delivered','cancelled','refunded'].includes(order.status)) { await conn.rollback(); return fail(res, `Order is already ${order.status}`, 409); }
