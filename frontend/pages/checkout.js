@@ -273,7 +273,7 @@ export default function CheckoutPage({ tenant }) {
                     </button>
                   </form>
                 </div>
-                <OrderSummary items={items} total={total} />
+                <OrderSummary items={items} total={total} originalTotal={originalTotal} totalSavings={totalSavings} />
               </motion.div>
             )}
 
@@ -303,7 +303,7 @@ export default function CheckoutPage({ tenant }) {
                   <button onClick={() => { setStep(1); setError(null); }}
                     className="mt-5 text-sm text-gray-400 hover:text-gray-600 transition-colors underline">← Edit delivery details</button>
                 </div>
-                <OrderSummary items={items} total={total} />
+                <OrderSummary items={items} total={total} originalTotal={originalTotal} totalSavings={totalSavings} />
               </motion.div>
             )}
 
@@ -355,7 +355,7 @@ function Field({ label, ...props }) {
   );
 }
 
-function OrderSummary({ items, total }) {
+function OrderSummary({ items, total, originalTotal = 0, totalSavings = 0 }) {
   return (
     <div className="bg-stone-50 rounded-2xl p-6 h-fit border border-gray-100">
       <h2 className="font-display text-lg text-gray-800 mb-4">Order summary</h2>
@@ -366,15 +366,18 @@ function OrderSummary({ items, total }) {
               <span className="text-gray-600 flex-1 pr-2 truncate">
                 {item.name} <span className="text-gray-400">×{item.quantity}</span>
               </span>
-              <span className="font-medium text-gray-800 flex-shrink-0">
-                ₹{(item.price * item.quantity).toFixed(2)}
-              </span>
+              <div className="flex-shrink-0 text-right">
+                <span className="font-medium text-gray-800">₹{(item.price * item.quantity).toFixed(2)}</span>
+                {item.original_price && item.original_price > item.price && (
+                  <span className="block text-xs text-gray-400 line-through">₹{(item.original_price * item.quantity).toFixed(2)}</span>
+                )}
+              </div>
             </div>
             {item.customization && (
               <div className="flex flex-wrap gap-1 pl-0">
                 {Object.entries(item.customization).filter(([,v])=>v).map(([k,v]) => (
                   <span key={k} className="inline-flex text-[10px] bg-amber-50 text-amber-700 border border-amber-100 px-2 py-0.5 rounded-full">
-                    {k}: {String(v).length > 15 ? String(v).slice(0,15)+'…' : v}
+                    {k === 'weight' ? String(v).split('|')[0] : k === 'eggless_charge' ? `Eggless: ${v}` : k === 'egg' ? `Egg: ${v}` : `${k}: ${String(v).length > 12 ? String(v).slice(0,12)+'…' : v}`}
                   </span>
                 ))}
               </div>
@@ -382,9 +385,26 @@ function OrderSummary({ items, total }) {
           </div>
         ))}
       </div>
-      <div className="border-t border-gray-200 pt-3 flex justify-between">
-        <span className="font-semibold text-gray-800">Total</span>
-        <span className="font-bold text-lg" style={{ color:'var(--tenant-primary)' }}>₹{total.toFixed(2)}</span>
+      <div className="border-t border-gray-200 pt-3 space-y-2">
+        {totalSavings > 0 && (
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-400 line-through">MRP</span>
+            <span className="text-gray-400 line-through">₹{originalTotal.toFixed(2)}</span>
+          </div>
+        )}
+        {totalSavings > 0 && (
+          <div className="flex justify-between text-sm">
+            <span className="text-green-600 font-medium">🎉 Discount</span>
+            <span className="text-green-600 font-semibold">-₹{totalSavings.toFixed(2)}</span>
+          </div>
+        )}
+        <div className="flex justify-between border-t border-gray-100 pt-2">
+          <span className="font-semibold text-gray-800">Total</span>
+          <span className="font-bold text-lg" style={{ color:'var(--tenant-primary)' }}>₹{total.toFixed(2)}</span>
+        </div>
+        {totalSavings > 0 && (
+          <p className="text-xs text-green-600 text-center bg-green-50 rounded-lg py-1.5">You save ₹{totalSavings.toFixed(2)} 🎂</p>
+        )}
       </div>
     </div>
   );
