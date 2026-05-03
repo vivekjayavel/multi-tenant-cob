@@ -28,7 +28,7 @@ async function fulfillOrder(orderId, tenantId, razorpayPaymentId, razorpaySignat
     await conn.commit();
   } catch (err) { await conn.rollback(); throw err; } finally { conn.release(); }
 
-  const [[order]] = await db.query(`SELECT o.id, o.total_price, o.status, o.delivery_address, o.notes, o.created_at, u.name AS user_name, u.email AS user_email FROM orders o JOIN users u ON u.id = o.user_id WHERE o.id = ? AND o.tenant_id = ? LIMIT 1`, [orderId, tenantId]);
+  const [[order]] = await db.query(`SELECT o.id, o.total_price, o.status, o.delivery_address, o.notes, o.created_at, u.name AS user_name, u.email AS user_email FROM orders o LEFT JOIN users u ON u.id = o.user_id WHERE o.id = ? AND o.tenant_id = ? LIMIT 1`, [orderId, tenantId]);
   const [emailItems] = await db.query('SELECT product_name, quantity, price FROM order_items WHERE order_id = ?', [orderId]);
   const [[tenant]] = await db.query('SELECT id, name, domain, logo_url, theme_color, whatsapp_number FROM tenants WHERE id = ? LIMIT 1', [tenantId]);
   const user = { name: order.user_name, email: order.user_email };
@@ -61,7 +61,7 @@ exports.createRazorpayOrder = async (req, res, next) => {
     const rzpOrder = await rzp.orders.create({ amount, currency: 'INR', receipt: `order_${orderId}`, notes: { tenant_id: String(req.tenant.id), order_id: String(orderId) } });
     await conn.execute('UPDATE orders SET razorpay_order_id = ? WHERE id = ?', [rzpOrder.id, orderId]);
     await conn.commit();
-    logPaymentInitiated({ tenantId: req.tenant.id, orderId, razorpayOrderId: rzpOrder.id, amount, currency: 'INR', userId: req.user.userId });
+    logPaymentInitiated({ tenantId: req.tenant.id, orderId, razorpayOrderId: rzpOrder.id, amount, currency: 'INR', userId: req.user?.userId || null });
     ok(res, { razorpay_order_id: rzpOrder.id, amount: rzpOrder.amount, currency: rzpOrder.currency, key_id: req.tenant.razorpay_key_id });
   } catch (err) { await conn.rollback(); logPaymentError({ tenantId: req.tenant?.id, orderId: req.body?.orderId, userId: req.user?.userId, error: err }); next(err); } finally { conn.release(); }
 };
@@ -73,8 +73,14 @@ exports.verifyPayment = async (req, res, next) => {
     try { keySecret = safeDecrypt(req.tenant.razorpay_key_secret); } catch { return fail(res, 'Payment configuration error', 503); }
     const body     = `${razorpay_order_id}|${razorpay_payment_id}`;
     const expected = crypto.createHmac('sha256', keySecret).update(body).digest('hex');
-    if (expected !== razorpay_signature) { logPaymentVerificationFailed({ tenantId: req.tenant.id, orderId, razorpayOrderId: razorpay_order_id, razorpayPaymentId: razorpay_payment_id, reason: 'HMAC mismatch', userId: req.user.userId }); return fail(res, 'Payment verification failed', 400); }
-    const [[dbOrder]] = await db.query('SELECT id, total_price, status, razorpay_order_id FROM orders WHERE id = ? AND tenant_id = ? AND user_id = ? LIMIT 1', [orderId, req.tenant.id, req.user.userId]);
+    if (expected !== razorpay_signature) { logPaymentVerificationFailed({ tenantId: req.tenant.id, orderId, razorpayOrderId: razorpay_order_id, razorpayPaymentId: razorpay_payment_id, reason: 'HMAC mismatch', userId: req.user?.userId || null }); return fail(res, 'Payment verification failed', 400); }
+    const userId = req.user?.userId || null;
+    const [[dbOrder]] = await db.query(
+      userId
+        ? 'SELECT id, total_price, status, razorpay_order_id FROM orders WHERE id = ? AND tenant_id = ? AND user_id = ? LIMIT 1'
+        : 'SELECT id, total_price, status, razorpay_order_id FROM orders WHERE id = ? AND tenant_id = ? LIMIT 1',
+      userId ? [orderId, req.tenant.id, userId] : [orderId, req.tenant.id]
+    );
     if (!dbOrder) return fail(res, 'Order not found', 404);
     if (dbOrder.status === 'paid') return ok(res, { paymentId: razorpay_payment_id }, 'Payment successful');
     if (dbOrder.razorpay_order_id !== razorpay_order_id) { logPaymentVerificationFailed({ tenantId: req.tenant.id, orderId, razorpayOrderId: razorpay_order_id, razorpayPaymentId: razorpay_payment_id, reason: 'Order ID mismatch', userId: req.user.userId, securityEvent: true }); return fail(res, 'Payment verification failed', 400); }
